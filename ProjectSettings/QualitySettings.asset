@@ -180,7 +180,7 @@ QualitySettings:
     Nintendo Switch: 5
     PS4: 5
     PSP2: 2
-    Standalone: 5
+    Standalone: 0
     Tizen: 2
     WebGL: 3
     WiiU: 5
