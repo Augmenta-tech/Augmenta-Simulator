@@ -77,7 +77,6 @@ public class FakePointManager : MonoBehaviour {
         }
         if (Input.GetMouseButton(0) && CanMoveCursorPoint)
         {
-           // Debug.Log("SECOOn");
             if (CursorPoint == null)
             {
                 CursorPoint = Instantiate(Prefab);
@@ -145,7 +144,6 @@ public class FakePointManager : MonoBehaviour {
 
         Ratio = (Width / (float)Height);
 
-        //Screen.SetResolution(400, (int)(400.0f / Ratio), false);
         transform.localScale = new Vector3(Width, Height,0.01f) / 100;
 
         Camera.main.aspect = Ratio;
@@ -164,11 +162,6 @@ public class FakePointManager : MonoBehaviour {
         }
 
         InstanciatedPoints.Clear();
-    }
-
-    public void PointDeleted()
-    {
-
     }
 
     public void OnMouseDrag()
@@ -242,23 +235,6 @@ public class FakePointManager : MonoBehaviour {
 
         OSCMaster.sendMessage(msg, TargetIP, TargetPort);
     }
-    /*
-        0: pid(int)
-        1: oid(int)
-        2: age(int)
-        3: centroid.x(float)
-        4: centroid.y(float)
-        5: velocity.x(float)
-        6: velocity.y(float)
-        7: depth(float)
-        8: boundingRect.x(float)
-        9: boundingRect.y(float)
-        10: boundingRect.width(float)
-        11: boundingRect.height(float)
-        12: highest.x(float)
-        13: highest.y(float)
-        14: highest.z(float)
-    */
 
     public void SendPersonEntered(GameObject obj)
     {
