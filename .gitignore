@@ -34,3 +34,5 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+Presets/Main/FakePointManager/_temp.pst
+Presets/Main/FakePointManager/23-5-2018_17-30-1.pst

@@ -287,10 +287,18 @@ public class FakePointManager : MonoBehaviour {
 
         //Bounding
         msg.Append(worldToViewPort.x - PointSize/10);
-        msg.Append(1 -(worldToViewPort.y - PointSize/10));
-        msg.Append(PointSize/10);
-        msg.Append(PointSize/10);
-
+        msg.Append(1 -(worldToViewPort.y + PointSize/10));
+        if (Width > Height)
+        {
+            msg.Append(PointSize / 10);
+            msg.Append((PointSize / 10) * ((float)Width / (float)Height));
+        }
+        else
+        {
+            msg.Append((PointSize / 10) * ((float)Height / (float)Width));
+            Debug.Log("AH");
+            msg.Append(PointSize / 10);
+        }
         msg.Append(0.0f);
         msg.Append(0.0f);
         msg.Append(0.0f);
