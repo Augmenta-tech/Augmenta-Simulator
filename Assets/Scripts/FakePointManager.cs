@@ -277,9 +277,8 @@ public class FakePointManager : MonoBehaviour {
         msg.Append(behaviour.pid);
         msg.Append(behaviour.pid);
 
-        msg.Append(worldToViewPort.x);
+        msg.Append(1 - worldToViewPort.x);
         msg.Append(worldToViewPort.y);
-
         //Velocity
         msg.Append(behaviour.direction.x * behaviour.Speed);
         msg.Append(behaviour.direction.y * behaviour.Speed);
@@ -288,7 +287,7 @@ public class FakePointManager : MonoBehaviour {
 
         //Bounding
         msg.Append(worldToViewPort.x - PointSize/10);
-        msg.Append(worldToViewPort.y - PointSize/10);
+        msg.Append(1 -(worldToViewPort.y - PointSize/10));
         msg.Append(PointSize/10);
         msg.Append(PointSize/10);
 
