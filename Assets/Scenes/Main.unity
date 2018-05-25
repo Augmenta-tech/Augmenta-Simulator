@@ -235,7 +235,7 @@ Prefab:
     - target: {fileID: 224261597021104126, guid: 79c2718dd59243e4c90e145349e7dadf,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -0.000030517578
       objectReference: {fileID: 0}
     - target: {fileID: 4679437618935694, guid: 79c2718dd59243e4c90e145349e7dadf, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -439,7 +439,7 @@ MonoBehaviour:
   Height: 800
   Ratio: 0
   NbPoints: 10
-  PointSize: 0.5
+  PointSize: {x: 0, y: 0}
   Speed: 1
   UseBrownianMotion: 0
   Prefab: {fileID: 1289109677555090, guid: d3786ded4baa5a546a9b1f7826784985, type: 2}
@@ -523,7 +523,8 @@ MonoBehaviour:
   Width: 500
   Height: 800
   NbPoints: 10
-  PointSize: 0.466
+  PointSizeX: 0
+  PointSizeY: 0
   Speed: 1
 --- !u!1 &722713527
 GameObject:

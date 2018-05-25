@@ -71,6 +71,7 @@ public class FakePointManager : MonoBehaviour {
             if (CursorPoint != null)
             {
                 NbPoints--;
+                SendPersonLeft(InstanciatedPoints[0]);
                 InstanciatedPoints.Remove(0);
                 Destroy(CursorPoint);
             }
@@ -229,12 +230,13 @@ public class FakePointManager : MonoBehaviour {
     {
         var msg = new UnityOSC.OSCMessage("/au/scene/");
         msg.Append(0);
-        msg.Append(0);
+        msg.Append(0f);
         msg.Append(NbPoints);
         msg.Append(0.5f);
         msg.Append(0.5f);
         msg.Append(Width);
         msg.Append(Height);
+        msg.Append(0f);
 
         OSCMaster.sendMessage(msg, TargetIP, TargetPort);
     }
@@ -255,7 +257,7 @@ public class FakePointManager : MonoBehaviour {
         msg.Append(behaviour.direction.x * behaviour.Speed);
         msg.Append(behaviour.direction.y * behaviour.Speed);
 
-        msg.Append(behaviour.pid);
+        msg.Append((float)behaviour.pid);
 
         //Bounding
         msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).x - PointSize.x);
@@ -286,7 +288,7 @@ public class FakePointManager : MonoBehaviour {
         msg.Append(behaviour.direction.x * behaviour.Speed);
         msg.Append(behaviour.direction.y * behaviour.Speed);
 
-        msg.Append(behaviour.pid);
+        msg.Append((float)behaviour.pid);
 
         //Bounding
         msg.Append(worldToViewPort.x - PointSize.x/2);
@@ -318,7 +320,7 @@ public class FakePointManager : MonoBehaviour {
         msg.Append(behaviour.direction.x * behaviour.Speed);
         msg.Append(behaviour.direction.y * behaviour.Speed);
 
-        msg.Append(behaviour.pid);
+        msg.Append((float)behaviour.pid);
 
         //Bounding
         msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).x - PointSize.x);
