@@ -22,8 +22,9 @@ public class FakePointManagerControllable : Controllable {
     [OSCProperty]
     public int NbPoints;
     [OSCProperty]
-    [Range(0.05f, 1.0f)]
-    public float PointSize;
+    public float PointSizeX;
+    [OSCProperty]
+    public float PointSizeY;
 
     [OSCProperty]
     [Range(0.0f,10.0f)]
@@ -35,16 +36,26 @@ public class FakePointManagerControllable : Controllable {
         NbPoints = 0; //TODO : remove this line, shouldn't be required
         manager.Clear();
     }
-
 	public override void Update () {
         //base.Update();
         manager.TargetIP = TargetIP;
         manager.TargetPort = TargetPort;
-        manager.Width = Width;
-        manager.Height = Height;
+
 
         manager.NbPoints = NbPoints;
         manager.Speed = Speed;
-        manager.PointSize = PointSize;
+        manager.PointSize = new Vector2(PointSizeX / Width, PointSizeY / Height);
+        if (manager.Height != Height || manager.Width != Width)
+        {
+            Screen.SetResolution(Width, Height, false);
+            float safeWidth = Screen.safeArea.width;
+            float safeHeight = Screen.safeArea.height;
+            if (Height > Width)
+                Screen.SetResolution((int)safeWidth, (int)(safeWidth * ((float)Height / (float)Width)), false);
+            else
+                Screen.SetResolution((int)(safeHeight * ((float)Width / (float)Height)), (int)safeHeight, false);
+        }
+        manager.Width = Width;
+        manager.Height = Height;
     }
 }

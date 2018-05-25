@@ -16,7 +16,7 @@ public class FakePointManager : MonoBehaviour {
 
     [Header("Points settings")]
     public int NbPoints;
-    public float PointSize;
+    public Vector2 PointSize;
     public float Speed;
 
     public bool UseBrownianMotion;
@@ -28,7 +28,7 @@ public class FakePointManager : MonoBehaviour {
     public static Dictionary<int, GameObject> InstanciatedPoints;
 
     private float _oldSpeed;
-    private float _oldSize;
+    private Vector2 _oldSize;
 
     private GameObject CursorPoint;
     public bool CanMoveCursorPoint;
@@ -61,7 +61,7 @@ public class FakePointManager : MonoBehaviour {
         {
             foreach (var obj in InstanciatedPoints)
             {
-                obj.Value.transform.localScale = new Vector3(PointSize, PointSize, PointSize);
+                obj.Value.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
             }
             _oldSize = PointSize;
         }
@@ -80,7 +80,7 @@ public class FakePointManager : MonoBehaviour {
             if (CursorPoint == null)
             {
                 CursorPoint = Instantiate(Prefab);
-
+                CursorPoint.transform.parent = transform;
                 var newPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
                 newPos.z = 0;
                 newPos.x = Mathf.Clamp(newPos.x, 0.05f, 0.95f);
@@ -89,11 +89,11 @@ public class FakePointManager : MonoBehaviour {
                 newPos.z = 0;
                 CursorPoint.transform.position = newPos;
                 CursorPoint.transform.GetChild(0).GetComponent<TextMesh>().text = "ID : 0";
-                CursorPoint.transform.localScale = new Vector3(PointSize, PointSize, PointSize);
+                CursorPoint.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
                 CursorPoint.GetComponent<FakePointBehaviour>().enabled = false;
                 CursorPoint.GetComponent<FakePointBehaviour>().pid = 0;
                 CursorPoint.GetComponent<FakePointBehaviour>().manager = this;
-
+     
                 InstanciatedPoints.Add(0, CursorPoint);
                 NbPoints++;
             }
@@ -115,10 +115,11 @@ public class FakePointManager : MonoBehaviour {
         {
             _highestPid++;
             var newPoint = Instantiate(Prefab);//, this.transform);
+            newPoint.transform.parent = transform;
             newPoint.GetComponent<FakePointBehaviour>().Speed = Speed;
             newPoint.GetComponent<FakePointBehaviour>().pid = _highestPid;
             newPoint.GetComponent<FakePointBehaviour>().manager = this;
-            newPoint.transform.localScale = new Vector3(PointSize, PointSize, PointSize);
+            newPoint.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
 
             InstanciatedPoints.Add(_highestPid, newPoint);
             InstanceNumber++;
@@ -142,9 +143,9 @@ public class FakePointManager : MonoBehaviour {
         if (Width <= 0) Width = 1;
         if (Height <= 0) Height = 1;
 
-        Ratio = (Width / (float)Height);
+        Ratio = ((float)Width / (float)Height);
 
-        transform.localScale = new Vector3(Width, Height,0.01f) / 100;
+        transform.localScale = new Vector3(Width, Height,1f) / 100;
 
         Camera.main.aspect = Ratio;
         Camera.main.orthographicSize = transform.localScale.y / 2;
@@ -170,8 +171,10 @@ public class FakePointManager : MonoBehaviour {
 
         var newPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
         newPos.z = 0;
-        newPos.x = Mathf.Clamp(newPos.x, 0.05f, 0.95f);
-        newPos.y = Mathf.Clamp(newPos.y, 0.05f, 0.95f);
+
+            newPos.x = Mathf.Clamp(newPos.x, 0f, 1f);
+            newPos.y = Mathf.Clamp(newPos.y, 0f, 1f);
+
         newPos = Camera.main.ViewportToWorldPoint(newPos);
         newPos.z = 0;
         CursorPoint.transform.position = newPos;
@@ -255,10 +258,10 @@ public class FakePointManager : MonoBehaviour {
         msg.Append(behaviour.pid);
 
         //Bounding
-        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).x - PointSize);
-        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).y - PointSize);
-        msg.Append(PointSize);
-        msg.Append(PointSize);
+        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).x - PointSize.x);
+        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).y - PointSize.y);
+        msg.Append(PointSize.x);
+        msg.Append(PointSize.y);
 
         msg.Append(0.0f);
         msg.Append(0.0f);
@@ -286,19 +289,12 @@ public class FakePointManager : MonoBehaviour {
         msg.Append(behaviour.pid);
 
         //Bounding
-        msg.Append(worldToViewPort.x - PointSize/10);
-        msg.Append(1 -(worldToViewPort.y + PointSize/10));
-        if (Width > Height)
-        {
-            msg.Append(PointSize / 10);
-            msg.Append((PointSize / 10) * ((float)Width / (float)Height));
-        }
-        else
-        {
-            msg.Append((PointSize / 10) * ((float)Height / (float)Width));
-            Debug.Log("AH");
-            msg.Append(PointSize / 10);
-        }
+        msg.Append(worldToViewPort.x - PointSize.x/2);
+        msg.Append(1 - (worldToViewPort.y + PointSize.y/2));
+
+        msg.Append(PointSize.x);
+        msg.Append(PointSize.y);
+
         msg.Append(0.0f);
         msg.Append(0.0f);
         msg.Append(0.0f);
@@ -325,10 +321,10 @@ public class FakePointManager : MonoBehaviour {
         msg.Append(behaviour.pid);
 
         //Bounding
-        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).x - PointSize);
-        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).y - PointSize);
-        msg.Append(PointSize);
-        msg.Append(PointSize);
+        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).x - PointSize.x);
+        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).y - PointSize.y);
+        msg.Append(PointSize.x);
+        msg.Append(PointSize.y);
 
         msg.Append(0.0f);
         msg.Append(0.0f);
