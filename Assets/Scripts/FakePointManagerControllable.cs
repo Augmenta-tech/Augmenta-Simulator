@@ -33,29 +33,29 @@ public class FakePointManagerControllable : Controllable {
     [OSCMethod]
     public void Clear()
     {
-        NbPoints = 0; //TODO : remove this line, shouldn't be required
         manager.Clear();
     }
-	public override void Update () {
-        //base.Update();
-        manager.TargetIP = TargetIP;
-        manager.TargetPort = TargetPort;
 
-
-        manager.NbPoints = NbPoints;
-        manager.Speed = Speed;
+    public override void Awake()
+    {
+        TargetScript = manager;
+        base.Awake();
+    }
+    public override void OnUiValueChanged(string name)
+    {
+        base.OnUiValueChanged(name);
         manager.PointSize = new Vector2(PointSizeX / Width, PointSizeY / Height);
-        if (manager.Height != Height || manager.Width != Width)
-        {
-            Screen.SetResolution(Width, Height, false);
-            float safeWidth = Screen.safeArea.width;
-            float safeHeight = Screen.safeArea.height;
-            if (Height > Width)
-                Screen.SetResolution((int)safeWidth, (int)(safeWidth * ((float)Height / (float)Width)), false);
-            else
-                Screen.SetResolution((int)(safeHeight * ((float)Width / (float)Height)), (int)safeHeight, false);
-        }
-        manager.Width = Width;
-        manager.Height = Height;
+        ChangeResolution();
+    }
+
+    public void ChangeResolution()
+    {
+        Screen.SetResolution(Width, Height, false);
+        float safeWidth = Screen.safeArea.width;
+        float safeHeight = Screen.safeArea.height;
+        if (Height > Width)
+            Screen.SetResolution((int)safeWidth, (int)(safeWidth * ((float)Height / (float)Width)), false);
+        else
+            Screen.SetResolution((int)(safeHeight * ((float)Width / (float)Height)), (int)safeHeight, false);
     }
 }

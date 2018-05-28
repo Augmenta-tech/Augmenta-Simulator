@@ -88,6 +88,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 2100000, guid: 808d67a5ef8f8cf4da36846b4a9a4261, type: 2}
   m_StaticBatchInfo:
@@ -122,6 +123,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 10100, guid: 0000000000000000e000000000000000, type: 0}
   m_StaticBatchInfo:
@@ -215,7 +217,7 @@ TextMesh:
   m_Font: {fileID: 0}
   m_Color:
     serializedVersion: 2
-    rgba: 4278190080
+    rgba: 4294309365
 --- !u!114 &114499490839992084
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -230,3 +232,4 @@ MonoBehaviour:
   manager: {fileID: 0}
   Speed: 0
   pid: 0
+  direction: {x: 0, y: 0, z: 0}

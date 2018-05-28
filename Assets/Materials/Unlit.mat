@@ -83,7 +83,7 @@ Material:
     m_Colors:
     - _BackgroundColor: {r: 1, g: 1, b: 1, a: 1}
     - _BorderColor: {r: 0.46318462, g: 1, b: 0.41911763, a: 0}
-    - _CenterColor: {r: 0.20874782, g: 0.42716706, b: 0.72794116, a: 0}
+    - _CenterColor: {r: 0.254717, g: 0.254717, b: 0.254717, a: 0.7058824}
     - _Color: {r: 0.07946544, g: 0.7058823, b: 0.057093434, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _PointColor: {r: 1, g: 0.6413793, b: 0, a: 1}

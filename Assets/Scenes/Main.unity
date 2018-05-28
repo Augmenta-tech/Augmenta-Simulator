@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 8
+  serializedVersion: 9
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -39,6 +39,7 @@ RenderSettings:
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
   m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -54,11 +55,10 @@ LightmapSettings:
     m_EnableBakedLightmaps: 1
     m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
-    serializedVersion: 9
+    serializedVersion: 10
     m_Resolution: 2
     m_BakeResolution: 10
-    m_TextureWidth: 1024
-    m_TextureHeight: 1024
+    m_AtlasSize: 1024
     m_AO: 0
     m_AOMaxDistance: 1
     m_CompAOExponent: 1
@@ -235,7 +235,7 @@ Prefab:
     - target: {fileID: 224261597021104126, guid: 79c2718dd59243e4c90e145349e7dadf,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 0.000030517578
       objectReference: {fileID: 0}
     - target: {fileID: 4679437618935694, guid: 79c2718dd59243e4c90e145349e7dadf, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -258,7 +258,7 @@ Prefab:
     - target: {fileID: 114191503529956728, guid: 79c2718dd59243e4c90e145349e7dadf,
         type: 2}
       propertyPath: localPort
-      value: 36278
+      value: 6001
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79c2718dd59243e4c90e145349e7dadf, type: 2}
@@ -444,7 +444,7 @@ MonoBehaviour:
   Height: 800
   Ratio: 0
   NbPoints: 10
-  PointSize: {x: 0, y: 0}
+  PointSize: {x: 20, y: 20}
   Speed: 1
   UseBrownianMotion: 0
   Prefab: {fileID: 1289109677555090, guid: d3786ded4baa5a546a9b1f7826784985, type: 2}
@@ -469,6 +469,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 2100000, guid: d3f31d6b11073234a8ae08bfc1ca10a9, type: 2}
   m_StaticBatchInfo:
@@ -528,8 +529,8 @@ MonoBehaviour:
   Width: 500
   Height: 800
   NbPoints: 10
-  PointSizeX: 0
-  PointSizeY: 0
+  PointSizeX: 100
+  PointSizeY: 100
   Speed: 1
 --- !u!1 &722713527
 GameObject:

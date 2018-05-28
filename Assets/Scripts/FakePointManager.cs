@@ -39,18 +39,19 @@ public class FakePointManager : MonoBehaviour {
         _highestPid = 0;
         _oldSpeed = Speed;
         _oldSize = PointSize;
-        OSCMaster.instance.messageAvailable += Instance_messageAvailable;
+        OSCMaster.instance.messageAvailable += HandleMessageAvailable;
         Physics2D.IgnoreLayerCollision(9, 9);
     }
 
-    private void Instance_messageAvailable(UnityOSC.OSCMessage message)
+    private void HandleMessageAvailable(UnityOSC.OSCMessage message)
     {
         string[] addSplit = message.Address.Split(new char[] { '/' });
         if (addSplit[1] == "yo")
         {
-            var tmp = new UnityOSC.OSCMessage("/wassup",  TargetIP + " " + TargetPort);
+            var msg = new UnityOSC.OSCMessage("/wassup");
+            msg.Append(TargetIP + " " + TargetPort);
             Debug.Log(message.Data);
-            OSCMaster.sendMessage(tmp, message.Data[0].ToString(), int.Parse(message.Data[1].ToString()));
+            OSCMaster.sendMessage(msg, message.Data[0].ToString(), int.Parse(message.Data[1].ToString()));
         }
     }
 
@@ -92,7 +93,7 @@ public class FakePointManager : MonoBehaviour {
             if (CursorPoint == null)
             {
                 CursorPoint = Instantiate(Prefab);
-                CursorPoint.GetComponent<MeshRenderer>().material.SetColor("_PointColor", new Color(Random.value, Random.value, Random.value));
+                CursorPoint.GetComponent<MeshRenderer>().material.SetColor("_PointColor", Color.HSVToRGB(Random.value, 0.85f, 0.75f));
                 CursorPoint.transform.parent = transform;
                 var newPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
                 newPos.z = 0;
@@ -108,7 +109,7 @@ public class FakePointManager : MonoBehaviour {
                 CursorPoint.GetComponent<FakePointBehaviour>().manager = this;
      
                 InstanciatedPoints.Add(0, CursorPoint);
-                NbPoints++;
+                NbPoints++; InstanceNumber++;
             }
         }
 
@@ -127,8 +128,9 @@ public class FakePointManager : MonoBehaviour {
         if (InstanceNumber < NbPoints)
         {
             _highestPid++;
-            var newPoint = Instantiate(Prefab);//, this.transform);
-            newPoint.GetComponent<MeshRenderer>().material.SetColor("_PointColor", new Color(Random.value, Random.value, Random.value));
+            var newPoint = Instantiate(Prefab);
+            
+            newPoint.GetComponent<MeshRenderer>().material.SetColor("_PointColor", Color.HSVToRGB(Random.value, 0.75f, 0.75f));
             newPoint.transform.parent = transform;
             newPoint.GetComponent<FakePointBehaviour>().Speed = Speed;
             newPoint.GetComponent<FakePointBehaviour>().pid = _highestPid;
@@ -347,7 +349,4 @@ public class FakePointManager : MonoBehaviour {
 
         OSCMaster.sendMessage(msg, TargetIP, TargetPort);
     }
-
-
-
 }
