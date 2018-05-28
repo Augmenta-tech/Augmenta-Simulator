@@ -55,7 +55,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1917345812934920}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.09, y: 0, z: -0.5}
+  m_LocalPosition: {x: 0, y: 0.245, z: -0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4918476803697206}
@@ -68,7 +68,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1289109677555090}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.865476, y: 1.0803839, z: 0}
+  m_LocalPosition: {x: 0.07862167, y: 0.13158913, z: 0.38218236}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children:
   - {fileID: 4705423301885936}
@@ -204,15 +204,15 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1917345812934920}
-  m_Text: 'ID : '
+  m_Text: 'ID : 0'
   m_OffsetZ: 0
   m_CharacterSize: 0.04
   m_LineSpacing: 1
   m_Anchor: 4
-  m_Alignment: 0
+  m_Alignment: 1
   m_TabSize: 4
   m_FontSize: 65
-  m_FontStyle: 1
+  m_FontStyle: 0
   m_RichText: 1
   m_Font: {fileID: 0}
   m_Color:
@@ -232,4 +232,4 @@ MonoBehaviour:
   manager: {fileID: 0}
   Speed: 0
   pid: 0
-  direction: {x: 0, y: 0, z: 0}
+  direction: {x: -0.20054637, y: 0.48093697, z: 0}

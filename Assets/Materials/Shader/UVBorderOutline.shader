@@ -2,6 +2,7 @@
 {
 	Properties
 	{
+		[Toggle] _UseTex("Use texture", Range(0,1)) = 0
 		_MainTex ("Texture", 2D) = "white" {}
 		_PointColor("Point color", Color) = (0,0,0,0)
 		_CenterColor("Center color", Color) = (0,0,0,0)
@@ -42,6 +43,7 @@
 			float4 _PointColor;
 			float4 _CenterColor;
 			float _SquareSize;
+			float _UseTex;
 			float _CenterSize;
 
 			sampler2D _MainTex;
@@ -62,7 +64,10 @@
 
 				if(i.uv.x > _CenterSize && i.uv.x < 1 - _CenterSize) {
 					if(i.uv.y > _CenterSize && i.uv.y < 1- _CenterSize) {
-						col = _CenterColor;
+						if(_UseTex)
+							col = tex2D(_MainTex, i.uv) * _CenterColor;
+						else
+							col = _CenterColor;
 					}
 				}
 
