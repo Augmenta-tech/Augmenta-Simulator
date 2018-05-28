@@ -187,14 +187,14 @@ public class FakePointManager : MonoBehaviour {
 
     public void ChangeResolution()
     {
-        var newWidth = Mathf.Clamp(Width, WidthMin, Screen.width);
-        var newHeight = Mathf.Clamp(Height, HeightMin, Screen.height);
         var ratio = Width / Height;
+        var newWidth = Mathf.Clamp(Width, WidthMin * ratio, Screen.width);
+        var newHeight = Mathf.Clamp(Height, HeightMin, Screen.height);
 
-        if (Height > Width)
-            Screen.SetResolution(newWidth, newHeight * ratio, false);
-        else
-            Screen.SetResolution(newWidth * ratio, newHeight, false);
+            Screen.SetResolution(newWidth, newHeight, false);
+        //if (Height < Width)
+        //else
+        //    Screen.SetResolution(newWidth * ratio, newHeight, false);
     }
 
     public void OnMouseDrag()
