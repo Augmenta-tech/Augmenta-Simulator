@@ -235,7 +235,7 @@ Prefab:
     - target: {fileID: 224261597021104126, guid: 79c2718dd59243e4c90e145349e7dadf,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 0.000030517578
       objectReference: {fileID: 0}
     - target: {fileID: 4679437618935694, guid: 79c2718dd59243e4c90e145349e7dadf, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -441,7 +441,9 @@ MonoBehaviour:
   TargetIP: 127.0.0.1
   TargetPort: 5000
   Width: 500
+  WidthMin: 300
   Height: 800
+  HeightMin: 300
   Ratio: 0
   NbPoints: 10
   PointSize: {x: 20, y: 20}

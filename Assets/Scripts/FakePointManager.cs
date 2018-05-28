@@ -11,7 +11,9 @@ public class FakePointManager : MonoBehaviour {
 
     [Header("Area settings")]
     public int Width;
+    public int WidthMin;
     public int Height;
+    public int HeightMin;
     public float Ratio;
 
     [Header("Points settings")]
@@ -83,6 +85,7 @@ public class FakePointManager : MonoBehaviour {
             if (CursorPoint != null)
             {
                 NbPoints--;
+                InstanceNumber--;
                 SendPersonLeft(InstanciatedPoints[0]);
                 InstanciatedPoints.Remove(0);
                 Destroy(CursorPoint);
@@ -109,7 +112,8 @@ public class FakePointManager : MonoBehaviour {
                 CursorPoint.GetComponent<FakePointBehaviour>().manager = this;
      
                 InstanciatedPoints.Add(0, CursorPoint);
-                NbPoints++; InstanceNumber++;
+                InstanceNumber++;
+                NbPoints++;
             }
         }
 
@@ -179,6 +183,18 @@ public class FakePointManager : MonoBehaviour {
         }
 
         InstanciatedPoints.Clear();
+    }
+
+    public void ChangeResolution()
+    {
+        var newWidth = Mathf.Clamp(Width, WidthMin, Screen.width);
+        var newHeight = Mathf.Clamp(Height, HeightMin, Screen.height);
+        var ratio = Width / Height;
+
+        if (Height > Width)
+            Screen.SetResolution(newWidth, newHeight * ratio, false);
+        else
+            Screen.SetResolution(newWidth * ratio, newHeight, false);
     }
 
     public void OnMouseDrag()

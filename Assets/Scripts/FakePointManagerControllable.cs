@@ -45,17 +45,6 @@ public class FakePointManagerControllable : Controllable {
     {
         base.OnUiValueChanged(name);
         manager.PointSize = new Vector2(PointSizeX / Width, PointSizeY / Height);
-        ChangeResolution();
-    }
-
-    public void ChangeResolution()
-    {
-        Screen.SetResolution(Width, Height, false);
-        float safeWidth = Screen.safeArea.width;
-        float safeHeight = Screen.safeArea.height;
-        if (Height > Width)
-            Screen.SetResolution((int)safeWidth, (int)(safeWidth * ((float)Height / (float)Width)), false);
-        else
-            Screen.SetResolution((int)(safeHeight * ((float)Width / (float)Height)), (int)safeHeight, false);
+        manager.ChangeResolution();
     }
 }
