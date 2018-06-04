@@ -6,7 +6,7 @@ This space size is in pixel, which corresponds to the video output resolution.
 
 ## Download
 
-https://github.com/Theoriz/Augmenta-Simulator
+https://github.com/Theoriz/Augmenta-Simulator/releases
 
 ## How to use ?
 
