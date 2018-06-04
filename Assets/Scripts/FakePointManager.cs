@@ -34,6 +34,8 @@ public class FakePointManager : MonoBehaviour {
     private float _oldSpeed;
     private Vector2 _oldSize;
 
+    private float _oldWidth, _oldHeight;
+
     private GameObject CursorPoint;
     public bool CanMoveCursorPoint;
 
@@ -116,8 +118,10 @@ public class FakePointManager : MonoBehaviour {
 
         _frameCounter++; 
 
-        if (Screen.currentResolution.width / Screen.currentResolution.height != Width / Height)
+        if (_oldWidth != Width && _oldHeight != Height)
         {
+            _oldWidth = Width;
+            _oldHeight = Height;
             ChangeResolution();
         }
 
@@ -251,18 +255,12 @@ public class FakePointManager : MonoBehaviour {
 
     public void ChangeResolution()
     {
-        return;
-
-
-
         var ratio = (float)Width / (float)Height;
-        var newWidth = 1;
-        var newHeight = 1; 
+        var newWidth = Width;
+        var newHeight = Height;
 
-        if (Height < Width)
-            newWidth = (int)Mathf.Clamp(Width * ratio, WidthLimit.x, WidthLimit.y);
-        else
-            newHeight = (int)Mathf.Clamp(Height * ratio, HeightLimit.x, HeightLimit.y);
+        newWidth = (int)Mathf.Clamp(Width, WidthLimit.x, WidthLimit.y);
+        newHeight = (int)Mathf.Clamp(Height, HeightLimit.x, HeightLimit.y);
 
         Screen.SetResolution(newWidth, newHeight, false);
     }
