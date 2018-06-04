@@ -5,7 +5,9 @@ This space size is in pixel, which corresponds to the video output resolution.
 ## How to use ?
 
 1 - Set resolution
+
 2 - Set the point number
+
 3 - Receive your data in your Augmenta Unity project
 
 ## Information
