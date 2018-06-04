@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Net.NetworkInformation;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,12 +9,13 @@ public class FakePointManager : MonoBehaviour {
     [Header("Network settings")]
     public string TargetIP;
     public int TargetPort;
+    public bool Mute;
 
     [Header("Area settings")]
     public int Width;
-    public int WidthMin;
+    public Vector2 WidthLimit;
     public int Height;
-    public int HeightMin;
+    public Vector2 HeightLimit;
     public float Ratio;
 
     [Header("Points settings")]
@@ -21,7 +23,7 @@ public class FakePointManager : MonoBehaviour {
     public Vector2 PointSize;
     public float Speed;
 
-    public bool UseBrownianMotion;
+    private int _frameCounter;
     public GameObject Prefab;
     private int InstanceNumber;
 
@@ -47,17 +49,78 @@ public class FakePointManager : MonoBehaviour {
 
     private void HandleMessageAvailable(UnityOSC.OSCMessage message)
     {
+        Debug.Log("Received : " + message.Address);
+        foreach(var data in message.Data)
+        {
+            Debug.Log("Data : " + data.ToString());
+        }
+
         string[] addSplit = message.Address.Split(new char[] { '/' });
         if (addSplit[1] == "yo")
         {
             var msg = new UnityOSC.OSCMessage("/wassup");
-            msg.Append(TargetIP + " " + TargetPort);
-            Debug.Log(message.Data);
+            msg.Append(Network.player.ipAddress);
+            msg.Append(ShowNetworkInterfaces());
+            Debug.Log("Answered : /wassup " + Network.player.ipAddress + " " + ShowNetworkInterfaces());
+            OSCMaster.sendMessage(msg, message.Data[0].ToString(), int.Parse(message.Data[1].ToString()));
+        }
+
+        if (addSplit[1] == "connect")
+        {
+            TargetIP = message.Data[1].ToString();
+            TargetPort = int.Parse(message.Data[2].ToString());
+            Debug.Log("TargetIp : " + message.Data[1].ToString() + ":" + message.Data[2].ToString());
+        }
+
+        if (addSplit[1] == "info")
+        {
+            var msg = new UnityOSC.OSCMessage("/info");
+            msg.Append(Network.player.ipAddress);
+            msg.Append("Simulator");
+            msg.Append(ShowNetworkInterfaces());
+            msg.Append("2.1");
+            msg.Append("SIMULATOR");
+            msg.Append("SIMULATOR");
+            msg.Append("SIMULATOR");
             OSCMaster.sendMessage(msg, message.Data[0].ToString(), int.Parse(message.Data[1].ToString()));
         }
     }
 
+    public string ShowNetworkInterfaces()
+    {
+        
+        IPGlobalProperties computerProperties = IPGlobalProperties.GetIPGlobalProperties();
+        NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
+
+        string mac = "";
+        foreach (NetworkInterface adapter in nics)
+        {
+            PhysicalAddress address = adapter.GetPhysicalAddress();
+            byte[] bytes = address.GetAddressBytes();
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                mac = string.Concat(mac + (string.Format("{0}", bytes[i].ToString("X2"))));
+                if (i != bytes.Length - 1)
+                {
+                    mac = string.Concat(mac + ":");
+                }
+            }
+            mac += "\n";
+            Debug.Log("Mac : " + mac);
+            return mac;
+        }
+        return null;
+    }
+
     void Update () {
+
+        _frameCounter++; 
+
+        if (Screen.currentResolution.width / Screen.currentResolution.height != Width / Height)
+        {
+            ChangeResolution();
+        }
+
         if (InstanceNumber != NbPoints)
             InstantiatePoint();
 
@@ -107,10 +170,9 @@ public class FakePointManager : MonoBehaviour {
                 CursorPoint.transform.position = newPos;
                 CursorPoint.transform.GetChild(0).GetComponent<TextMesh>().text = "ID : 0";
                 CursorPoint.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
-                CursorPoint.GetComponent<FakePointBehaviour>().enabled = false;
                 CursorPoint.GetComponent<FakePointBehaviour>().pid = 0;
                 CursorPoint.GetComponent<FakePointBehaviour>().manager = this;
-     
+                CursorPoint.GetComponent<FakePointBehaviour>().isMouse = true;
                 InstanciatedPoints.Add(0, CursorPoint);
                 InstanceNumber++;
                 NbPoints++;
@@ -132,6 +194,8 @@ public class FakePointManager : MonoBehaviour {
         if (InstanceNumber < NbPoints)
         {
             _highestPid++;
+            InstanceNumber++;
+
             var newPoint = Instantiate(Prefab);
             
             newPoint.GetComponent<MeshRenderer>().material.SetColor("_PointColor", Color.HSVToRGB(Random.value, 0.75f, 0.75f));
@@ -142,7 +206,7 @@ public class FakePointManager : MonoBehaviour {
             newPoint.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
 
             InstanciatedPoints.Add(_highestPid, newPoint);
-            InstanceNumber++;
+            
 
             SendPersonEntered(InstanciatedPoints[_highestPid]);
         }
@@ -171,7 +235,7 @@ public class FakePointManager : MonoBehaviour {
         Camera.main.orthographicSize = transform.localScale.y / 2;
     }
 
-    public void Clear()
+    public void RemovePoints()
     {
         NbPoints = 0;
         InstanceNumber = 0;
@@ -187,14 +251,20 @@ public class FakePointManager : MonoBehaviour {
 
     public void ChangeResolution()
     {
-        var ratio = Width / Height;
-        var newWidth = Mathf.Clamp(Width, WidthMin * ratio, Screen.width);
-        var newHeight = Mathf.Clamp(Height, HeightMin, Screen.height);
+        return;
 
-            Screen.SetResolution(newWidth, newHeight, false);
-        //if (Height < Width)
-        //else
-        //    Screen.SetResolution(newWidth * ratio, newHeight, false);
+
+
+        var ratio = (float)Width / (float)Height;
+        var newWidth = 1;
+        var newHeight = 1; 
+
+        if (Height < Width)
+            newWidth = (int)Mathf.Clamp(Width * ratio, WidthLimit.x, WidthLimit.y);
+        else
+            newHeight = (int)Mathf.Clamp(Height * ratio, HeightLimit.x, HeightLimit.y);
+
+        Screen.SetResolution(newWidth, newHeight, false);
     }
 
     public void OnMouseDrag()
@@ -216,153 +286,115 @@ public class FakePointManager : MonoBehaviour {
     //OSC part
 
     /*
-        * Augmenta OSC Protocol :
+        0: pid (int)                        // Personal ID ex : 42th person to enter stage has pid=42
+        1: oid (int)                        // Ordered ID ex : if 3 person on stage, 43th person might have oid=2
+        2: age (int)                        // Time on stage (in frame number)
+        3: centroid.x (float 0:1)           // Position projected to the ground
+        4: centroid.y (float 0:1)               
+        5: velocity.x (float -1:1)           // Speed and direction vector
+        6: velocity.y (float -1:1)
+        7: depth (float 0:1)                // Distance to sensor (in m) (not implemented)
+        8: boundingRect.x (float 0:1)       // Top view bounding box
+        9: boundingRect.y (float 0:1)
+        10: boundingRect.width (float 0:1)
+        11: boundingRect.height (float 0:1)
+        12: highest.x (float 0:1)           // Highest point placement
+        13: highest.y (float 0:1)
+        14: highest.z (float 0:1)           // Height of the person
 
-            /au/personWillLeave/ args0 arg1 ... argn
-            /au/personUpdated/   args0 arg1 ... argn
-            /au/personEntered/   args0 arg1 ... argn
+        /au/scene   args0 arg1 ... argn
 
-            where args are :
-
-            0: pid (int)
-            1: oid (int)
-            2: age (int)
-            3: centroid.x (float)
-            4: centroid.y (float)
-            5: velocity.x (float)
-            6: velocity.y (float)
-            7: depth (float)
-            8: boundingRect.x (float)
-            9: boundingRect.y (float)
-            10: boundingRect.width (float)
-            11: boundingRect.height (float)
-            12: highest.x (float)
-            13: highest.y (float)
-            14: highest.z (float)
-            15:
-            16:
-            17:
-            18:
-            19:
-            20+ : contours (if enabled)
-
-            /au/scene/   args0 arg1 ... argn
-
-            0: currentTime (int)
-            1: percentCovered (float)
-            2: numPeople (int)
-            3: averageMotion.x (float)
-            4: averageMotion.y (float)
-            5: scene.width (int)
-            6: scene.height (int)
+        0: currentTime (int)                // Time (in frame number)
+        1: percentCovered (float 0:1)       // Percent covered
+        2: numPeople (int)                  // Number of person
+        3: averageMotion.x (float 0:1)          // Average motion
+        4: averageMotion.y (float 0:1)
+        5: scene.width (int)                // Scene size
+        6: scene.height (int)
+        7: scene.depth (int)
     */
 
     public void SendSceneUpdated()
     {
+        if (Mute) return;
+
         var msg = new UnityOSC.OSCMessage("/au/scene/");
-        msg.Append(0);
-        msg.Append(0f);
+        msg.Append(_frameCounter);
+        //Compute point size
+        msg.Append(InstanceNumber * PointSize.x * PointSize.y);
         msg.Append(NbPoints);
-        msg.Append(0.5f);
-        msg.Append(0.5f);
+        //Compute average motion
+        var velocitySum = Vector3.zero;
+        foreach(var element in InstanciatedPoints)
+        {
+            velocitySum += -element.Value.GetComponent<FakePointBehaviour>().NormalizedVelocity;
+        }
+        velocitySum /= InstanciatedPoints.Count;
+
+        msg.Append(velocitySum.x);
+        msg.Append(velocitySum.y);
         msg.Append(Width);
         msg.Append(Height);
-        msg.Append(0f);
+        msg.Append(100f);
 
         OSCMaster.sendMessage(msg, TargetIP, TargetPort);
     }
 
     public void SendPersonEntered(GameObject obj)
     {
-        var msg = new UnityOSC.OSCMessage("/au/personEntered/");
-        var behaviour = obj.GetComponent<FakePointBehaviour>();
-
-        msg.Append(behaviour.pid);
-        msg.Append(behaviour.pid);
-        msg.Append(behaviour.pid);
-
-        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).x);
-        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).y);
-
-        //Velocity
-        msg.Append(behaviour.direction.x * behaviour.Speed);
-        msg.Append(behaviour.direction.y * behaviour.Speed);
-
-        msg.Append((float)behaviour.pid);
-
-        //Bounding
-        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).x - PointSize.x);
-        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).y - PointSize.y);
-        msg.Append(PointSize.x);
-        msg.Append(PointSize.y);
-
-        msg.Append(0.0f);
-        msg.Append(0.0f);
-        msg.Append(0.0f);
-
-        OSCMaster.sendMessage(msg, TargetIP, TargetPort);
+        SendAugmentaMessage("/au/personEntered/", obj);
     }
 
     public void SendPersonUpdated(GameObject obj)
     {
-        var msg = new UnityOSC.OSCMessage("/au/personUpdated/");
-        var behaviour = obj.GetComponent<FakePointBehaviour>();
-        var worldToViewPort = Camera.main.WorldToViewportPoint(obj.transform.position);
-
-        msg.Append(behaviour.pid);
-        msg.Append(behaviour.pid);
-        msg.Append(behaviour.pid);
-
-        msg.Append(1 - worldToViewPort.x);
-        msg.Append(worldToViewPort.y);
-        //Velocity
-        msg.Append(behaviour.direction.x * behaviour.Speed);
-        msg.Append(behaviour.direction.y * behaviour.Speed);
-
-        msg.Append((float)behaviour.pid);
-
-        //Bounding
-        msg.Append(worldToViewPort.x - PointSize.x/2);
-        msg.Append(1 - (worldToViewPort.y + PointSize.y/2));
-
-        msg.Append(PointSize.x);
-        msg.Append(PointSize.y);
-
-        msg.Append(0.0f);
-        msg.Append(0.0f);
-        msg.Append(0.0f);
-
-        OSCMaster.sendMessage(msg, TargetIP, TargetPort);
+        SendAugmentaMessage("/au/personUpdated/", obj);
     }
 
     public void SendPersonLeft(GameObject obj)
     {
-        var msg = new UnityOSC.OSCMessage("/au/personWillLeave/");
+        SendAugmentaMessage("/au/personWillLeave/", obj);
+    }
+
+
+    public void SendAugmentaMessage(string address, GameObject obj)
+    {
+        if (Mute) return;
+
+        var msg = new UnityOSC.OSCMessage(address);
         var behaviour = obj.GetComponent<FakePointBehaviour>();
+        var worldToViewPort = Camera.main.WorldToViewportPoint(obj.transform.position);
+        worldToViewPort = new Vector3(worldToViewPort.x, Mathf.Abs(worldToViewPort.y - 1), worldToViewPort.z); //Switch from bot-left (0;0) to top-left(0;0)
 
         msg.Append(behaviour.pid);
-        msg.Append(behaviour.pid);
-        msg.Append(behaviour.pid);
+        //oid
 
-        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).x);
-        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).y);
+        if (CursorPoint != null)
+            msg.Append(behaviour.pid);
+        else
+            msg.Append(behaviour.pid - 1);
 
+        msg.Append((int)behaviour.Age);
+        //centroid
+        msg.Append(worldToViewPort.x);
+        msg.Append(worldToViewPort.y);
         //Velocity
-        msg.Append(behaviour.direction.x * behaviour.Speed);
-        msg.Append(behaviour.direction.y * behaviour.Speed);
-
+        var normalizedVelocity = behaviour.NormalizedVelocity;
+        msg.Append(-normalizedVelocity.x);
+        msg.Append(-normalizedVelocity.y);
         msg.Append((float)behaviour.pid);
 
         //Bounding
-        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).x - PointSize.x);
-        msg.Append(Camera.main.WorldToViewportPoint(obj.transform.position).y - PointSize.y);
+        msg.Append(worldToViewPort.x - PointSize.x / 2);
+        msg.Append(worldToViewPort.y - PointSize.y / 2);
+
         msg.Append(PointSize.x);
         msg.Append(PointSize.y);
 
-        msg.Append(0.0f);
-        msg.Append(0.0f);
-        msg.Append(0.0f);
+        msg.Append(worldToViewPort.x);
+        msg.Append(worldToViewPort.y);
+        msg.Append(0.5f);
 
         OSCMaster.sendMessage(msg, TargetIP, TargetPort);
     }
+    
 }

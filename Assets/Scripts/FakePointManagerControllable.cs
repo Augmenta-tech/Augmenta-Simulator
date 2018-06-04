@@ -11,6 +11,8 @@ public class FakePointManagerControllable : Controllable {
     public string TargetIP;
     [OSCProperty]
     public int TargetPort;
+    [OSCProperty]
+    public bool Mute;
 
     [Header("Area settings")]
     [OSCProperty]
@@ -31,9 +33,9 @@ public class FakePointManagerControllable : Controllable {
     public float Speed;
 
     [OSCMethod]
-    public void Clear()
+    public void RemovePoints()
     {
-        manager.Clear();
+        manager.RemovePoints();
     }
 
     public override void Awake()
@@ -41,6 +43,7 @@ public class FakePointManagerControllable : Controllable {
         TargetScript = manager;
         base.Awake();
     }
+
     public override void OnUiValueChanged(string name)
     {
         base.OnUiValueChanged(name);

@@ -235,7 +235,7 @@ Prefab:
     - target: {fileID: 224261597021104126, guid: 79c2718dd59243e4c90e145349e7dadf,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000061035156
+      value: 0.000015258789
       objectReference: {fileID: 0}
     - target: {fileID: 4679437618935694, guid: 79c2718dd59243e4c90e145349e7dadf, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -259,6 +259,26 @@ Prefab:
         type: 2}
       propertyPath: localPort
       value: 6001
+      objectReference: {fileID: 0}
+    - target: {fileID: 224261597021104126, guid: 79c2718dd59243e4c90e145349e7dadf,
+        type: 2}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224261597021104126, guid: 79c2718dd59243e4c90e145349e7dadf,
+        type: 2}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114683521581413328, guid: 79c2718dd59243e4c90e145349e7dadf,
+        type: 2}
+      propertyPath: SliderPrefab
+      value: 
+      objectReference: {fileID: 1018181201034402, guid: 89ea43e620d17ff4399df6de2e79a506,
+        type: 2}
+    - target: {fileID: 1277216160771640, guid: 79c2718dd59243e4c90e145349e7dadf, type: 2}
+      propertyPath: m_Name
+      value: OCF
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79c2718dd59243e4c90e145349e7dadf, type: 2}
@@ -440,15 +460,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TargetIP: 127.0.0.1
   TargetPort: 5000
+  Mute: 0
   Width: 500
-  WidthMin: 300
+  WidthLimit: {x: 300, y: 1900}
   Height: 800
-  HeightMin: 300
+  HeightLimit: {x: 300, y: 1000}
   Ratio: 0
   NbPoints: 10
   PointSize: {x: 20, y: 20}
   Speed: 1
-  UseBrownianMotion: 0
   Prefab: {fileID: 1289109677555090, guid: d3786ded4baa5a546a9b1f7826784985, type: 2}
   CanMoveCursorPoint: 0
 --- !u!33 &575826800
@@ -528,11 +548,12 @@ MonoBehaviour:
   manager: {fileID: 575826799}
   TargetIP: 127.0.0.1
   TargetPort: 5000
+  Mute: 0
   Width: 500
   Height: 800
   NbPoints: 10
-  PointSizeX: 100
-  PointSizeY: 100
+  PointSizeX: 75
+  PointSizeY: 75
   Speed: 1
 --- !u!1 &722713527
 GameObject:
