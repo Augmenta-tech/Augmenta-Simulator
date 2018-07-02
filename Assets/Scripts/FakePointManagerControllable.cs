@@ -48,6 +48,5 @@ public class FakePointManagerControllable : Controllable {
     {
         base.OnUiValueChanged(name);
         manager.PointSize = new Vector2(PointSizeX / Width, PointSizeY / Height);
-        manager.ChangeResolution();
     }
 }

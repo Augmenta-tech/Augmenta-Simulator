@@ -118,7 +118,7 @@ public class FakePointManager : MonoBehaviour {
 
         _frameCounter++; 
 
-        if (_oldWidth != Width && _oldHeight != Height)
+        if (_oldWidth != Width || _oldHeight != Height)
         {
             _oldWidth = Width;
             _oldHeight = Height;
@@ -194,11 +194,15 @@ public class FakePointManager : MonoBehaviour {
     public void InstantiatePoint()
     {
         if (NbPoints <= 0) NbPoints = 0;
+        
 
         if (InstanceNumber < NbPoints)
         {
             _highestPid++;
             InstanceNumber++;
+
+            if (_highestPid <= 0)
+                _highestPid = 1;
 
             var newPoint = Instantiate(Prefab);
             
@@ -210,8 +214,8 @@ public class FakePointManager : MonoBehaviour {
             newPoint.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
 
             InstanciatedPoints.Add(_highestPid, newPoint);
-            
 
+          
             SendPersonEntered(InstanciatedPoints[_highestPid]);
         }
 
@@ -224,6 +228,9 @@ public class FakePointManager : MonoBehaviour {
             InstanceNumber--;
 
         }
+
+
+        
     }
 
     private void ComputeOrthoCamera()

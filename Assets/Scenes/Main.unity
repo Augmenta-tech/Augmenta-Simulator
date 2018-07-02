@@ -235,7 +235,7 @@ Prefab:
     - target: {fileID: 224261597021104126, guid: 79c2718dd59243e4c90e145349e7dadf,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000015258789
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4679437618935694, guid: 79c2718dd59243e4c90e145349e7dadf, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -278,7 +278,12 @@ Prefab:
         type: 2}
     - target: {fileID: 1277216160771640, guid: 79c2718dd59243e4c90e145349e7dadf, type: 2}
       propertyPath: m_Name
-      value: OCF
+      value: GenUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 224261597021104126, guid: 79c2718dd59243e4c90e145349e7dadf,
+        type: 2}
+      propertyPath: m_SizeDelta.y
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79c2718dd59243e4c90e145349e7dadf, type: 2}
@@ -536,6 +541,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 549500f70af21674585d1c1e51ec43c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BarColor: {r: 0.54509807, g: 0, b: 0.8207547, a: 1}
   id: FakePointManager
   folder: 
   debug: 0
