@@ -1,0 +1,3 @@
+[submodule "Assets/Librairies/GenUI"]
+	path = Assets/Librairies/GenUI
+	url = http://github.com/theoriz/genui
