@@ -6,7 +6,7 @@ This space size is in pixel, which corresponds to the video output resolution.
 
 ## Download
 
-https://github.com/Theoriz/Augmenta-Simulator/releases
+Windows & Mac OS : https://github.com/Theoriz/Augmenta-Simulator/releases
 
 ## How to use ?
 
@@ -17,9 +17,13 @@ https://github.com/Theoriz/Augmenta-Simulator/releases
 3 - Receive your data in your Augmenta Unity project
 
 ## Information
+
+To to toggle UI press "tab".
+
 The window is resizeable which means that you can have a different aspect ratio than the area aspect ratio in which Augmenta works.
 This won't change the data output, it is only a visual change.
 
 ## Version
 
-Unity : 2018.1.1f1
+Unity : 2018.1.6f1
+GenUI : https://github.com/theoriz/genui
