@@ -96,6 +96,9 @@ public class PointManager : MonoBehaviour {
         CanMoveCursorPoint = true;
         _highestPid = 0;
         Physics2D.IgnoreLayerCollision(9, 9);
+
+        Width = 500;
+        Height = 800;
     }
 
     void Update () {
