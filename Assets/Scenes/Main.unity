@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -113,71 +113,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &170076733
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 170076735}
-  - component: {fileID: 170076734}
-  m_Layer: 0
-  m_Name: Directional Light
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!108 &170076734
-Light:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 170076733}
-  m_Enabled: 1
-  serializedVersion: 8
-  m_Type: 1
-  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 1
-  m_Range: 10
-  m_SpotAngle: 30
-  m_CookieSize: 10
-  m_Shadows:
-    m_Type: 2
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_Lightmapping: 1
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_ShadowRadius: 0
-  m_ShadowAngle: 0
---- !u!4 &170076735
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 170076733}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1001 &229262182
 Prefab:
   m_ObjectHideFlags: 0
@@ -215,7 +150,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4679437618935694, guid: 79c2718dd59243e4c90e145349e7dadf, type: 2}
       propertyPath: m_RootOrder
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 224579476644313692, guid: 79c2718dd59243e4c90e145349e7dadf,
         type: 2}
@@ -359,7 +294,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &541493437
 GameObject:
@@ -426,8 +361,10 @@ GameObject:
   - component: {fileID: 575826800}
   - component: {fileID: 575826801}
   - component: {fileID: 575826799}
-  - component: {fileID: 575826802}
   - component: {fileID: 575826803}
+  - component: {fileID: 575826802}
+  - component: {fileID: 575826804}
+  - component: {fileID: 575826805}
   m_Layer: 0
   m_Name: Core
   m_TagString: Untagged
@@ -450,7 +387,7 @@ Transform:
   - {fileID: 1324714786}
   - {fileID: 722713528}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &575826799
 MonoBehaviour:
@@ -463,17 +400,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c0ec0cc0b7bcc545a832bc273e09c4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TargetIP: 127.0.0.1
-  TargetPort: 5000
-  Mute: 0
-  Width: 500
   WidthLimit: {x: 300, y: 1900}
-  Height: 800
   HeightLimit: {x: 300, y: 1000}
   Ratio: 0
+  Mute: 0
   NbPoints: 10
-  PointSize: {x: 20, y: 20}
-  Speed: 1
   Prefab: {fileID: 1289109677555090, guid: d3786ded4baa5a546a9b1f7826784985, type: 2}
   CanMoveCursorPoint: 0
 --- !u!33 &575826800
@@ -542,7 +473,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BarColor: {r: 0.54509807, g: 0, b: 0.8207547, a: 1}
-  id: FakePointManager
+  id: PointManager
   folder: 
   debug: 0
   targetDirectory: 
@@ -552,8 +483,6 @@ MonoBehaviour:
   currentPreset: 
   presetList: []
   manager: {fileID: 575826799}
-  TargetIP: 127.0.0.1
-  TargetPort: 5000
   Mute: 0
   Width: 500
   Height: 800
@@ -561,6 +490,41 @@ MonoBehaviour:
   PointSizeX: 75
   PointSizeY: 75
   Speed: 1
+--- !u!114 &575826804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 575826797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78fc6aa1bb97f104e961e836a436c864, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &575826805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 575826797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ca16df4d60ac0e4f8a8740b3a42d7ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BarColor: {r: 1, g: 0.8006334, b: 0.23829654, a: 1}
+  id: AugmentaOSC
+  folder: 
+  debug: 0
+  targetDirectory: 
+  sourceScene: 
+  usePanel: 1
+  usePresets: 1
+  currentPreset: 
+  presetList: []
+  manager: {fileID: 575826804}
+  TargetIP: 
+  TargetPort: 0
 --- !u!1 &722713527
 GameObject:
   m_ObjectHideFlags: 0
