@@ -130,7 +130,7 @@ public class PointManager : MonoBehaviour {
                 Destroy(CursorPoint);
             }
         }
-        if (Input.GetMouseButton(0) && CanMoveCursorPoint)
+        else if (Input.GetMouseButton(0) && CanMoveCursorPoint)
         {
             if (CursorPoint == null)
             {
