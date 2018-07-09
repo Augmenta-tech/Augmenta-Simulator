@@ -17,6 +17,7 @@ public class PointManagerControllable : Controllable {
 
     [Header("Points settings")]
     [OSCProperty]
+    [Range(0,50)]
     public int NbPoints;
     [OSCProperty]
     public float PointSizeX;
