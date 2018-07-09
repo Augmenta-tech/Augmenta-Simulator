@@ -98,7 +98,7 @@ public class AugmentaOSCHandler : MonoBehaviour
             msg.Append(machineAddress);
             msg.Append(netWorkInterface);
             if(debug)
-                Debug.Log("Answered : /wassup " + machineAddress + " " + netWorkInterface);
+                Debug.Log("[Augmenta] /wassup " + machineAddress + " " + netWorkInterface);
             SendMessageTo(msg, message.Data[0].ToString(), int.Parse(message.Data[1].ToString()));
         }
 
@@ -108,7 +108,7 @@ public class AugmentaOSCHandler : MonoBehaviour
             TargetIP = message.Data[1].ToString();
             TargetPort = int.Parse(message.Data[2].ToString());
             if (debug)
-                Debug.Log("TargetIp : " + message.Data[1].ToString() + ":" + message.Data[2].ToString());
+                Debug.Log("[Augmenta] Sending to " + message.Data[1].ToString() + ":" + message.Data[2].ToString());
             //CreateClient("AugmentaSimulatorOutput", IPAddress.Parse(TargetIP), TargetPort);
         }
 

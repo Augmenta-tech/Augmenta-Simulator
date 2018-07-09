@@ -23,6 +23,7 @@ public class PointBehaviour : MonoBehaviour {
     public int pid;
     public Vector3 direction;
     public bool isMouse;
+    public Color PointColor;
 
     public Vector3 NormalizedVelocity;
 

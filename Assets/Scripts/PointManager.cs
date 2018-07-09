@@ -7,7 +7,7 @@ using System.Net;
 public class PointManager : MonoBehaviour {
 
     [Header("Area settings")]
-    private int _width;
+    private int _width = 500;
     public int Width
     {
         get
@@ -22,7 +22,7 @@ public class PointManager : MonoBehaviour {
     }
     public Vector2 WidthLimit;
 
-    private int _height;
+    private int _height = 800;
     public int Height
     {
         get
@@ -39,7 +39,20 @@ public class PointManager : MonoBehaviour {
     public float Ratio;
 
     [Header("Points settings")]
-    public bool Mute;
+    public bool _mute;
+    public bool Mute
+    {
+        get
+        {
+            return _mute;
+        }
+        set
+        {
+            this._mute = value;
+            foreach (var point in InstanciatedPoints.Values)
+                ChangePointColor(point);
+        }
+    }
     public int NbPoints;
     private Vector2 _pointSize;
     public Vector2 PointSize
@@ -96,9 +109,7 @@ public class PointManager : MonoBehaviour {
         CanMoveCursorPoint = true;
         _highestPid = 0;
         Physics2D.IgnoreLayerCollision(9, 9);
-
-        Width = 500;
-        Height = 800;
+        ChangeResolution();
     }
 
     void Update () {
@@ -124,7 +135,9 @@ public class PointManager : MonoBehaviour {
             if (CursorPoint == null)
             {
                 CursorPoint = Instantiate(Prefab);
-                CursorPoint.GetComponent<MeshRenderer>().material.SetColor("_PointColor", Color.HSVToRGB(Random.value, 0.85f, 0.75f));
+                CursorPoint.GetComponent<PointBehaviour>().PointColor = Color.HSVToRGB(Random.value, 0.85f, 0.75f);
+                CursorPoint.GetComponent<MeshRenderer>().material.SetColor("_PointColor", CursorPoint.GetComponent<PointBehaviour>().PointColor);
+                ChangePointColor(CursorPoint);
                 CursorPoint.transform.parent = transform;
                 var newPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
                 newPos.z = 0;
@@ -152,6 +165,13 @@ public class PointManager : MonoBehaviour {
             SendPersonUpdated(obj.Value);
 	}
 
+    public void ChangePointColor(GameObject target) {
+        if (Mute)
+            target.GetComponent<Renderer>().material.SetColor("_PointColor", Color.gray);
+        else
+            target.GetComponent<Renderer>().material.SetColor("_PointColor", target.GetComponent<PointBehaviour>().PointColor);
+    }
+
     public void InstantiatePoint()
     {
         if (NbPoints <= 0) NbPoints = 0;
@@ -166,8 +186,10 @@ public class PointManager : MonoBehaviour {
                 _highestPid = 1;
 
             var newPoint = Instantiate(Prefab);
-            
-            newPoint.GetComponent<MeshRenderer>().material.SetColor("_PointColor", Color.HSVToRGB(Random.value, 0.75f, 0.75f));
+
+            newPoint.GetComponent<PointBehaviour>().PointColor = Color.HSVToRGB(Random.value, 0.85f, 0.75f);
+            newPoint.GetComponent<MeshRenderer>().material.SetColor("_PointColor", newPoint.GetComponent<PointBehaviour>().PointColor);
+            ChangePointColor(newPoint);
             newPoint.transform.parent = transform;
             newPoint.GetComponent<PointBehaviour>().Speed = Speed;
             newPoint.GetComponent<PointBehaviour>().pid = _highestPid;
@@ -189,9 +211,6 @@ public class PointManager : MonoBehaviour {
             InstanceNumber--;
 
         }
-
-
-        
     }
 
     private void ComputeOrthoCamera()
@@ -224,8 +243,8 @@ public class PointManager : MonoBehaviour {
     public void ChangeResolution()
     {
         var ratio = (float)Width / (float)Height;
-        var newWidth = Width;
-        var newHeight = Height;
+        var newWidth = _width;
+        var newHeight = _height;
 
         newWidth = (int)Mathf.Clamp(Width, WidthLimit.x, WidthLimit.y);
         newHeight = (int)Mathf.Clamp(Height, HeightLimit.x, HeightLimit.y);

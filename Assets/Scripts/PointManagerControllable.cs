@@ -39,6 +39,11 @@ public class PointManagerControllable : Controllable {
         base.Awake();
     }
 
+    public override void DataLoaded()
+    {
+        manager.ChangeResolution();
+    }
+
     public override void OnUiValueChanged(string name)
     {
         base.OnUiValueChanged(name);
