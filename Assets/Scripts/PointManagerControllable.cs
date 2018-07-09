@@ -28,7 +28,7 @@ public class PointManagerControllable : Controllable {
     public float Speed;
 
     [OSCMethod]
-    public void RemovePoints()
+    public void RemoveAll()
     {
         manager.RemovePoints();
     }

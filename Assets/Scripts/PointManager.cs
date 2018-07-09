@@ -112,7 +112,21 @@ public class PointManager : MonoBehaviour {
         ChangeResolution();
     }
 
+    public void CheckInputs()
+    {
+        if (Input.GetKeyUp(KeyCode.M))
+            Mute = !Mute;
+
+        if (Input.GetKeyUp(KeyCode.Escape))
+            Application.Quit();
+
+        if (Input.GetKeyUp(KeyCode.Backspace))
+            RemovePoints();
+    }
+
     void Update () {
+
+        CheckInputs();
 
         _frameCounter++; 
 

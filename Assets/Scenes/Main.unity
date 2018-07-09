@@ -403,7 +403,7 @@ MonoBehaviour:
   WidthLimit: {x: 300, y: 1900}
   HeightLimit: {x: 300, y: 1000}
   Ratio: 0
-  Mute: 0
+  _mute: 0
   NbPoints: 10
   Prefab: {fileID: 1289109677555090, guid: d3786ded4baa5a546a9b1f7826784985, type: 2}
   CanMoveCursorPoint: 0
