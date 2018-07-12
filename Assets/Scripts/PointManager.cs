@@ -120,7 +120,7 @@ public class PointManager : MonoBehaviour {
         if (Input.GetKeyUp(KeyCode.Escape))
             Application.Quit();
 
-        if (Input.GetKeyUp(KeyCode.Backspace))
+        if (Input.GetKeyUp(KeyCode.R))
             RemovePoints();
     }
 
