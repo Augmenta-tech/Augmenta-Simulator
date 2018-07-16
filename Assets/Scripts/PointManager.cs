@@ -334,7 +334,7 @@ public class PointManager : MonoBehaviour {
         msg.Append(velocitySum.y);
         msg.Append(Width);
         msg.Append(Height);
-        msg.Append(100f);
+        msg.Append(100);
 
         AugmentaOSCHandler.Instance.SendMessage("AugmentaSimulatorOutput", msg);
     }
