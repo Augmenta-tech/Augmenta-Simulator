@@ -1,20 +1,21 @@
-﻿Shader "Custom/UVBorderOutline"
+﻿Shader "Unlit/AugmentaUnlitOnTop"
 {
 	Properties
 	{
-		[Toggle] _UseTex("Use texture", Range(0,1)) = 0
 		_MainTex ("Texture", 2D) = "white" {}
-		_BorderColor("Point color", Color) = (0,0,0,0)
 		_CenterColor("Center color", Color) = (0,0,0,0)
-		_CenterSize ("CenterSize", Range(0, 0.5)) = 0.1
+		_BorderColor("Border color", Color) = (0,0,0,0)
+		_BorderThickness("Border Thickness", Range(0.0, 1.0)) = 0.1
+		_Transparency("Transparency", Range(0.0, 1.0)) = 1.0
 	}
 	SubShader
 	{
 		Tags {"Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent"}
 		LOD 100
-     
-		ZWrite Off
-		ZTest LEss     
+		
+		//Cull Off
+		//ZWrite Off
+		//ZTest Always     
 		Blend SrcAlpha OneMinusSrcAlpha 
 		
 		Pass
@@ -40,11 +41,10 @@
 				float4 vertex : SV_POSITION;
 			};
 
-			float4 _BorderColor;
 			float4 _CenterColor;
-			float _SquareSize;
-			float _UseTex;
-			float _CenterSize;
+			float4 _BorderColor;
+			float _BorderThickness;
+			float _Transparency;
 
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
@@ -60,19 +60,16 @@
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
-				fixed4 col = _BorderColor;
+				fixed4 col = _CenterColor;
 
-				if(i.uv.x > _CenterSize && i.uv.x < 1 - _CenterSize) {
-					if(i.uv.y > _CenterSize && i.uv.y < 1- _CenterSize) {
-						if(_UseTex)
-							col = tex2D(_MainTex, i.uv) * _CenterColor;
-						else
-							col = _CenterColor;
-					}
+				
+				if(i.uv.x < _BorderThickness  || i.uv.x > 1 - _BorderThickness || i.uv.y < _BorderThickness || i.uv.y > 1 - _BorderThickness) {
+						col = _BorderColor;
+					
 				}
+				
+				col.a = _Transparency;
 
-				// apply fog
-				UNITY_APPLY_FOG(i.fogCoord, col);
 				return col;
 			}
 			ENDCG

@@ -366,7 +366,7 @@ GameObject:
   - component: {fileID: 575826804}
   - component: {fileID: 575826805}
   m_Layer: 0
-  m_Name: Core
+  m_Name: Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -405,7 +405,7 @@ MonoBehaviour:
   Ratio: 0
   _mute: 0
   NbPoints: 10
-  Prefab: {fileID: 1289109677555090, guid: d3786ded4baa5a546a9b1f7826784985, type: 2}
+  Prefab: {fileID: 1897133376265846, guid: f52716752aba2a44281446caa8282db8, type: 2}
   CanMoveCursorPoint: 0
 --- !u!33 &575826800
 MeshFilter:
@@ -429,7 +429,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: d3f31d6b11073234a8ae08bfc1ca10a9, type: 2}
+  - {fileID: 2100000, guid: 7cd67c5e337e6c44c89a4bea7e8985f3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -486,7 +486,7 @@ MonoBehaviour:
   Mute: 0
   Width: 500
   Height: 800
-  NbPoints: 10
+  NbPoints: 5
   PointSizeX: 75
   PointSizeY: 75
   Speed: 1

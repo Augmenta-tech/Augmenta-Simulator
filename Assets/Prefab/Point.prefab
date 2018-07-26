@@ -181,7 +181,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 6200000, guid: cc539cdfbf73ce8459814c4fe4e1acb6, type: 2}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -230,6 +230,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
-  Speed: 0
+  Age: 0
+  PointInfoText: {fileID: 0}
+  Point: {fileID: 0}
+  VelocityVisualizer: {fileID: 0}
+  VelocityThickness: 0
   pid: 0
+  oid: 0
   direction: {x: -0.20054637, y: 0.48093697, z: 0}
+  isMouse: 0
+  PointColor: {r: 0, g: 0, b: 0, a: 0}
+  NormalizedVelocity: {x: 0, y: 0, z: 0}
+  _oldPosition: {x: 0, y: 0, z: 0}

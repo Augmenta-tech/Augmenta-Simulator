@@ -7,6 +7,11 @@ public class PointBehaviour : MonoBehaviour {
     public PointManager manager;
     public long Age;
 
+    public TextMesh PointInfoText;
+    public Transform Point;
+    public Transform VelocityVisualizer;
+    public float VelocityThickness;
+
     private float _speed;
     public float Speed
     {
@@ -21,6 +26,7 @@ public class PointBehaviour : MonoBehaviour {
         }
     }
     public int pid;
+    public int oid;
     public Vector3 direction;
     public bool isMouse;
     public Color PointColor;
@@ -41,7 +47,7 @@ public class PointBehaviour : MonoBehaviour {
 
         //GetComponent<Rigidbody2D>().velocity = direction * Speed;
 
-        transform.GetChild(0).GetComponent<TextMesh>().text = "ID : " + pid;
+        Point.GetComponent<MeshRenderer>().material.SetColor("_BorderColor", PointColor);
     }
 
     public void UpdateOldPosition()
@@ -86,6 +92,25 @@ public class PointBehaviour : MonoBehaviour {
             newPos = Vector3.zero;
 
         transform.position = newPos;
+
+        if (manager == null)
+            return;
+        //Update bouding box
+       // Point.transform.localScale = new Vector3(manager.Width* manager.transform.localScale.x, manager.Height * manager.transform.localScale.y, 0.1f);
+
+        var oid = pid;
+        //if (!isMouse)
+        //    oid -= 1;
+
+        //udpate text
+        PointInfoText.text = "PID : " + pid + '\n' + '\n'  + "OID : " + oid;
+
+        //Update velocity
+        float angle = Mathf.Atan2(NormalizedVelocity.y, NormalizedVelocity.x) * 180 / Mathf.PI;
+        if (float.IsNaN(angle))
+            return;
+        VelocityVisualizer.localRotation = Quaternion.Euler(new Vector3(0, 0, -angle + 90));
+        VelocityVisualizer.localScale = new Vector3(VelocityThickness, NormalizedVelocity.magnitude * 100, VelocityThickness);
     }
 
     private void OnMouseDown()
@@ -109,6 +134,10 @@ public class PointBehaviour : MonoBehaviour {
         manager.CanMoveCursorPoint = true;
     }
 
+    public void ChangePointColor(Color col)
+    {
+        Point.GetComponent<MeshRenderer>().material.SetColor("_BorderColor", col);
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

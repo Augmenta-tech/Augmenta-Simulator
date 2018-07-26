@@ -50,7 +50,7 @@ public class PointManager : MonoBehaviour {
         {
             this._mute = value;
             foreach (var point in InstanciatedPoints.Values)
-                ChangePointColor(point);
+                ChangePointColor(point.GetComponent<PointBehaviour>());
         }
     }
     public int NbPoints;
@@ -150,8 +150,8 @@ public class PointManager : MonoBehaviour {
             {
                 CursorPoint = Instantiate(Prefab);
                 CursorPoint.GetComponent<PointBehaviour>().PointColor = Color.HSVToRGB(Random.value, 0.85f, 0.75f);
-                CursorPoint.GetComponent<MeshRenderer>().material.SetColor("_PointColor", CursorPoint.GetComponent<PointBehaviour>().PointColor);
-                ChangePointColor(CursorPoint);
+//                CursorPoint.GetComponent<MeshRenderer>().material.SetColor("_PointColor", CursorPoint.GetComponent<PointBehaviour>().PointColor);
+                ChangePointColor(CursorPoint.GetComponent<PointBehaviour>());
                 CursorPoint.transform.parent = transform;
                 var newPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
                 newPos.z = 0;
@@ -179,11 +179,11 @@ public class PointManager : MonoBehaviour {
             SendPersonUpdated(obj.Value);
 	}
 
-    public void ChangePointColor(GameObject target) {
+    public void ChangePointColor(PointBehaviour target) {
         if (Mute)
-            target.GetComponent<Renderer>().material.SetColor("_PointColor", Color.gray);
+            target.ChangePointColor(Color.gray);
         else
-            target.GetComponent<Renderer>().material.SetColor("_PointColor", target.GetComponent<PointBehaviour>().PointColor);
+            target.ChangePointColor(target.PointColor);
     }
 
     public void InstantiatePoint()
@@ -202,12 +202,11 @@ public class PointManager : MonoBehaviour {
             var newPoint = Instantiate(Prefab);
 
             newPoint.GetComponent<PointBehaviour>().PointColor = Color.HSVToRGB(Random.value, 0.85f, 0.75f);
-            newPoint.GetComponent<MeshRenderer>().material.SetColor("_PointColor", newPoint.GetComponent<PointBehaviour>().PointColor);
-            ChangePointColor(newPoint);
+            newPoint.GetComponent<PointBehaviour>().manager = this;
+            ChangePointColor(newPoint.GetComponent<PointBehaviour>());
             newPoint.transform.parent = transform;
             newPoint.GetComponent<PointBehaviour>().Speed = Speed;
             newPoint.GetComponent<PointBehaviour>().pid = _highestPid;
-            newPoint.GetComponent<PointBehaviour>().manager = this;
             newPoint.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
 
             InstanciatedPoints.Add(_highestPid, newPoint);
