@@ -47,7 +47,7 @@ public class PointBehaviour : MonoBehaviour {
 
         //GetComponent<Rigidbody2D>().velocity = direction * Speed;
 
-        Point.GetComponent<MeshRenderer>().material.SetColor("_BorderColor", PointColor);
+        //Point.GetComponent<MeshRenderer>().material.SetColor("_BorderColor", PointColor);
     }
 
     public void UpdateOldPosition()
@@ -68,6 +68,7 @@ public class PointBehaviour : MonoBehaviour {
 
         //Debug.Log("Velocity : " + (oldPositionNormalized - worldToViewPort));
         NormalizedVelocity = oldPositionNormalized - worldToViewPort;
+        //NormalizedVelocity = GetComponent<Rigidbody2D>().velocity
     }
 
     private void Update()
@@ -75,7 +76,6 @@ public class PointBehaviour : MonoBehaviour {
         Age++;
       
         //Compute velocity
-        ComputeNormalizedVelocity();
 
         if (isMouse)
         {
@@ -93,6 +93,7 @@ public class PointBehaviour : MonoBehaviour {
 
         transform.position = newPos;
 
+        ComputeNormalizedVelocity();
         if (manager == null)
             return;
         //Update bouding box
@@ -109,7 +110,13 @@ public class PointBehaviour : MonoBehaviour {
         float angle = Mathf.Atan2(NormalizedVelocity.y, NormalizedVelocity.x) * 180 / Mathf.PI;
         if (float.IsNaN(angle))
             return;
+
+
+        //Debug.Log("Scale : " + NormalizedVelocity.magnitude * 100);
+
         VelocityVisualizer.localRotation = Quaternion.Euler(new Vector3(0, 0, -angle + 90));
+        
+        //111
         VelocityVisualizer.localScale = new Vector3(VelocityThickness, NormalizedVelocity.magnitude * 100, VelocityThickness);
     }
 

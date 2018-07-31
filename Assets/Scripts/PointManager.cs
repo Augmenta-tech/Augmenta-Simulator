@@ -133,6 +133,10 @@ public class PointManager : MonoBehaviour {
         if (InstanceNumber != NbPoints)
             InstantiatePoint();
 
+        //"Weird behaviour "fix"
+        if (NbPoints == 0)
+            CanMoveCursorPoint = true;
+
         if (Input.GetMouseButton(1))
         {
             if (CursorPoint != null)
@@ -217,12 +221,14 @@ public class PointManager : MonoBehaviour {
 
         if (InstanceNumber > NbPoints)
         {
-            SendPersonLeft(InstanciatedPoints[_highestPid]);
-            Destroy(InstanciatedPoints[_highestPid]);
-            InstanciatedPoints.Remove(_highestPid);
-            _highestPid--;
-            InstanceNumber--;
-
+            if (InstanciatedPoints.ContainsKey(_highestPid))
+            {
+                SendPersonLeft(InstanciatedPoints[_highestPid]);
+                Destroy(InstanciatedPoints[_highestPid]);
+                InstanciatedPoints.Remove(_highestPid);
+                _highestPid--;
+                InstanceNumber--;
+            }
         }
     }
 
@@ -234,6 +240,7 @@ public class PointManager : MonoBehaviour {
         Ratio = ((float)Width / (float)Height);
 
         transform.localScale = new Vector3(Width, Height,1f) / 100;
+        GetComponent<Renderer>().material.mainTextureScale = transform.localScale * 1.5f;
 
         Camera.main.aspect = Ratio;
         Camera.main.orthographicSize = transform.localScale.y / 2;

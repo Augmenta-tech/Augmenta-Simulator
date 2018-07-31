@@ -404,7 +404,7 @@ MonoBehaviour:
   HeightLimit: {x: 300, y: 1000}
   Ratio: 0
   _mute: 0
-  NbPoints: 10
+  NbPoints: 1
   Prefab: {fileID: 1897133376265846, guid: f52716752aba2a44281446caa8282db8, type: 2}
   CanMoveCursorPoint: 0
 --- !u!33 &575826800
@@ -472,6 +472,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 549500f70af21674585d1c1e51ec43c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TargetScript: {fileID: 0}
   BarColor: {r: 0.54509807, g: 0, b: 0.8207547, a: 1}
   id: PointManager
   folder: 
@@ -486,7 +487,7 @@ MonoBehaviour:
   Mute: 0
   Width: 500
   Height: 800
-  NbPoints: 5
+  NbPoints: 1
   PointSizeX: 75
   PointSizeY: 75
   Speed: 1
@@ -513,6 +514,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ca16df4d60ac0e4f8a8740b3a42d7ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TargetScript: {fileID: 0}
   BarColor: {r: 1, g: 0.8006334, b: 0.23829654, a: 1}
   id: AugmentaOSC
   folder: 
