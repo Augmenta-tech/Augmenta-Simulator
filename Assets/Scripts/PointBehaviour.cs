@@ -44,15 +44,6 @@ public class PointBehaviour : MonoBehaviour {
             GetComponent<Rigidbody2D>().velocity = rndVelocity;
         else
             GetComponent<Rigidbody2D>().isKinematic = true;
-
-        //GetComponent<Rigidbody2D>().velocity = direction * Speed;
-
-        //Point.GetComponent<MeshRenderer>().material.SetColor("_BorderColor", PointColor);
-    }
-
-    public void UpdateOldPosition()
-    {
-        _oldPosition = transform.position;
     }
 
     private void ComputeNormalizedVelocity()
@@ -66,9 +57,26 @@ public class PointBehaviour : MonoBehaviour {
 
         _oldPosition = transform.position;
 
-        //Debug.Log("Velocity : " + (oldPositionNormalized - worldToViewPort));
-        NormalizedVelocity = oldPositionNormalized - worldToViewPort;
+        //Debug.Log("Velocity : " + (oldPositionNormalized - worldToViewPort));²
+        NormalizedVelocity = (oldPositionNormalized - worldToViewPort);
         //NormalizedVelocity = GetComponent<Rigidbody2D>().velocity
+    }
+
+    private void FixedUpdate()
+    {
+        ComputeNormalizedVelocity();
+        //Update velocity
+        float angle = Mathf.Atan2(NormalizedVelocity.y, NormalizedVelocity.x) * 180 / Mathf.PI;
+        if (float.IsNaN(angle))
+            return;
+
+
+        //Debug.Log("Scale : " + NormalizedVelocity.magnitude * 100);
+
+        VelocityVisualizer.localRotation = Quaternion.Euler(new Vector3(0, 0, -angle + 90));
+
+        //111
+        VelocityVisualizer.localScale = new Vector3(VelocityThickness, NormalizedVelocity.magnitude * 100, VelocityThickness);
     }
 
     private void Update()
@@ -93,7 +101,7 @@ public class PointBehaviour : MonoBehaviour {
 
         transform.position = newPos;
 
-        ComputeNormalizedVelocity();
+        
         if (manager == null)
             return;
         //Update bouding box
@@ -106,18 +114,7 @@ public class PointBehaviour : MonoBehaviour {
         //udpate text
         PointInfoText.text = "PID : " + pid + '\n' + '\n'  + "OID : " + oid;
 
-        //Update velocity
-        float angle = Mathf.Atan2(NormalizedVelocity.y, NormalizedVelocity.x) * 180 / Mathf.PI;
-        if (float.IsNaN(angle))
-            return;
 
-
-        //Debug.Log("Scale : " + NormalizedVelocity.magnitude * 100);
-
-        VelocityVisualizer.localRotation = Quaternion.Euler(new Vector3(0, 0, -angle + 90));
-        
-        //111
-        VelocityVisualizer.localScale = new Vector3(VelocityThickness, NormalizedVelocity.magnitude * 100, VelocityThickness);
     }
 
     private void OnMouseDown()
