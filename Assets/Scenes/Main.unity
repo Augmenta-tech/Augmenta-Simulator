@@ -476,7 +476,7 @@ MonoBehaviour:
   BarColor: {r: 0.54509807, g: 0, b: 0.8207547, a: 1}
   id: PointManager
   folder: 
-  debug: 1
+  debug: 0
   targetDirectory: 
   sourceScene: 
   usePanel: 1
