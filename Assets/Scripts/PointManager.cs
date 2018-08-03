@@ -7,7 +7,7 @@ using System.Net;
 public class PointManager : MonoBehaviour {
 
     [Header("Area settings")]
-    private int _width = 500;
+    private int _width;
     public int Width
     {
         get
@@ -22,7 +22,7 @@ public class PointManager : MonoBehaviour {
     }
     public Vector2 WidthLimit;
 
-    private int _height = 800;
+    private int _height;
     public int Height
     {
         get
@@ -49,8 +49,11 @@ public class PointManager : MonoBehaviour {
         set
         {
             this._mute = value;
-            foreach (var point in InstanciatedPoints.Values)
-                ChangePointColor(point.GetComponent<PointBehaviour>());
+            if (InstanciatedPoints != null)
+            {
+                foreach (var point in InstanciatedPoints.Values)
+                    ChangePointColor(point.GetComponent<PointBehaviour>());
+            }
         }
     }
     public int NbPoints;
@@ -234,8 +237,8 @@ public class PointManager : MonoBehaviour {
 
     private void ComputeOrthoCamera()
     {
-        if (Width <= 0) Width = 1;
-        if (Height <= 0) Height = 1;
+        if (Width <= 0) Width = 500;
+        if (Height <= 0) Height = 800;
 
         Ratio = ((float)Width / (float)Height);
 
