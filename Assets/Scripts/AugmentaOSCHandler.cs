@@ -52,9 +52,9 @@ public class AugmentaOSCHandler : MonoBehaviour
     {
         Instance = this;
         TargetIP = "127.0.0.1";
-        TargetPort = 7000;
+        TargetPort = 5000;
 
-        machineAddress = Network.player.ipAddress;
+        machineAddress = IPManager.GetIpv4();
         netWorkInterface = ShowNetworkInterfaces();
 
         CreateServer("AugmentaYo", 36278);

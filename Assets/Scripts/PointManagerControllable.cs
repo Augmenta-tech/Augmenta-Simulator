@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class PointManagerControllable : Controllable {
 
-    public PointManager manager;
-
     [OSCProperty]
     public bool Mute;
 
@@ -17,7 +15,7 @@ public class PointManagerControllable : Controllable {
 
     [Header("Points settings")]
     [OSCProperty]
-    [Range(0,50)]
+    [Range(0,30)]
     public int NbPoints;
     [OSCProperty]
     public float PointSizeX;
@@ -31,23 +29,17 @@ public class PointManagerControllable : Controllable {
     [OSCMethod]
     public void RemoveAll()
     {
-        manager.RemovePoints();
-    }
-
-    public override void Awake()
-    {
-        TargetScript = manager;
-        base.Awake();
+        ((PointManager)TargetScript).RemovePoints();
     }
 
     public override void DataLoaded()
     {
-        manager.ChangeResolution();
+        ((PointManager)TargetScript).ChangeResolution();
     }
 
     public override void OnUiValueChanged(string name)
     {
         base.OnUiValueChanged(name);
-        manager.PointSize = new Vector2(PointSizeX / Width, PointSizeY / Height);
+        ((PointManager)TargetScript).PointSize = new Vector2(PointSizeX / Width, PointSizeY / Height);
     }
 }

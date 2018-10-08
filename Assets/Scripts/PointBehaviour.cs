@@ -44,6 +44,8 @@ public class PointBehaviour : MonoBehaviour {
             GetComponent<Rigidbody2D>().velocity = rndVelocity;
         else
             GetComponent<Rigidbody2D>().isKinematic = true;
+
+        VelocityVisualizer.localScale = Vector3.zero;
     }
 
     private void ComputeNormalizedVelocity()

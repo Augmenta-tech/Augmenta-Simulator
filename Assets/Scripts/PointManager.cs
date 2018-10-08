@@ -2,6 +2,7 @@
 using System.Net.NetworkInformation;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Net;
 
 public class PointManager : MonoBehaviour {
@@ -100,8 +101,8 @@ public class PointManager : MonoBehaviour {
     public GameObject Prefab;
     private int InstanceNumber;
 
+    private bool _clickStartedOutsideUI;
     private int _highestPid;
-
     public static Dictionary<int, GameObject> InstanciatedPoints;
 
     private GameObject CursorPoint;
@@ -133,14 +134,23 @@ public class PointManager : MonoBehaviour {
 
         _frameCounter++; 
 
-        if (InstanceNumber != NbPoints)
+        while (InstanceNumber != NbPoints)
             InstantiatePoint();
 
         //"Weird behaviour "fix"
         if (NbPoints == 0)
             CanMoveCursorPoint = true;
 
-        if (Input.GetMouseButton(1))
+        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
+        {
+            _clickStartedOutsideUI = true;
+        }
+        if(Input.GetMouseButtonUp(0))
+        {
+            _clickStartedOutsideUI = false;
+        }
+
+        if (Input.GetMouseButton(1) && !EventSystem.current.IsPointerOverGameObject())
         {
             if (CursorPoint != null)
             {
@@ -151,7 +161,7 @@ public class PointManager : MonoBehaviour {
                 Destroy(CursorPoint);
             }
         }
-        else if (Input.GetMouseButton(0) && CanMoveCursorPoint)
+        else if (Input.GetMouseButton(0) && CanMoveCursorPoint && !EventSystem.current.IsPointerOverGameObject())
         {
             if (CursorPoint == null)
             {
@@ -212,6 +222,7 @@ public class PointManager : MonoBehaviour {
             newPoint.GetComponent<PointBehaviour>().manager = this;
             ChangePointColor(newPoint.GetComponent<PointBehaviour>());
             newPoint.transform.parent = transform;
+            newPoint.transform.localPosition = new Vector3(Random.Range(-0.5f + (PointSize.x / Width) , 0.5f - (PointSize.x / Width)), Random.Range(-0.5f + (PointSize.y / Height), 0.5f - (PointSize.y / Height)));
             newPoint.GetComponent<PointBehaviour>().Speed = Speed;
             newPoint.GetComponent<PointBehaviour>().pid = _highestPid;
             newPoint.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
@@ -277,7 +288,7 @@ public class PointManager : MonoBehaviour {
 
     public void OnMouseDrag()
     {
-        if (CursorPoint == null || !CanMoveCursorPoint) return;
+        if (CursorPoint == null || !CanMoveCursorPoint || !_clickStartedOutsideUI) return;
 
         var newPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
         newPos.z = 0;
