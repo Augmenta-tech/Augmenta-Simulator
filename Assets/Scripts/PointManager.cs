@@ -337,7 +337,7 @@ public class PointManager : MonoBehaviour {
     {
         if (Mute) return;
 
-        var msg = new UnityOSC.OSCMessage("/au/scene/");
+        var msg = new UnityOSC.OSCMessage("/au/scene");
         msg.Append(_frameCounter);
         //Compute point size
         msg.Append(InstanceNumber * PointSize.x * PointSize.y);
@@ -361,17 +361,17 @@ public class PointManager : MonoBehaviour {
 
     public void SendPersonEntered(GameObject obj)
     {
-        SendAugmentaMessage("/au/personEntered/", obj);
+        SendAugmentaMessage("/au/personEntered", obj);
     }
 
     public void SendPersonUpdated(GameObject obj)
     {
-        SendAugmentaMessage("/au/personUpdated/", obj);
+        SendAugmentaMessage("/au/personUpdated", obj);
     }
 
     public void SendPersonLeft(GameObject obj)
     {
-        SendAugmentaMessage("/au/personWillLeave/", obj);
+        SendAugmentaMessage("/au/personWillLeave", obj);
     }
 
 
