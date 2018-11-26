@@ -52,7 +52,7 @@ public class AugmentaOSCHandler : MonoBehaviour
     {
         Instance = this;
         TargetIP = "127.0.0.1";
-        TargetPort = 5000;
+        TargetPort = 12000;
 
         machineAddress = IPManager.GetIpv4();
         netWorkInterface = ShowNetworkInterfaces();

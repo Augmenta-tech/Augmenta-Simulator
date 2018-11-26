@@ -8,7 +8,7 @@ using System.Net;
 public class PointManager : MonoBehaviour {
 
     [Header("Area settings")]
-    private int _width;
+    private int _width = 1280;
     public int Width
     {
         get
@@ -23,7 +23,7 @@ public class PointManager : MonoBehaviour {
     }
     public Vector2 WidthLimit;
 
-    private int _height;
+    private int _height = 800;
     public int Height
     {
         get

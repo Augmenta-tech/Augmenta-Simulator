@@ -378,11 +378,11 @@ MonoBehaviour:
   currentPreset: 
   presetList: []
   Mute: 0
-  Width: 500
+  Width: 1280
   Height: 800
   NbPoints: 1
-  PointSizeX: 75
-  PointSizeY: 75
+  PointSizeX: 100
+  PointSizeY: 100
   Speed: 1
 --- !u!114 &575826804
 MonoBehaviour:
@@ -570,16 +570,21 @@ Prefab:
     - target: {fileID: 224261597021104126, guid: 79c2718dd59243e4c90e145349e7dadf,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: -909
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224579476644313692, guid: 79c2718dd59243e4c90e145349e7dadf,
         type: 2}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224261597021104126, guid: 79c2718dd59243e4c90e145349e7dadf,
         type: 2}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224579476644313692, guid: 79c2718dd59243e4c90e145349e7dadf,
+        type: 2}
+      propertyPath: m_AnchorMax.x
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
