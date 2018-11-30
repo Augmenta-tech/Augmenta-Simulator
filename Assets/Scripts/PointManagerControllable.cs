@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class PointManagerControllable : Controllable {
 
+    [Header("Output settings")]
     [OSCProperty]
     public bool Mute;
+    [OSCProperty]
+    public int OutputPort;
+    [OSCProperty]
+    public string OutputIP;
 
     [Header("Area settings")]
     [OSCProperty]

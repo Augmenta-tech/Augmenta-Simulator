@@ -257,8 +257,6 @@ GameObject:
   - component: {fileID: 575826799}
   - component: {fileID: 575826803}
   - component: {fileID: 575826802}
-  - component: {fileID: 575826804}
-  - component: {fileID: 575826805}
   m_Layer: 0
   m_Name: Area
   m_TagString: Untagged
@@ -370,7 +368,7 @@ MonoBehaviour:
   BarColor: {r: 0.54509807, g: 0, b: 0.8207547, a: 1}
   id: PointManager
   folder: 
-  debug: 0
+  debug: 1
   targetDirectory: 
   sourceScene: 
   usePanel: 1
@@ -378,48 +376,14 @@ MonoBehaviour:
   currentPreset: 
   presetList: []
   Mute: 0
+  OutputPort: 0
+  OutputIP: 
   Width: 1280
   Height: 800
   NbPoints: 1
   PointSizeX: 100
   PointSizeY: 100
   Speed: 1
---- !u!114 &575826804
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 575826797}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 78fc6aa1bb97f104e961e836a436c864, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  debug: 1
---- !u!114 &575826805
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 575826797}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ca16df4d60ac0e4f8a8740b3a42d7ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TargetScript: {fileID: 575826804}
-  BarColor: {r: 1, g: 0.8006334, b: 0.23829654, a: 1}
-  id: AugmentaOSC
-  folder: 
-  debug: 0
-  targetDirectory: 
-  sourceScene: 
-  usePanel: 1
-  usePresets: 1
-  currentPreset: 
-  presetList: []
-  TargetIP: 
-  TargetPort: 0
 --- !u!1 &722713527
 GameObject:
   m_ObjectHideFlags: 0
@@ -585,6 +549,11 @@ Prefab:
     - target: {fileID: 224579476644313692, guid: 79c2718dd59243e4c90e145349e7dadf,
         type: 2}
       propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224579476644313692, guid: 79c2718dd59243e4c90e145349e7dadf,
+        type: 2}
+      propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

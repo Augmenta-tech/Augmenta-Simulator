@@ -7,6 +7,32 @@ using System.Net;
 
 public class PointManager : MonoBehaviour {
 
+    [Header("Output settings")]
+    private int _outputPort = 12000;
+    public int OutputPort {
+        get
+        {
+            return _outputPort;
+        }
+        set
+        {
+            _outputPort = value;
+            InitConnection();
+        }
+    }
+    private string _outputIp = "127.0.0.1";
+    public string OutputIP
+    {
+        get
+        {
+            return _outputIp;
+        }
+        set
+        {
+            _outputIp = value;
+            InitConnection();
+        }
+    }
     [Header("Area settings")]
     private int _width = 1280;
     public int Width
@@ -114,6 +140,16 @@ public class PointManager : MonoBehaviour {
         _highestPid = 0;
         Physics2D.IgnoreLayerCollision(9, 9);
         ChangeResolution();
+        InitConnection();
+    }
+
+    public void InitConnection()
+    {
+        if(OSCMaster.Clients.ContainsKey("AugmentaSimulatorOutput"))
+        {
+            OSCMaster.RemoveClient("AugmentaSimulatorOutput");
+        }
+        OSCMaster.CreateClient("AugmentaSimulatorOutput", IPAddress.Parse(OutputIP), OutputPort);
     }
 
     public void CheckInputs()
@@ -356,7 +392,7 @@ public class PointManager : MonoBehaviour {
         msg.Append(Height);
         msg.Append(100);
 
-        AugmentaOSCHandler.Instance.SendMessage("AugmentaSimulatorOutput", msg);
+        OSCMaster.Clients["AugmentaSimulatorOutput"].Send(msg);
     }
 
     public void SendPersonEntered(GameObject obj)
@@ -413,7 +449,7 @@ public class PointManager : MonoBehaviour {
         msg.Append(worldToViewPort.y);
         msg.Append(0.5f);
 
-        AugmentaOSCHandler.Instance.SendMessage("AugmentaSimulatorOutput", msg);
+        OSCMaster.Clients["AugmentaSimulatorOutput"].Send(msg);
     }
     
 }
