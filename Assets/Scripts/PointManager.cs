@@ -84,7 +84,7 @@ public class PointManager : MonoBehaviour {
         }
     }
     public int NbPoints;
-    private Vector2 _pointSize;
+    private Vector2 _pointSize = new Vector2(75, 75);
     public Vector2 PointSize
     {
         get
@@ -103,7 +103,7 @@ public class PointManager : MonoBehaviour {
             }
         }
     }
-    private float _speed;
+    private float _speed = 1;
     public float Speed
     {
         get

@@ -365,10 +365,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetScript: {fileID: 575826799}
-  BarColor: {r: 0.54509807, g: 0, b: 0.8207547, a: 1}
-  id: PointManager
+  BarColor: {r: 1, g: 1, b: 1, a: 1}
+  id: 
   folder: 
-  debug: 1
+  debug: 0
   targetDirectory: 
   sourceScene: 
   usePanel: 1
@@ -378,12 +378,12 @@ MonoBehaviour:
   Mute: 0
   OutputPort: 0
   OutputIP: 
-  Width: 1280
-  Height: 800
-  NbPoints: 1
-  PointSizeX: 100
-  PointSizeY: 100
-  Speed: 1
+  Width: 0
+  Height: 0
+  NbPoints: 0
+  PointSizeX: 75
+  PointSizeY: 75
+  Speed: 0
 --- !u!1 &722713527
 GameObject:
   m_ObjectHideFlags: 0
