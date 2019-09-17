@@ -60,7 +60,7 @@ public class PointBehaviour : MonoBehaviour {
         _oldPosition = transform.position;
 
         //Debug.Log("Velocity : " + (oldPositionNormalized - worldToViewPort));²
-        NormalizedVelocity = (oldPositionNormalized - worldToViewPort);
+        NormalizedVelocity = (oldPositionNormalized - worldToViewPort) / Time.deltaTime;
         //NormalizedVelocity = GetComponent<Rigidbody2D>().velocity
     }
 
@@ -78,7 +78,7 @@ public class PointBehaviour : MonoBehaviour {
         VelocityVisualizer.localRotation = Quaternion.Euler(new Vector3(0, 0, -angle + 90));
 
         //111
-        VelocityVisualizer.localScale = new Vector3(VelocityThickness, NormalizedVelocity.magnitude * 100, VelocityThickness);
+        VelocityVisualizer.localScale = new Vector3(VelocityThickness, NormalizedVelocity.magnitude, VelocityThickness);
     }
 
     private void Update()
