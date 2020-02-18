@@ -123,6 +123,22 @@ public class PointManager : MonoBehaviour {
         }
     }
 
+    private float _noiseIntensity = 0;
+    public float NoiseIntensity {
+        get {
+            return _noiseIntensity;
+        }
+        set {
+            _noiseIntensity = value;
+
+            if (InstanciatedPoints == null) return;
+
+            foreach (var obj in InstanciatedPoints) {
+                obj.Value.GetComponent<PointBehaviour>().noiseIntensity = _noiseIntensity;
+            }
+        }
+    }
+
     private int _frameCounter;
     public GameObject Prefab;
     private int InstanceNumber;

@@ -31,6 +31,10 @@ public class PointManagerControllable : Controllable {
     [Range(0.0f,10.0f)]
     public float Speed;
 
+    [OSCProperty]
+    [Range(0.0f, 1.0f)]
+    public float NoiseIntensity;
+
     [OSCMethod]
     public void RemoveAll()
     {

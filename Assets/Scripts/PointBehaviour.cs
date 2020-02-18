@@ -35,6 +35,8 @@ public class PointBehaviour : MonoBehaviour {
 
     public Vector3 _oldPosition;
 
+    public float noiseIntensity = 0;
+
 	void Start () {
         direction = Random.onUnitSphere;
         direction.z = 0;
@@ -96,7 +98,7 @@ public class PointBehaviour : MonoBehaviour {
         //Screen out
         var actualPos = Camera.main.WorldToViewportPoint(transform.position);
 
-        var newPos = transform.position;
+        var newPos = transform.position + Random.Range(-noiseIntensity,noiseIntensity) * Vector3.right + Random.Range(-noiseIntensity, noiseIntensity) * Vector3.up;
 
         if (actualPos.x < 0.00f || actualPos.x > 1f || actualPos.y < 0.0f || actualPos.y > 1f)
             newPos = Vector3.zero;
