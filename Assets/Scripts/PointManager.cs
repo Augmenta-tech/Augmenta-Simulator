@@ -4,154 +4,107 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Net;
+using System.Linq;
 
 public class PointManager : MonoBehaviour {
 
     [Header("Output settings")]
     private int _outputPort = 12000;
     public int OutputPort {
-        get
-        {
-            return _outputPort;
-        }
-        set
-        {
-            _outputPort = value;
-            InitConnection();
-        }
+        get { return _outputPort; }
+        set { _outputPort = value; InitConnection(); }
     }
+
     private string _outputIp = "127.0.0.1";
-    public string OutputIP
-    {
-        get
-        {
-            return _outputIp;
-        }
-        set
-        {
-            _outputIp = value;
-            InitConnection();
-        }
+    public string OutputIP {
+        get { return _outputIp; }
+        set { _outputIp = value; InitConnection(); }
     }
+
     [Header("Area settings")]
     private int _width = 1280;
-    public int Width
-    {
-        get
-        {
-            return _width;
-        }
-        set
-        {
-            this._width = value;
-            ChangeResolution();
-        }
+    public int Width {
+        get { return _width; }
+        set { _width = value; ChangeResolution(); }
     }
     public Vector2 WidthLimit;
 
     private int _height = 800;
-    public int Height
-    {
-        get
-        {
-            return _height;
-        }
-        set
-        {
-            this._height = value;
-            ChangeResolution();
-        }
+    public int Height {
+        get { return _height; }
+        set { _height = value; ChangeResolution(); }
     }
     public Vector2 HeightLimit;
+
     public float Ratio;
 
     [Header("Points settings")]
     public bool _mute;
-    public bool Mute
-    {
-        get
-        {
-            return _mute;
-        }
-        set
-        {
-            this._mute = value;
-            if (InstanciatedPoints != null)
-            {
-                foreach (var point in InstanciatedPoints.Values)
-                    ChangePointColor(point.GetComponent<PointBehaviour>());
-            }
+    public bool Mute {
+        get { return _mute; }
+        set { _mute = value;
+            if (InstantiatedPoints == null) return;
+            foreach (var point in InstantiatedPoints.Values)
+                UpdatePointColor(point.GetComponent<PointBehaviour>());
         }
     }
-    public int NbPoints;
+
+    public int PointsCount;
+
     private Vector2 _pointSize = new Vector2(75, 75);
-    public Vector2 PointSize
-    {
-        get
-        {
-            return _pointSize;
-        }
-        set
-        {
-            this._pointSize = value;
-
-            if (InstanciatedPoints == null) return;
-
-            foreach (var obj in InstanciatedPoints)
-            {
+    public Vector2 PointSize {
+        get { return _pointSize; }
+        set { _pointSize = value;
+            if (InstantiatedPoints == null) return;
+            foreach (var obj in InstantiatedPoints)
                 obj.Value.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
-            }
         }
     }
+
     private float _speed = 1;
-    public float Speed
-    {
-        get
-        {
-            return _speed;
-        }
-        set
-        {
-            this._speed = value;
-
-            if (InstanciatedPoints == null) return;
-
-            foreach (var obj in InstanciatedPoints)
-            {
+    public float Speed {
+        get { return _speed; }
+        set { _speed = value;
+            if (InstantiatedPoints == null) return;
+            foreach (var obj in InstantiatedPoints)
                 obj.Value.GetComponent<PointBehaviour>().Speed = Speed;
-            }
         }
     }
+
+    //Noise Parameters
 
     private float _noiseIntensity = 0;
     public float NoiseIntensity {
-        get {
-            return _noiseIntensity;
-        }
-        set {
-            _noiseIntensity = value;
-
-            if (InstanciatedPoints == null) return;
-
-            foreach (var obj in InstanciatedPoints) {
+        get { return _noiseIntensity; }
+        set { _noiseIntensity = value;
+            if (InstantiatedPoints == null) return;
+            foreach (var obj in InstantiatedPoints)
                 obj.Value.GetComponent<PointBehaviour>().noiseIntensity = _noiseIntensity;
-            }
         }
     }
 
-    private int _frameCounter;
+    public float IncorrectDetectionProbability = 0;
+    public float IncorrectDetectionDuration = 0.1f;
+
+    public float PointFlickeringProbability = 0;
+    public float PointFlickeringDuration = 0.1f;
+
     public GameObject Prefab;
-    private int InstanceNumber;
-
-    private bool _clickStartedOutsideUI;
-    private int _highestPid;
-    public static Dictionary<int, GameObject> InstanciatedPoints;
-
-    private GameObject CursorPoint;
+    public static Dictionary<int, GameObject> InstantiatedPoints;
     public bool CanMoveCursorPoint;
 
+    private int _frameCounter;
+    private bool _clickStartedOutsideUI;
+    private int _highestPid;
+    private GameObject _cursorPoint;
+
+    private Dictionary<int, GameObject> _incorrectInstantiatedPoints;
+
+    #region MonoBehaviour Implementation
+
     void Start () {
-        InstanciatedPoints = new Dictionary<int, GameObject>();
+        InstantiatedPoints = new Dictionary<int, GameObject>();
+        _incorrectInstantiatedPoints = new Dictionary<int, GameObject>();
         CanMoveCursorPoint = true;
         _highestPid = 0;
         Physics2D.IgnoreLayerCollision(9, 9);
@@ -159,16 +112,57 @@ public class PointManager : MonoBehaviour {
         InitConnection();
     }
 
-    public void InitConnection()
-    {
-        if(OSCMaster.Clients.ContainsKey("AugmentaSimulatorOutput"))
-        {
-            OSCMaster.RemoveClient("AugmentaSimulatorOutput");
-        }
-        OSCMaster.CreateClient("AugmentaSimulatorOutput", IPAddress.Parse(OutputIP), OutputPort);
+    void Update() {
+
+        //Check keyboard inputs
+        ProcessKeyboardInputs();
+
+        _frameCounter++;
+
+        //Add or remove points to match desired point count
+        UpdateInstantiatedPointsCount();
+
+        //Process mouse
+        ProcessMouseInputs();
+
+        //Create incorrect detections
+        CreateIncorrectDetection();
+
+        //Update camera
+        //!\ SHOULD PROBABLY ONLY BE DONE ON RESOLUTION CHANGE /!\\
+        ComputeOrthoCamera();
+
+        //Send Augmenta scene message
+        SendSceneUpdated();
+
+        //Send Augmenta persons messages
+        foreach (var point in InstantiatedPoints)
+            SendPersonUpdated(point.Value);
+
+        foreach (var point in _incorrectInstantiatedPoints)
+            SendPersonUpdated(point.Value);
     }
 
-    public void CheckInputs()
+    public void OnMouseDrag() {
+        if (_cursorPoint == null || !CanMoveCursorPoint || !_clickStartedOutsideUI) return;
+
+        var newPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+        newPos.z = 0;
+
+        newPos.x = Mathf.Clamp(newPos.x, 0f, 1f);
+        newPos.y = Mathf.Clamp(newPos.y, 0f, 1f);
+
+        newPos = Camera.main.ViewportToWorldPoint(newPos);
+        newPos.z = 0;
+        _cursorPoint.transform.position = newPos;
+    }
+
+    #endregion
+
+    /// <summary>
+    /// Process keyboard key presses
+    /// </summary>
+    public void ProcessKeyboardInputs()
     {
         if (Input.GetKeyUp(KeyCode.M))
             Mute = !Mute;
@@ -180,121 +174,161 @@ public class PointManager : MonoBehaviour {
             RemovePoints();
     }
 
-    void Update () {
+    /// <summary>
+    /// Process mouse button presses
+    /// </summary>
+    public void ProcessMouseInputs() {
 
-        CheckInputs();
-
-        _frameCounter++; 
-
-        while (InstanceNumber != NbPoints)
-            InstantiatePoint();
-
-        //"Weird behaviour "fix"
-        if (NbPoints == 0)
+        //Weird behaviour "fix"
+        if (PointsCount == 0)
             CanMoveCursorPoint = true;
 
-        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
-        {
+        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) {
             _clickStartedOutsideUI = true;
         }
-        if(Input.GetMouseButtonUp(0))
-        {
+
+        if (Input.GetMouseButtonUp(0)) {
             _clickStartedOutsideUI = false;
         }
 
-        if (Input.GetMouseButton(1) && !EventSystem.current.IsPointerOverGameObject())
-        {
-            if (CursorPoint != null)
-            {
-                NbPoints--;
-                InstanceNumber--;
-                SendPersonLeft(InstanciatedPoints[0]);
-                InstanciatedPoints.Remove(0);
-                Destroy(CursorPoint);
+        if (Input.GetMouseButton(1) && !EventSystem.current.IsPointerOverGameObject()) {
+            if (_cursorPoint != null) {
+                PointsCount--;
+                SendPersonLeft(InstantiatedPoints[0]);
+                InstantiatedPoints.Remove(0);
+                Destroy(_cursorPoint);
             }
-        }
-        else if (Input.GetMouseButton(0) && CanMoveCursorPoint && !EventSystem.current.IsPointerOverGameObject())
-        {
-            if (CursorPoint == null)
-            {
-                CursorPoint = Instantiate(Prefab);
-                CursorPoint.GetComponent<PointBehaviour>().PointColor = Color.HSVToRGB(Random.value, 0.85f, 0.75f);
-//                CursorPoint.GetComponent<MeshRenderer>().material.SetColor("_PointColor", CursorPoint.GetComponent<PointBehaviour>().PointColor);
-                ChangePointColor(CursorPoint.GetComponent<PointBehaviour>());
-                CursorPoint.transform.parent = transform;
+        } else if (Input.GetMouseButton(0) && CanMoveCursorPoint && !EventSystem.current.IsPointerOverGameObject()) {
+            if (_cursorPoint == null) {
+                _cursorPoint = Instantiate(Prefab);
+
+                PointBehaviour cursorPointBehaviour = _cursorPoint.GetComponent<PointBehaviour>();
+
+                cursorPointBehaviour.PointColor = Color.HSVToRGB(Random.value, 0.85f, 0.75f);
+                UpdatePointColor(cursorPointBehaviour);
+                _cursorPoint.transform.parent = transform;
                 var newPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
                 newPos.z = 0;
                 newPos.x = Mathf.Clamp(newPos.x, 0.05f, 0.95f);
                 newPos.y = Mathf.Clamp(newPos.y, 0.05f, 0.95f);
                 newPos = Camera.main.ViewportToWorldPoint(newPos);
                 newPos.z = 0;
-                CursorPoint.transform.position = newPos;
-                CursorPoint.transform.GetChild(0).GetComponent<TextMesh>().text = "ID : 0";
-                CursorPoint.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
-                CursorPoint.GetComponent<PointBehaviour>().pid = 0;
-                CursorPoint.GetComponent<PointBehaviour>().manager = this;
-                CursorPoint.GetComponent<PointBehaviour>().isMouse = true;
-                InstanciatedPoints.Add(0, CursorPoint);
-                InstanceNumber++;
-                NbPoints++;
+                _cursorPoint.transform.position = newPos;
+                _cursorPoint.transform.GetChild(0).GetComponent<TextMesh>().text = "ID : 0";
+                _cursorPoint.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
+                cursorPointBehaviour.pid = 0;
+                cursorPointBehaviour.manager = this;
+                cursorPointBehaviour.isMouse = true;
+                InstantiatedPoints.Add(0, _cursorPoint);
+                PointsCount++;
             }
         }
-
-        ComputeOrthoCamera();
-
-        SendSceneUpdated();
-
-        foreach(var obj in InstanciatedPoints)
-            SendPersonUpdated(obj.Value);
-	}
-
-    public void ChangePointColor(PointBehaviour target) {
-        if (Mute)
-            target.ChangePointColor(Color.gray);
-        else
-            target.ChangePointColor(target.PointColor);
     }
 
-    public void InstantiatePoint()
-    {
-        if (NbPoints <= 0) NbPoints = 0;
-        
+    public void UpdatePointColor(PointBehaviour target) {
+        if (Mute)
+            target.UpdatePointColor(Color.gray);
+        else
+            target.UpdatePointColor(target.PointColor);
+    }
 
-        if (InstanceNumber < NbPoints)
-        {
-            _highestPid++;
-            InstanceNumber++;
+    /// <summary>
+    /// Instantiate incorrect detection points
+    /// </summary>
+    private void CreateIncorrectDetection() {
 
-            if (_highestPid <= 0)
-                _highestPid = 1;
+        if(Random.Range(0.0f, 1.0f) <= IncorrectDetectionProbability) {
+            InstantiatePoint(true);
+        }
+    }
 
-            var newPoint = Instantiate(Prefab);
+    /// <summary>
+    /// Create or remove instantiated points according to the desired point count
+    /// </summary>
+    public void UpdateInstantiatedPointsCount() {
 
-            newPoint.GetComponent<PointBehaviour>().PointColor = Color.HSVToRGB(Random.value, 0.85f, 0.75f);
-            newPoint.GetComponent<PointBehaviour>().manager = this;
-            ChangePointColor(newPoint.GetComponent<PointBehaviour>());
-            newPoint.transform.parent = transform;
-            newPoint.transform.localPosition = new Vector3(Random.Range(-0.5f + (PointSize.x / Width) , 0.5f - (PointSize.x / Width)), Random.Range(-0.5f + (PointSize.y / Height), 0.5f - (PointSize.y / Height)));
-            newPoint.GetComponent<PointBehaviour>().Speed = Speed;
-            newPoint.GetComponent<PointBehaviour>().pid = _highestPid;
-            newPoint.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
+        if (PointsCount <= 0) PointsCount = 0;
 
-            InstanciatedPoints.Add(_highestPid, newPoint);
-
-          
-            SendPersonEntered(InstanciatedPoints[_highestPid]);
+        //Create new points
+        while (InstantiatedPoints.Count < PointsCount) {
+            InstantiatePoint();
         }
 
-        if (InstanceNumber > NbPoints)
-        {
-            if (InstanciatedPoints.ContainsKey(_highestPid))
-            {
-                SendPersonLeft(InstanciatedPoints[_highestPid]);
-                Destroy(InstanciatedPoints[_highestPid]);
-                InstanciatedPoints.Remove(_highestPid);
-                _highestPid--;
-                InstanceNumber--;
-            }
+        //Remove points
+        while (InstantiatedPoints.Count > PointsCount) {
+            RemovePoint();
+        }
+    }
+
+    /// <summary>
+    /// Instantiate new point
+    /// </summary>
+    public void InstantiatePoint(bool isIncorrectDetection = false) {
+
+		_highestPid++;
+
+		if (_highestPid <= 0)
+			_highestPid = 1;
+
+		GameObject newPoint = Instantiate(Prefab);
+
+		PointBehaviour newPointBehaviour = newPoint.GetComponent<PointBehaviour>();
+
+		newPointBehaviour.PointColor = Color.HSVToRGB(Random.value, 0.85f, 0.75f);
+		newPointBehaviour.manager = this;
+		UpdatePointColor(newPointBehaviour);
+		newPoint.transform.parent = transform;
+		newPoint.transform.localPosition = new Vector3(Random.Range(-0.5f + (PointSize.x / Width), 0.5f - (PointSize.x / Width)), Random.Range(-0.5f + (PointSize.y / Height), 0.5f - (PointSize.y / Height)));
+		newPointBehaviour.Speed = Speed;
+		newPointBehaviour.pid = _highestPid;
+		newPoint.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
+        newPointBehaviour.isIncorrectDetection = isIncorrectDetection;
+
+        if (isIncorrectDetection) {
+            _incorrectInstantiatedPoints.Add(_highestPid, newPoint);
+            SendPersonEntered(_incorrectInstantiatedPoints[_highestPid]);
+        } else {
+            InstantiatedPoints.Add(_highestPid, newPoint);
+            SendPersonEntered(InstantiatedPoints[_highestPid]);
+        }
+	}
+
+	/// <summary>
+	/// Remove point with highest pid
+	/// </summary>
+	public void RemovePoint() {
+
+        if (InstantiatedPoints.Count == 0)
+            return;
+
+        int pidToRemove = InstantiatedPoints.ElementAt(InstantiatedPoints.Count - 1).Key;
+
+		SendPersonLeft(InstantiatedPoints[pidToRemove]);
+		Destroy(InstantiatedPoints[pidToRemove]);
+		InstantiatedPoints.Remove(pidToRemove);
+	}
+
+    /// <summary>
+    /// Remove point with given pid
+    /// </summary>
+    public void RemovePoint(int pid) {
+
+        if (InstantiatedPoints.ContainsKey(pid)) {
+            SendPersonLeft(InstantiatedPoints[pid]);
+            Destroy(InstantiatedPoints[pid]);
+            InstantiatedPoints.Remove(pid);
+        }
+    }
+
+    /// <summary>
+    /// Remove incorrect point with given pid
+    /// </summary>
+    public void RemoveIncorrectPoint(int pid) {
+
+        if (_incorrectInstantiatedPoints.ContainsKey(pid)) {
+            SendPersonLeft(_incorrectInstantiatedPoints[pid]);
+            Destroy(_incorrectInstantiatedPoints[pid]);
+            _incorrectInstantiatedPoints.Remove(pid);
         }
     }
 
@@ -314,16 +348,15 @@ public class PointManager : MonoBehaviour {
 
     public void RemovePoints()
     {
-        NbPoints = 0;
-        InstanceNumber = 0;
+        PointsCount = 0;
         _highestPid = 0;
 
-        foreach (var obj in InstanciatedPoints) {
+        foreach (var obj in InstantiatedPoints) {
             SendPersonLeft(obj.Value);
             Destroy(obj.Value);
         }
 
-        InstanciatedPoints.Clear();
+        InstantiatedPoints.Clear();
     }
 
     public void ChangeResolution()
@@ -338,21 +371,7 @@ public class PointManager : MonoBehaviour {
         Screen.SetResolution(newWidth, newHeight, false);
     }
 
-    public void OnMouseDrag()
-    {
-        if (CursorPoint == null || !CanMoveCursorPoint || !_clickStartedOutsideUI) return;
-
-        var newPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-        newPos.z = 0;
-
-            newPos.x = Mathf.Clamp(newPos.x, 0f, 1f);
-            newPos.y = Mathf.Clamp(newPos.y, 0f, 1f);
-
-        newPos = Camera.main.ViewportToWorldPoint(newPos);
-        newPos.z = 0;
-        CursorPoint.transform.position = newPos;
-    }
-
+    #region OSC Message
 
     //OSC part
 
@@ -385,6 +404,13 @@ public class PointManager : MonoBehaviour {
         7: scene.depth (int)
     */
 
+    public void InitConnection() {
+        if (OSCMaster.Clients.ContainsKey("AugmentaSimulatorOutput")) {
+            OSCMaster.RemoveClient("AugmentaSimulatorOutput");
+        }
+        OSCMaster.CreateClient("AugmentaSimulatorOutput", IPAddress.Parse(OutputIP), OutputPort);
+    }
+
     public void SendSceneUpdated()
     {
         if (Mute) return;
@@ -392,15 +418,15 @@ public class PointManager : MonoBehaviour {
         var msg = new UnityOSC.OSCMessage("/au/scene");
         msg.Append(_frameCounter);
         //Compute point size
-        msg.Append(InstanceNumber * PointSize.x * PointSize.y);
-        msg.Append(NbPoints);
+        msg.Append(InstantiatedPoints.Count * PointSize.x * PointSize.y);
+        msg.Append(PointsCount);
         //Compute average motion
         var velocitySum = Vector3.zero;
-        foreach(var element in InstanciatedPoints)
+        foreach(var element in InstantiatedPoints)
         {
             velocitySum += -element.Value.GetComponent<PointBehaviour>().NormalizedVelocity;
         }
-        velocitySum /= InstanciatedPoints.Count;
+        velocitySum /= InstantiatedPoints.Count;
 
         msg.Append(velocitySum.x);
         msg.Append(velocitySum.y);
@@ -439,7 +465,7 @@ public class PointManager : MonoBehaviour {
         msg.Append(behaviour.pid);
         //oid
 
-        if (CursorPoint != null)
+        if (_cursorPoint != null)
             msg.Append(behaviour.pid);
         else
             msg.Append(behaviour.pid - 1);
@@ -467,5 +493,6 @@ public class PointManager : MonoBehaviour {
 
         OSCMaster.Clients["AugmentaSimulatorOutput"].Send(msg);
     }
-    
+
+    #endregion
 }

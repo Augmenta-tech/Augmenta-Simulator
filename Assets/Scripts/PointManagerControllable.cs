@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PointManagerControllable : Controllable {
 
-    [Header("Output settings")]
+    [Header("Output Settings")]
     [OSCProperty]
     public bool Mute;
     [OSCProperty]
@@ -12,28 +12,36 @@ public class PointManagerControllable : Controllable {
     [OSCProperty]
     public string OutputIP;
 
-    [Header("Area settings")]
+    [Header("Area Settings")]
     [OSCProperty]
     public int Width;
     [OSCProperty]
     public int Height;
 
-    [Header("Points settings")]
-    [OSCProperty]
-    [Range(0,30)]
-    public int NbPoints;
+    [Header("Points Settings")]
+    [OSCProperty][Range(0,30)]
+    public int PointsCount;
     [OSCProperty]
     public float PointSizeX;
     [OSCProperty]
     public float PointSizeY;
 
-    [OSCProperty]
-    [Range(0.0f,10.0f)]
+    [OSCProperty][Range(0.0f,10.0f)]
     public float Speed;
 
-    [OSCProperty]
-    [Range(0.0f, 1.0f)]
+    [Header("Simulated Errors Settings")]
+    [OSCProperty][Range(0.0f, 1.0f)]
     public float NoiseIntensity;
+
+    [OSCProperty][Range(0.0f, 1.0f)]
+    public float IncorrectDetectionProbability = 0;
+    [OSCProperty]
+    public float IncorrectDetectionDuration = 0.1f;
+
+    [OSCProperty][Range(0.0f, 1.0f)]
+    public float PointFlickeringProbability = 0;
+    [OSCProperty]
+    public float PointFlickeringDuration = 0.1f;
 
     [OSCMethod]
     public void RemoveAll()

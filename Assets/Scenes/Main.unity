@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -315,7 +316,7 @@ MonoBehaviour:
   HeightLimit: {x: 300, y: 1000}
   Ratio: 0
   _mute: 0
-  NbPoints: 1
+  PointsCount: 0
   Prefab: {fileID: 1897133376265846, guid: f52716752aba2a44281446caa8282db8, type: 3}
   CanMoveCursorPoint: 0
 --- !u!33 &575826800
@@ -340,6 +341,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -391,7 +393,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TargetScript: {fileID: 575826799}
   BarColor: {r: 1, g: 1, b: 1, a: 1}
-  id: 
+  id: PointManager
   folder: 
   debug: 0
   targetDirectory: 
@@ -406,10 +408,11 @@ MonoBehaviour:
   OutputIP: 
   Width: 0
   Height: 0
-  NbPoints: 0
+  PointsCount: 0
   PointSizeX: 75
   PointSizeY: 75
   Speed: 0
+  NoiseIntensity: 0
 --- !u!1 &722713527
 GameObject:
   m_ObjectHideFlags: 0
@@ -563,6 +566,16 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114445698576836282, guid: 79c2718dd59243e4c90e145349e7dadf,
+        type: 3}
+      propertyPath: ipRefreshDelay
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114736921750431862, guid: 79c2718dd59243e4c90e145349e7dadf,
+        type: 3}
+      propertyPath: CloseGenUIPanelAtStart
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 224261597021104126, guid: 79c2718dd59243e4c90e145349e7dadf,
         type: 3}
       propertyPath: m_SizeDelta.y
@@ -587,11 +600,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchorMin.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114445698576836282, guid: 79c2718dd59243e4c90e145349e7dadf,
-        type: 3}
-      propertyPath: ipRefreshDelay
-      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 79c2718dd59243e4c90e145349e7dadf, type: 3}

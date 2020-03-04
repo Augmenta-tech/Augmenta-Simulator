@@ -13,18 +13,13 @@ public class PointBehaviour : MonoBehaviour {
     public float VelocityThickness;
 
     private float _speed;
-    public float Speed
-    {
-        get
-        {
-            return _speed;
-        }
-        set
-        {
-            this._speed = value;
+    public float Speed {
+        get { return _speed; }
+        set { _speed = value;
             GetComponent<Rigidbody2D>().velocity = direction * Speed;
         }
     }
+
     public int pid;
     public int oid;
     public Vector3 direction;
@@ -37,6 +32,12 @@ public class PointBehaviour : MonoBehaviour {
 
     public float noiseIntensity = 0;
 
+    public bool isIncorrectDetection = false;
+
+    private float timer = 0;
+
+	#region MonoBehaviour Implementation
+
 	void Start () {
         direction = Random.onUnitSphere;
         direction.z = 0;
@@ -48,7 +49,89 @@ public class PointBehaviour : MonoBehaviour {
             GetComponent<Rigidbody2D>().isKinematic = true;
 
         VelocityVisualizer.localScale = Vector3.zero;
+
+        timer = 0;
     }
+
+    private void Update() {
+        //Handle IncorrectDetection points
+        if (isIncorrectDetection) {
+            timer += Time.deltaTime;
+            if (timer > manager.IncorrectDetectionDuration) {
+                manager.RemoveIncorrectPoint(pid);
+            }
+        }
+
+        Age++;
+
+        //Compute velocity
+        if (isMouse || isIncorrectDetection) {
+            GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+            Speed = 0.0f;
+        }
+
+        //Screen out
+        var actualPos = Camera.main.WorldToViewportPoint(transform.position);
+
+        var newPos = transform.position + Random.Range(-noiseIntensity, noiseIntensity) * Vector3.right + Random.Range(-noiseIntensity, noiseIntensity) * Vector3.up;
+
+        if (actualPos.x < 0.00f || actualPos.x > 1f || actualPos.y < 0.0f || actualPos.y > 1f)
+            newPos = Vector3.zero;
+
+        transform.position = newPos;
+
+        if (manager == null)
+            return;
+
+        var oid = pid;
+
+        //udpate text
+        PointInfoText.text = "PID : " + pid + '\n' + '\n' + "OID : " + oid;
+    }
+
+    private void FixedUpdate() {
+
+        ComputeNormalizedVelocity();
+        //Update velocity
+        float angle = Mathf.Atan2(NormalizedVelocity.y, NormalizedVelocity.x) * 180 / Mathf.PI;
+        if (float.IsNaN(angle))
+            return;
+
+        VelocityVisualizer.localRotation = Quaternion.Euler(new Vector3(0, 0, -angle + 90));
+
+        VelocityVisualizer.localScale = new Vector3(VelocityThickness, NormalizedVelocity.magnitude, VelocityThickness);
+    }
+
+    private void OnMouseDown() {
+        manager.CanMoveCursorPoint = false;
+    }
+
+    private void OnMouseDrag() {
+        var newPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+        newPos.z = 0;
+        newPos.x = Mathf.Clamp(newPos.x, 0.05f, 0.95f);
+        newPos.y = Mathf.Clamp(newPos.y, 0.05f, 0.95f);
+        newPos = Camera.main.ViewportToWorldPoint(newPos);
+        newPos.z = 0;
+        transform.position = newPos;
+    }
+
+    private void OnMouseUp() {
+        manager.CanMoveCursorPoint = true;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision) {
+        if (collision.name == "Left" || collision.name == "Right") {
+            direction = new Vector2(-direction.x, direction.y);
+        }
+        if (collision.name == "Top" || collision.name == "Bot") {
+            direction = new Vector2(direction.x, -direction.y);
+        }
+
+        GetComponent<Rigidbody2D>().velocity = direction * Speed;
+    }
+
+    #endregion
 
     private void ComputeNormalizedVelocity()
     {
@@ -61,103 +144,11 @@ public class PointBehaviour : MonoBehaviour {
 
         _oldPosition = transform.position;
 
-        //Debug.Log("Velocity : " + (oldPositionNormalized - worldToViewPort));²
         NormalizedVelocity = (oldPositionNormalized - worldToViewPort) / Time.deltaTime;
-        //NormalizedVelocity = GetComponent<Rigidbody2D>().velocity
     }
 
-    private void FixedUpdate()
+    public void UpdatePointColor(Color color)
     {
-        ComputeNormalizedVelocity();
-        //Update velocity
-        float angle = Mathf.Atan2(NormalizedVelocity.y, NormalizedVelocity.x) * 180 / Mathf.PI;
-        if (float.IsNaN(angle))
-            return;
-
-
-        //Debug.Log("Scale : " + NormalizedVelocity.magnitude * 100);
-
-        VelocityVisualizer.localRotation = Quaternion.Euler(new Vector3(0, 0, -angle + 90));
-
-        //111
-        VelocityVisualizer.localScale = new Vector3(VelocityThickness, NormalizedVelocity.magnitude, VelocityThickness);
-    }
-
-    private void Update()
-    {
-        Age++;
-      
-        //Compute velocity
-
-        if (isMouse)
-        {
-            GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-            Speed = 0.0f;
-        }
-
-        //Screen out
-        var actualPos = Camera.main.WorldToViewportPoint(transform.position);
-
-        var newPos = transform.position + Random.Range(-noiseIntensity,noiseIntensity) * Vector3.right + Random.Range(-noiseIntensity, noiseIntensity) * Vector3.up;
-
-        if (actualPos.x < 0.00f || actualPos.x > 1f || actualPos.y < 0.0f || actualPos.y > 1f)
-            newPos = Vector3.zero;
-
-        transform.position = newPos;
-
-        
-        if (manager == null)
-            return;
-        //Update bouding box
-       // Point.transform.localScale = new Vector3(manager.Width* manager.transform.localScale.x, manager.Height * manager.transform.localScale.y, 0.1f);
-
-        var oid = pid;
-        //if (!isMouse)
-        //    oid -= 1;
-
-        //udpate text
-        PointInfoText.text = "PID : " + pid + '\n' + '\n'  + "OID : " + oid;
-
-
-    }
-
-    private void OnMouseDown()
-    {
-        manager.CanMoveCursorPoint = false;
-    }
-
-    private void OnMouseDrag()
-    {
-        var newPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-        newPos.z = 0;
-        newPos.x = Mathf.Clamp(newPos.x, 0.05f, 0.95f);
-        newPos.y = Mathf.Clamp(newPos.y, 0.05f, 0.95f);
-        newPos = Camera.main.ViewportToWorldPoint(newPos);
-        newPos.z = 0;
-        transform.position = newPos;
-    }
-
-    private void OnMouseUp()
-    {
-        manager.CanMoveCursorPoint = true;
-    }
-
-    public void ChangePointColor(Color col)
-    {
-        Point.GetComponent<MeshRenderer>().material.SetColor("_BorderColor", col);
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if(collision.name == "Left" || collision.name == "Right")
-        {
-            direction = new Vector2(-direction.x , direction.y);
-        }
-        if(collision.name == "Top" || collision.name == "Bot")
-        {
-            direction = new Vector2(direction.x, -direction.y);
-        }
-
-        GetComponent<Rigidbody2D>().velocity = direction * Speed;
+        Point.GetComponent<MeshRenderer>().material.SetColor("_BorderColor", color);
     }
 }
