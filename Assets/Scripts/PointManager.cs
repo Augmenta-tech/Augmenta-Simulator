@@ -58,6 +58,12 @@ public class PointManager : MonoBehaviour {
             if (InstantiatedPoints == null) return;
             foreach (var obj in InstantiatedPoints)
                 obj.Value.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
+
+            foreach (var obj in _incorrectInstantiatedPoints)
+                obj.Value.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
+
+            foreach (var obj in _flickeringPoints)
+                obj.Value.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
         }
     }
 
@@ -67,6 +73,12 @@ public class PointManager : MonoBehaviour {
         set { _speed = value;
             if (InstantiatedPoints == null) return;
             foreach (var obj in InstantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().Speed = Speed;
+
+            foreach (var obj in _incorrectInstantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().Speed = Speed;
+
+            foreach (var obj in _flickeringPoints)
                 obj.Value.GetComponent<PointBehaviour>().Speed = Speed;
         }
     }
@@ -78,7 +90,14 @@ public class PointManager : MonoBehaviour {
         get { return _noiseIntensity; }
         set { _noiseIntensity = value;
             if (InstantiatedPoints == null) return;
+
             foreach (var obj in InstantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().noiseIntensity = _noiseIntensity;
+
+            foreach (var obj in _incorrectInstantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().noiseIntensity = _noiseIntensity;
+
+            foreach (var obj in _flickeringPoints)
                 obj.Value.GetComponent<PointBehaviour>().noiseIntensity = _noiseIntensity;
         }
     }
