@@ -10,6 +10,7 @@ public class PointBehaviour : MonoBehaviour {
     public TextMesh PointInfoText;
     public Transform Point;
     public Transform VelocityVisualizer;
+
     public float VelocityThickness;
 
     private float _speed;
@@ -33,6 +34,7 @@ public class PointBehaviour : MonoBehaviour {
     public float noiseIntensity = 0;
 
     public bool isIncorrectDetection = false;
+    public bool isFlickering = false;
 
     private float timer = 0;
 
@@ -62,6 +64,14 @@ public class PointBehaviour : MonoBehaviour {
             }
         }
 
+        //Handle flickering
+        if (isFlickering) {
+            timer += Time.deltaTime;
+            if (timer > manager.PointFlickeringDuration) {
+                manager.StopFlickering(pid);
+            }
+        }
+
         Age++;
 
         //Compute velocity
@@ -82,8 +92,6 @@ public class PointBehaviour : MonoBehaviour {
 
         if (manager == null)
             return;
-
-        var oid = pid;
 
         //udpate text
         PointInfoText.text = "PID : " + pid + '\n' + '\n' + "OID : " + oid;
@@ -150,5 +158,26 @@ public class PointBehaviour : MonoBehaviour {
     public void UpdatePointColor(Color color)
     {
         Point.GetComponent<MeshRenderer>().material.SetColor("_BorderColor", color);
+    }
+
+    public void StartFlickering() {
+
+        timer = 0;
+        HidePoint();
+        isFlickering = true;
+    }
+
+    public void HidePoint() {
+
+        PointInfoText.gameObject.SetActive(false);
+        Point.gameObject.SetActive(false);
+        VelocityVisualizer.gameObject.SetActive(false);
+    }
+
+    public void ShowPoint() {
+
+        PointInfoText.gameObject.SetActive(true);
+        Point.gameObject.SetActive(true);
+        VelocityVisualizer.gameObject.SetActive(true);
     }
 }

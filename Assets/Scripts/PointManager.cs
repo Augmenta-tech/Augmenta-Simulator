@@ -90,8 +90,9 @@ public class PointManager : MonoBehaviour {
     public float PointFlickeringDuration = 0.1f;
 
     public GameObject Prefab;
-    public static Dictionary<int, GameObject> InstantiatedPoints;
     public bool CanMoveCursorPoint;
+
+    public static Dictionary<int, GameObject> InstantiatedPoints;
 
     private int _frameCounter;
     private bool _clickStartedOutsideUI;
@@ -99,16 +100,22 @@ public class PointManager : MonoBehaviour {
     private GameObject _cursorPoint;
 
     private Dictionary<int, GameObject> _incorrectInstantiatedPoints;
+    private Dictionary<int, GameObject> _flickeringPoints;
 
     #region MonoBehaviour Implementation
 
     void Start () {
+
         InstantiatedPoints = new Dictionary<int, GameObject>();
         _incorrectInstantiatedPoints = new Dictionary<int, GameObject>();
+        _flickeringPoints = new Dictionary<int, GameObject>();
+
         CanMoveCursorPoint = true;
+
         _highestPid = 0;
-        Physics2D.IgnoreLayerCollision(9, 9);
+
         ChangeResolution();
+
         InitConnection();
     }
 
@@ -127,6 +134,9 @@ public class PointManager : MonoBehaviour {
 
         //Create incorrect detections
         CreateIncorrectDetection();
+
+        //Create flickering
+        CreateFlickeringPoints();
 
         //Update camera
         //!\ SHOULD PROBABLY ONLY BE DONE ON RESOLUTION CHANGE /!\\
@@ -217,6 +227,7 @@ public class PointManager : MonoBehaviour {
                 _cursorPoint.transform.GetChild(0).GetComponent<TextMesh>().text = "ID : 0";
                 _cursorPoint.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
                 cursorPointBehaviour.pid = 0;
+                cursorPointBehaviour.oid = 0;
                 cursorPointBehaviour.manager = this;
                 cursorPointBehaviour.isMouse = true;
                 InstantiatedPoints.Add(0, _cursorPoint);
@@ -240,6 +251,50 @@ public class PointManager : MonoBehaviour {
         if(Random.Range(0.0f, 1.0f) <= IncorrectDetectionProbability) {
             InstantiatePoint(true);
         }
+    }
+
+    /// <summary>
+    /// Create point flickering
+    /// </summary>
+    private void CreateFlickeringPoints() {
+
+        if (InstantiatedPoints.Count == 0)
+            return;
+
+        if (Random.Range(0.0f, 1.0f) <= PointFlickeringProbability) {
+
+            int flickeringIndex = Random.Range(1, InstantiatedPoints.Count);
+
+            int pidToFlicker = InstantiatedPoints.ElementAt(flickeringIndex).Key;
+
+            _flickeringPoints.Add(pidToFlicker, InstantiatedPoints.ElementAt(flickeringIndex).Value);
+
+            SendPersonLeft(InstantiatedPoints[pidToFlicker]);
+            InstantiatedPoints.ElementAt(flickeringIndex).Value.GetComponent<PointBehaviour>().StartFlickering();
+            InstantiatedPoints.Remove(pidToFlicker);
+            PointsCount--;
+
+            //Update OIDs
+            UpdateOIDs();
+        }
+    }
+
+    /// <summary>
+    /// Recreate flickering point
+    /// </summary>
+    /// <param name="pid"></param>
+    public void StopFlickering(int pid) {
+
+        InstantiatedPoints.Add(pid, _flickeringPoints[pid]);
+        PointsCount++;
+
+        var pointBehaviour = _flickeringPoints[pid].GetComponent<PointBehaviour>();
+        pointBehaviour.isFlickering = false;
+        pointBehaviour.ShowPoint();
+
+        _flickeringPoints.Remove(pid);
+        UpdateOIDs();
+        SendPersonEntered(InstantiatedPoints[pid]);
     }
 
     /// <summary>
@@ -283,12 +338,15 @@ public class PointManager : MonoBehaviour {
 		newPointBehaviour.pid = _highestPid;
 		newPoint.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
         newPointBehaviour.isIncorrectDetection = isIncorrectDetection;
+        newPointBehaviour.isFlickering = false;
 
         if (isIncorrectDetection) {
             _incorrectInstantiatedPoints.Add(_highestPid, newPoint);
+            UpdateOIDs();
             SendPersonEntered(_incorrectInstantiatedPoints[_highestPid]);
         } else {
             InstantiatedPoints.Add(_highestPid, newPoint);
+            UpdateOIDs();
             SendPersonEntered(InstantiatedPoints[_highestPid]);
         }
 	}
@@ -303,10 +361,18 @@ public class PointManager : MonoBehaviour {
 
         int pidToRemove = InstantiatedPoints.ElementAt(InstantiatedPoints.Count - 1).Key;
 
+        //Do not remove the cursor point unless it is the last one
+        if(pidToRemove == 0 && InstantiatedPoints.Count > 1)
+            pidToRemove = InstantiatedPoints.ElementAt(InstantiatedPoints.Count - 2).Key;
+
 		SendPersonLeft(InstantiatedPoints[pidToRemove]);
 		Destroy(InstantiatedPoints[pidToRemove]);
 		InstantiatedPoints.Remove(pidToRemove);
-	}
+
+        //Update OIDs
+        UpdateOIDs();
+
+    }
 
     /// <summary>
     /// Remove point with given pid
@@ -317,6 +383,9 @@ public class PointManager : MonoBehaviour {
             SendPersonLeft(InstantiatedPoints[pid]);
             Destroy(InstantiatedPoints[pid]);
             InstantiatedPoints.Remove(pid);
+
+            //Update OIDs
+            UpdateOIDs();
         }
     }
 
@@ -329,7 +398,26 @@ public class PointManager : MonoBehaviour {
             SendPersonLeft(_incorrectInstantiatedPoints[pid]);
             Destroy(_incorrectInstantiatedPoints[pid]);
             _incorrectInstantiatedPoints.Remove(pid);
+
+            //Update OIDs
+            UpdateOIDs();
         }
+    }
+
+    /// <summary>
+    /// Recompute points OIDs
+    /// </summary>
+    private void UpdateOIDs() {
+
+        for (int i = 0; i < InstantiatedPoints.Count; i++) {
+            if(InstantiatedPoints.ElementAt(i).Key != 0)
+                InstantiatedPoints.ElementAt(i).Value.GetComponent<PointBehaviour>().oid = i + 1;
+        }
+
+        for (int i = 0; i < _incorrectInstantiatedPoints.Count; i++) {
+            _incorrectInstantiatedPoints.ElementAt(i).Value.GetComponent<PointBehaviour>().oid = InstantiatedPoints.Count + i + 1;
+        }
+
     }
 
     private void ComputeOrthoCamera()
@@ -463,12 +551,9 @@ public class PointManager : MonoBehaviour {
         worldToViewPort = new Vector3(worldToViewPort.x, Mathf.Abs(worldToViewPort.y - 1), worldToViewPort.z); //Switch from bot-left (0;0) to top-left(0;0)
 
         msg.Append(behaviour.pid);
-        //oid
 
-        if (_cursorPoint != null)
-            msg.Append(behaviour.pid);
-        else
-            msg.Append(behaviour.pid - 1);
+        //oid
+        msg.Append(behaviour.oid);
 
         msg.Append((int)behaviour.Age);
         //centroid
