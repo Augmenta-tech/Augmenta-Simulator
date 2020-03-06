@@ -19,8 +19,10 @@ public class PointManagerControllable : Controllable {
     public int Height;
 
     [Header("Points Settings")]
-    [OSCProperty][Range(0,30)]
+    [OSCProperty(isInteractible = false)]
     public int PointsCount;
+    [OSCProperty][Range(0, 30)]
+    public int DesiredPointsCount;
     [OSCProperty]
     public float PointSizeX;
     [OSCProperty]

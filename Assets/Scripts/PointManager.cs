@@ -49,7 +49,17 @@ public class PointManager : MonoBehaviour {
         }
     }
 
-    public int PointsCount;
+    public int PointsCount {
+        get { return _pointsCount; }
+        set { }
+    }
+    private int _pointsCount;
+
+    public int DesiredPointsCount {
+        get { return _desiredPointsCount; }
+        set { _desiredPointsCount = value; UpdateInstantiatedPointsCount(); }
+    }
+    private int _desiredPointsCount;
 
     private Vector2 _pointSize = new Vector2(75, 75);
     public Vector2 PointSize {
@@ -145,9 +155,6 @@ public class PointManager : MonoBehaviour {
 
         _frameCounter++;
 
-        //Add or remove points to match desired point count
-        UpdateInstantiatedPointsCount();
-
         //Process mouse
         ProcessMouseInputs();
 
@@ -209,7 +216,7 @@ public class PointManager : MonoBehaviour {
     public void ProcessMouseInputs() {
 
         //Weird behaviour "fix"
-        if (PointsCount == 0)
+        if (_pointsCount == 0)
             CanMoveCursorPoint = true;
 
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) {
@@ -222,7 +229,7 @@ public class PointManager : MonoBehaviour {
 
         if (Input.GetMouseButton(1) && !EventSystem.current.IsPointerOverGameObject()) {
             if (_cursorPoint != null) {
-                PointsCount--;
+                _pointsCount--;
                 SendPersonLeft(InstantiatedPoints[0]);
                 InstantiatedPoints.Remove(0);
                 Destroy(_cursorPoint);
@@ -250,7 +257,7 @@ public class PointManager : MonoBehaviour {
                 cursorPointBehaviour.manager = this;
                 cursorPointBehaviour.isMouse = true;
                 InstantiatedPoints.Add(0, _cursorPoint);
-                PointsCount++;
+                _pointsCount++;
             }
         }
     }
@@ -284,17 +291,21 @@ public class PointManager : MonoBehaviour {
 
             int flickeringIndex = Random.Range(1, InstantiatedPoints.Count);
 
-            int pidToFlicker = InstantiatedPoints.ElementAt(flickeringIndex).Key;
+            try {
+                int pidToFlicker = InstantiatedPoints.ElementAt(flickeringIndex).Key;
 
-            _flickeringPoints.Add(pidToFlicker, InstantiatedPoints.ElementAt(flickeringIndex).Value);
+                _flickeringPoints.Add(pidToFlicker, InstantiatedPoints.ElementAt(flickeringIndex).Value);
 
-            SendPersonLeft(InstantiatedPoints[pidToFlicker]);
-            InstantiatedPoints.ElementAt(flickeringIndex).Value.GetComponent<PointBehaviour>().StartFlickering();
-            InstantiatedPoints.Remove(pidToFlicker);
-            PointsCount--;
+                SendPersonLeft(InstantiatedPoints[pidToFlicker]);
+                InstantiatedPoints.ElementAt(flickeringIndex).Value.GetComponent<PointBehaviour>().StartFlickering();
+                InstantiatedPoints.Remove(pidToFlicker);
+                _pointsCount--;
 
-            //Update OIDs
-            UpdateOIDs();
+                //Update OIDs
+                UpdateOIDs();
+            } catch {
+
+            }
         }
     }
 
@@ -305,7 +316,7 @@ public class PointManager : MonoBehaviour {
     public void StopFlickering(int pid) {
 
         InstantiatedPoints.Add(pid, _flickeringPoints[pid]);
-        PointsCount++;
+        _pointsCount++;
 
         var pointBehaviour = _flickeringPoints[pid].GetComponent<PointBehaviour>();
         pointBehaviour.isFlickering = false;
@@ -321,15 +332,15 @@ public class PointManager : MonoBehaviour {
     /// </summary>
     public void UpdateInstantiatedPointsCount() {
 
-        if (PointsCount <= 0) PointsCount = 0;
+        if (_desiredPointsCount <= 0) _desiredPointsCount = 0;
 
         //Create new points
-        while (InstantiatedPoints.Count < PointsCount) {
+        while (InstantiatedPoints.Count < _desiredPointsCount) {
             InstantiatePoint();
         }
 
         //Remove points
-        while (InstantiatedPoints.Count > PointsCount) {
+        while (InstantiatedPoints.Count > _desiredPointsCount) {
             RemovePoint();
         }
     }
@@ -368,6 +379,8 @@ public class PointManager : MonoBehaviour {
             UpdateOIDs();
             SendPersonEntered(InstantiatedPoints[_highestPid]);
         }
+
+        _pointsCount++;
 	}
 
 	/// <summary>
@@ -391,6 +404,7 @@ public class PointManager : MonoBehaviour {
         //Update OIDs
         UpdateOIDs();
 
+        _pointsCount--;
     }
 
     /// <summary>
@@ -405,6 +419,8 @@ public class PointManager : MonoBehaviour {
 
             //Update OIDs
             UpdateOIDs();
+
+            _pointsCount--;
         }
     }
 
@@ -420,6 +436,8 @@ public class PointManager : MonoBehaviour {
 
             //Update OIDs
             UpdateOIDs();
+
+            _pointsCount--;
         }
     }
 
@@ -455,7 +473,7 @@ public class PointManager : MonoBehaviour {
 
     public void RemovePoints()
     {
-        PointsCount = 0;
+        _pointsCount = 0;
         _highestPid = 0;
 
         foreach (var obj in InstantiatedPoints) {
@@ -526,7 +544,7 @@ public class PointManager : MonoBehaviour {
         msg.Append(_frameCounter);
         //Compute point size
         msg.Append(InstantiatedPoints.Count * PointSize.x * PointSize.y);
-        msg.Append(PointsCount);
+        msg.Append(_pointsCount);
         //Compute average motion
         var velocitySum = Vector3.zero;
         foreach(var element in InstantiatedPoints)
