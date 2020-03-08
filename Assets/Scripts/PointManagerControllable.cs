@@ -31,6 +31,12 @@ public class PointManagerControllable : Controllable {
     [OSCProperty][Range(0.0f,10.0f)]
     public float Speed;
 
+    [OSCMethod]
+    public void RemoveAll()
+    {
+        ((PointManager)TargetScript).RemovePoints();
+    }
+
     [Header("Simulated Errors Settings")]
     [OSCProperty][Range(0.0f, 1.0f)]
     public float NoiseIntensity;
@@ -45,11 +51,6 @@ public class PointManagerControllable : Controllable {
     [OSCProperty]
     public float PointFlickeringDuration = 0.1f;
 
-    [OSCMethod]
-    public void RemoveAll()
-    {
-        ((PointManager)TargetScript).RemovePoints();
-    }
 
     public override void DataLoaded()
     {
