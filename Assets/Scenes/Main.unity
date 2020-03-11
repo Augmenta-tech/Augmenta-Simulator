@@ -121,6 +121,77 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &18100214
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 18100216}
+  - component: {fileID: 18100215}
+  - component: {fileID: 18100217}
+  m_Layer: 0
+  m_Name: OSCManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &18100215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18100214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4c8e32f3cdcfe04caee8594416a7f5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debug: 0
+--- !u!4 &18100216
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18100214}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &18100217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18100214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddbd102086f074645b5d0ba7b1048fda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TargetScript: {fileID: 18100215}
+  BarColor: {r: 1, g: 1, b: 1, a: 1}
+  id: OSC Manager
+  folder: 
+  debug: 0
+  targetDirectory: 
+  sourceScene: 
+  usePanel: 1
+  usePresets: 1
+  hasPresets: 0
+  currentPreset: 
+  presetList: []
+  OutputPort: 0
+  OutputIP: 
 --- !u!1 &282840810
 GameObject:
   m_ObjectHideFlags: 0
@@ -316,7 +387,10 @@ MonoBehaviour:
   HeightLimit: {x: 300, y: 1000}
   Ratio: 0
   _mute: 0
-  PointsCount: 0
+  IncorrectDetectionProbability: 0
+  IncorrectDetectionDuration: 0.1
+  PointFlickeringProbability: 0
+  PointFlickeringDuration: 0.1
   Prefab: {fileID: 1897133376265846, guid: f52716752aba2a44281446caa8282db8, type: 3}
   CanMoveCursorPoint: 0
 --- !u!33 &575826800
@@ -404,15 +478,18 @@ MonoBehaviour:
   currentPreset: 
   presetList: []
   Mute: 0
-  OutputPort: 0
-  OutputIP: 
   Width: 0
   Height: 0
   PointsCount: 0
+  DesiredPointsCount: 0
   PointSizeX: 75
   PointSizeY: 75
   Speed: 0
   NoiseIntensity: 0
+  IncorrectDetectionProbability: 0
+  IncorrectDetectionDuration: 0.1
+  PointFlickeringProbability: 0
+  PointFlickeringDuration: 0.1
 --- !u!1 &722713527
 GameObject:
   m_ObjectHideFlags: 0

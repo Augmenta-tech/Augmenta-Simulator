@@ -7,10 +7,6 @@ public class PointManagerControllable : Controllable {
     [Header("Output Settings")]
     [OSCProperty]
     public bool Mute;
-    [OSCProperty]
-    public int OutputPort;
-    [OSCProperty]
-    public string OutputIP;
 
     [Header("Area Settings")]
     [OSCProperty]
@@ -31,7 +27,7 @@ public class PointManagerControllable : Controllable {
     [OSCProperty][Range(0.0f,10.0f)]
     public float Speed;
 
-    [Header("Simulated Errors Settings")]
+    [Header("Noisy Data Simulation")]
     [OSCProperty][Range(0.0f, 1.0f)]
     public float NoiseIntensity;
 

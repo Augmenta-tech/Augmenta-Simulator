@@ -1,21 +1,22 @@
 ﻿using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Linq;
 
-public class IPManager
+public class NetworkManager
 {
     public static string GetIpv4()
     {
 #if UNITY_EDITOR || UNITY_STANDALONE
-        NetworkInterfaceType _type = NetworkInterfaceType.Wireless80211;
+
         string output = "";
         foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces())
         {
-            if (item.NetworkInterfaceType == _type && item.OperationalStatus == OperationalStatus.Up)
+            if (item.OperationalStatus == OperationalStatus.Up)
             {
                 foreach (UnicastIPAddressInformation ip in item.GetIPProperties().UnicastAddresses)
                 {
-                    if (ip.Address.AddressFamily == AddressFamily.InterNetwork)
+                    if (ip.Address.AddressFamily == AddressFamily.InterNetwork && ip.Address.ToString() != "127.0.0.1")
                     {
                         output = ip.Address.ToString();
                     }
@@ -26,8 +27,6 @@ public class IPManager
 #else
         return GetIpv4Mobile();
 #endif
-
-
     }
 
     private static string GetIpv4Mobile()
@@ -43,5 +42,23 @@ public class IPManager
             }
         }
         return null;
+    }
+
+    public static string GetMacAddress() {
+
+        string output = "";
+
+        foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces()) {
+
+            if (item.OperationalStatus != OperationalStatus.Up)
+                continue;
+
+            if (item.GetPhysicalAddress().ToString() != "") {
+
+                output = string.Join(":", item.GetPhysicalAddress().GetAddressBytes().Select(b => b.ToString("X2")));
+            }
+        }
+
+        return output;
     }
 }

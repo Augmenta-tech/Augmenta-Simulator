@@ -8,19 +8,6 @@ using System.Linq;
 
 public class PointManager : MonoBehaviour {
 
-    [Header("Output settings")]
-    private int _outputPort = 12000;
-    public int OutputPort {
-        get { return _outputPort; }
-        set { _outputPort = value; InitConnection(); }
-    }
-
-    private string _outputIp = "127.0.0.1";
-    public string OutputIP {
-        get { return _outputIp; }
-        set { _outputIp = value; InitConnection(); }
-    }
-
     [Header("Area settings")]
     private int _width = 1280;
     public int Width {
@@ -144,8 +131,6 @@ public class PointManager : MonoBehaviour {
         _highestPid = 0;
 
         ChangeResolution();
-
-        InitConnection();
     }
 
     void Update() {
@@ -193,12 +178,14 @@ public class PointManager : MonoBehaviour {
         _cursorPoint.transform.position = newPos;
     }
 
-    #endregion
+	#endregion
 
-    /// <summary>
-    /// Process keyboard key presses
-    /// </summary>
-    public void ProcessKeyboardInputs()
+	#region Points Handling
+
+	/// <summary>
+	/// Process keyboard key presses
+	/// </summary>
+	public void ProcessKeyboardInputs()
     {
         if (Input.GetKeyUp(KeyCode.M))
             Mute = !Mute;
@@ -457,7 +444,23 @@ public class PointManager : MonoBehaviour {
 
     }
 
-    private void ComputeOrthoCamera()
+    public void RemovePoints() {
+        _pointsCount = 0;
+        _highestPid = 0;
+
+        foreach (var obj in InstantiatedPoints) {
+            SendPersonLeft(obj.Value);
+            Destroy(obj.Value);
+        }
+
+        InstantiatedPoints.Clear();
+    }
+
+	#endregion
+
+	#region Camera Handling
+
+	private void ComputeOrthoCamera()
     {
         if (Width <= 0) Width = 500;
         if (Height <= 0) Height = 800;
@@ -469,19 +472,6 @@ public class PointManager : MonoBehaviour {
 
         Camera.main.aspect = Ratio;
         Camera.main.orthographicSize = transform.localScale.y / 2;
-    }
-
-    public void RemovePoints()
-    {
-        _pointsCount = 0;
-        _highestPid = 0;
-
-        foreach (var obj in InstantiatedPoints) {
-            SendPersonLeft(obj.Value);
-            Destroy(obj.Value);
-        }
-
-        InstantiatedPoints.Clear();
     }
 
     public void ChangeResolution()
@@ -496,11 +486,13 @@ public class PointManager : MonoBehaviour {
         Screen.SetResolution(newWidth, newHeight, false);
     }
 
-    #region OSC Message
+	#endregion
 
-    //OSC part
+	#region OSC Message
 
-    /*
+	//OSC part
+
+	/*
         0: pid (int)                        // Personal ID ex : 42th person to enter stage has pid=42
         1: oid (int)                        // Ordered ID ex : if 3 person on stage, 43th person might have oid=2
         2: age (int)                        // Time on stage (in frame number)
@@ -529,13 +521,6 @@ public class PointManager : MonoBehaviour {
         7: scene.depth (int)
     */
 
-    public void InitConnection() {
-        if (OSCMaster.Clients.ContainsKey("AugmentaSimulatorOutput")) {
-            OSCMaster.RemoveClient("AugmentaSimulatorOutput");
-        }
-        OSCMaster.CreateClient("AugmentaSimulatorOutput", IPAddress.Parse(OutputIP), OutputPort);
-    }
-
     public void SendSceneUpdated()
     {
         if (Mute) return;
@@ -559,7 +544,7 @@ public class PointManager : MonoBehaviour {
         msg.Append(Height);
         msg.Append(100);
 
-        OSCMaster.Clients["AugmentaSimulatorOutput"].Send(msg);
+        OSCManager.activeManager.SendAugmentaMessage(msg);
     }
 
     public void SendPersonEntered(GameObject obj)
@@ -613,7 +598,7 @@ public class PointManager : MonoBehaviour {
         msg.Append(worldToViewPort.y);
         msg.Append(0.5f);
 
-        OSCMaster.Clients["AugmentaSimulatorOutput"].Send(msg);
+        OSCManager.activeManager.SendAugmentaMessage(msg);
     }
 
     #endregion
