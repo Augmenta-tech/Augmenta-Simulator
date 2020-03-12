@@ -2,33 +2,27 @@
 
 Work without Augmenta hardware by simulating people moving in space.
 
-This area size is in pixel, which corresponds to the video output resolution.
-
 ![Simulator](https://github.com/Theoriz/Augmenta/blob/gh-pages/res/gif/simulator2.gif) 
 
 ## Download
 
 Windows & Mac OS : https://github.com/Theoriz/Augmenta-Simulator/releases
 
-## How to use ?
+## Shortcuts
 
-In UI : 
+H : Toggle UI
 
-1 - Set resolution
+## Window Size
 
-2 - Set the point number
-
-3 - Set the OSC data output
-
-## Information
-
-To toggle the UI press "h".
-
-The window is resizeable which means that it can have a different aspect ratio than the area aspect ratio in which Augmenta works.
+The window is resizeable which means that it can have a different aspect ratio than the Augmenta Area aspect ratio.
 This won't change the data output, it is only a visual change.
+
+## Zeroconf
+
+For the simulator to create a Zeroconf service on Windows, you need to have Apple Bonjour for Windows installed.
 
 ## Version
 
-Unity : 2018.1.8f1
+Unity : 2019.3.5f1
 
 GenUI : https://github.com/theoriz/genui

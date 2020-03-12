@@ -110,6 +110,8 @@ public class PointManager : MonoBehaviour {
 
     public static Dictionary<int, GameObject> InstantiatedPoints;
 
+    public Material backgroundMaterial;
+
     private int _frameCounter;
     private bool _clickStartedOutsideUI;
     private int _highestPid;
@@ -468,7 +470,7 @@ public class PointManager : MonoBehaviour {
         Ratio = ((float)Width / (float)Height);
 
         transform.localScale = new Vector3(Width, Height,1f) / 100;
-        GetComponent<Renderer>().material.mainTextureScale = transform.localScale * 1.5f;
+        backgroundMaterial.mainTextureScale = transform.localScale * 1.5f;
 
         Camera.main.aspect = Ratio;
         Camera.main.orthographicSize = transform.localScale.y / 2;
