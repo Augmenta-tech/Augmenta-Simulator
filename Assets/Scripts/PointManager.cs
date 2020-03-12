@@ -48,8 +48,8 @@ public class PointManager : MonoBehaviour {
     }
     private int _desiredPointsCount;
 
-    private Vector2 _pointSize = new Vector2(75, 75);
-    public Vector2 PointSize {
+    private Vector3 _pointSize = new Vector3(75, 75, 2);
+    public Vector3 PointSize {
         get { return _pointSize; }
         set { _pointSize = value;
             if (InstantiatedPoints == null) return;
@@ -596,7 +596,7 @@ public class PointManager : MonoBehaviour {
 
         msg.Append(worldToViewPort.x);
         msg.Append(worldToViewPort.y);
-        msg.Append(0.5f);
+        msg.Append(PointSize.z);
 
         OSCManager.activeManager.SendAugmentaMessage(msg);
     }

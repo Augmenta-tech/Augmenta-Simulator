@@ -23,6 +23,8 @@ public class PointManagerControllable : Controllable {
     public float PointSizeX;
     [OSCProperty]
     public float PointSizeY;
+    [OSCProperty]
+    public float PointSizeZ;
 
     [OSCProperty][Range(0.0f,10.0f)]
     public float Speed;
@@ -55,6 +57,6 @@ public class PointManagerControllable : Controllable {
     public override void OnUiValueChanged(string name)
     {
         base.OnUiValueChanged(name);
-        ((PointManager)TargetScript).PointSize = new Vector2(PointSizeX / Width, PointSizeY / Height);
+        ((PointManager)TargetScript).PointSize = new Vector3(PointSizeX / Width, PointSizeY / Height, PointSizeZ);
     }
 }
