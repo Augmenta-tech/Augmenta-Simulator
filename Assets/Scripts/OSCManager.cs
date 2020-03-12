@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Net;
 using UnityOSC;
+using System.Linq;
 
 public class OSCManager : MonoBehaviour
 {
@@ -21,9 +22,14 @@ public class OSCManager : MonoBehaviour
         set { _outputIp = value; CreateAugmentaClient(); }
     }
 
+    [Tooltip("Time in s before a connection without heartbeat is deleted. 0 = Never.")]
+    public float ConnectionTimeout = 60;
+
     public bool debug = false;
 
-    private List<string> augmentaOutputs;
+    private Dictionary<string, float> augmentaOutputs; // <ID, timer>
+    private KeyValuePair<string, float> tmpOutput;
+    private List<string> outputsToDelete;
 
     private OSCManagerControllable controllable;
 
@@ -33,7 +39,8 @@ public class OSCManager : MonoBehaviour
 
         activeManager = this;
 
-        augmentaOutputs = new List<string>();
+        augmentaOutputs = new Dictionary<string, float>();
+        outputsToDelete = new List<string>();
     }
 
     // Start is called before the first frame update
@@ -45,7 +52,50 @@ public class OSCManager : MonoBehaviour
         CreateAugmentaClient();
     }
 
+    private void Update() {
+
+        
+        UpdateOutputsTimers();
+
+    }
+
     #endregion
+
+    /// <summary>
+    /// Increase output timers and delete timed out outputs
+    /// </summary>
+    void UpdateOutputsTimers() {
+
+        outputsToDelete.Clear();
+
+        for(int i=0; i<augmentaOutputs.Count; i++) {
+
+            tmpOutput = augmentaOutputs.ElementAt(i);
+
+            //Increase output timers
+            augmentaOutputs[tmpOutput.Key] = tmpOutput.Value + Time.deltaTime;
+
+            //Check for deletion only if connection timeout is strictly positive
+            if (ConnectionTimeout <= 0)
+                continue;
+
+            //Mark for deletion
+            if (augmentaOutputs[tmpOutput.Key] > ConnectionTimeout)
+                outputsToDelete.Add(tmpOutput.Key);
+        }
+
+        //Delete timed out outputs
+        foreach(var output in outputsToDelete) {
+
+            if(OSCMaster.Clients.ContainsKey(output))
+                OSCMaster.RemoveClient(output);
+
+            augmentaOutputs.Remove(output);
+
+            if (debug)
+                Debug.Log("Output " + output + " timed out.");
+        }
+    }
 
     /// <summary>
     /// Create client to send Augmenta message
@@ -68,7 +118,7 @@ public class OSCManager : MonoBehaviour
         OSCMaster.Clients["AugmentaSimulatorOutput"].Send(message);
 
         foreach(var output in augmentaOutputs)
-            OSCMaster.Clients[output].Send(message);
+            OSCMaster.Clients[output.Key].Send(message);
     }
 
     /// <summary>
@@ -113,20 +163,20 @@ public class OSCManager : MonoBehaviour
             case "connect":
 
                 //Answer connect
-                string outputID = message.Data[0].ToString();
                 string outputIP = message.Data[1].ToString();
                 int outputPort = (int)message.Data[2];
 
-                //Create output client
-                if (OSCMaster.Clients.ContainsKey(outputID)) {
-                    OSCMaster.RemoveClient(outputID);
-                }
-                OSCMaster.CreateClient(outputID, outputIP, outputPort);
+                string outputID = GetIDFromIPAndPort(outputIP, outputPort);
 
-                augmentaOutputs.Add(outputID);
+                //Create output client
+                if (!OSCMaster.Clients.ContainsKey(outputID))
+                    OSCMaster.CreateClient(outputID, outputIP, outputPort);
+
+                if(!augmentaOutputs.ContainsKey(outputID))
+                    augmentaOutputs.Add(outputID, 0);
 
                 if (debug)
-                    Debug.Log("Created output " + outputID + " at " + outputIP + ":" + outputPort);
+                    Debug.Log("Created output " + outputID);
 
                 break;
 
@@ -136,15 +186,16 @@ public class OSCManager : MonoBehaviour
                 string disconnectIP = message.Data[0].ToString();
                 int disconnectPort = (int)message.Data[1];
 
-                foreach(var client in OSCMaster.Clients) {
-                    if(client.Value.ClientIPAddress.ToString() == disconnectIP && client.Value.Port == disconnectPort) {
-                        OSCMaster.RemoveClient(client.Key);
+                string disconnectID = GetIDFromIPAndPort(disconnectIP, disconnectPort);
 
-                        if (debug)
-                            Debug.Log("Removed output " + client.Key + " at " + disconnectIP + ":" + disconnectPort);
+                if(OSCMaster.Clients.ContainsKey(disconnectID)) {
 
-                        augmentaOutputs.Remove(client.Key);
-                    }
+                    OSCMaster.RemoveClient(disconnectID);
+
+                    if (debug)
+                        Debug.Log("Removed output " + disconnectID);
+                                                             
+                    augmentaOutputs.Remove(disconnectID);
                 }
 
                 break;
@@ -176,7 +227,7 @@ public class OSCManager : MonoBehaviour
                 infoMessage.Append("Augmenta Simulator");
                 infoMessage.Append(NetworkManager.GetMacAddress());
                 infoMessage.Append(Application.version);
-                infoMessage.Append(controllable.currentPreset);
+                infoMessage.Append(controllable.currentPreset != "" ? controllable.currentPreset : "None");
                 infoMessage.Append("Simulator");
                 infoMessage.Append("Simulated");
 
@@ -189,9 +240,29 @@ public class OSCManager : MonoBehaviour
             case "heartbeat":
 
                 //Answer heartbeat
+                string heartbeatIP = message.Data[1].ToString();
+                int heartbeatPort = (int)message.Data[2];
+
+                string heartbeatID = GetIDFromIPAndPort(heartbeatIP, heartbeatPort);
+
                 if (debug)
-                    Debug.Log("Received heartbeat");
+                    Debug.Log("Received heartbeat for " + heartbeatID);
+
+                if (augmentaOutputs.ContainsKey(heartbeatID))
+                    augmentaOutputs[heartbeatID] = 0;
+
                 break;
         }
+    }
+
+    /// <summary>
+    /// Returns an ID based on the IP address and the port
+    /// </summary>
+    /// <param name="IP"></param>
+    /// <param name="port"></param>
+    /// <returns></returns>
+    string GetIDFromIPAndPort(string IP, int port) {
+
+        return string.Join(":", new string[] { IP, port.ToString() });
     }
 }
