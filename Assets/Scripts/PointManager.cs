@@ -405,6 +405,9 @@ public class PointManager : MonoBehaviour {
             UpdateOIDs();
 
             _pointsCount--;
+
+        } else {
+            RemoveIncorrectPoint(pid);
         }
     }
 
@@ -441,7 +444,7 @@ public class PointManager : MonoBehaviour {
         keysList.Sort();
 
         for (int i = 0; i < _incorrectInstantiatedPoints.Count; i++) {
-            _incorrectInstantiatedPoints[keysList[i]].GetComponent<PointBehaviour>().oid = i;
+            _incorrectInstantiatedPoints[keysList[i]].GetComponent<PointBehaviour>().oid = InstantiatedPoints.Count + i;
         }
 
     }

@@ -106,17 +106,6 @@ public class PointBehaviour : MonoBehaviour {
         VelocityVisualizer.localScale = new Vector3(VelocityThickness, NormalizedVelocity.magnitude, VelocityThickness);
     }
 
-    private void OnTriggerEnter(Collider collision) {
-        if (collision.name == "Left" || collision.name == "Right") {
-            direction = new Vector2(-direction.x, direction.y);
-        }
-        if (collision.name == "Top" || collision.name == "Bot") {
-            direction = new Vector2(direction.x, -direction.y);
-        }
-
-        rigidbody.velocity = direction * Speed;
-    }
-
     public void OnMouseDrag() {
 
         ray = manager.camera.ScreenPointToRay(Input.mousePosition);
