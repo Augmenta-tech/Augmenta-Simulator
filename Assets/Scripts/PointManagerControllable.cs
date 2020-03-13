@@ -8,11 +8,20 @@ public class PointManagerControllable : Controllable {
     [OSCProperty]
     public bool Mute;
 
+    public List<string> ProtocolVersions;
+    [OSCProperty(TargetList ="ProtocolVersions", IncludeInPresets = true)] public string ProtocolVersion;
+
     [Header("Area Settings")]
     [OSCProperty]
-    public int Width;
+    [Tooltip("in meters")]
+    public float Width;
     [OSCProperty]
-    public int Height;
+    [Tooltip("in meters")]
+    public float Height;
+    [OSCProperty]
+    public float MetersPerPixel;
+
+
 
     [Header("Points Settings")]
     [OSCProperty(isInteractible = false)]
@@ -49,14 +58,16 @@ public class PointManagerControllable : Controllable {
         ((PointManager)TargetScript).RemovePoints();
     }
 
-    public override void DataLoaded()
-    {
-        ((PointManager)TargetScript).ChangeResolution();
-    }
-
     public override void OnUiValueChanged(string name)
     {
         base.OnUiValueChanged(name);
         ((PointManager)TargetScript).PointSize = new Vector3(PointSizeX / Width, PointSizeY / Height, PointSizeZ);
+        ((PointManager)TargetScript).ProtocolVersion = ProtocolVersion;
+    }
+
+    public override void OnScriptValueChanged(string name) {
+        base.OnScriptValueChanged(name);
+        ProtocolVersion = ((PointManager)TargetScript).ProtocolVersion;
+        ProtocolVersions = ((PointManager)TargetScript).ProtocolVersions;
     }
 }

@@ -8,22 +8,28 @@ using System.Linq;
 
 public class PointManager : MonoBehaviour {
 
+    [Header("Output settings")]
+    public List<string> ProtocolVersions;
+    public string ProtocolVersion = "1";
+
     [Header("Area settings")]
-    private int _width = 1280;
-    public int Width {
+    private float _width = 5;
+    public float Width {
         get { return _width; }
-        set { _width = value; ChangeResolution(); }
+        set { _width = value; UpdateAreaSize(); }
     }
-    public Vector2 WidthLimit;
 
-    private int _height = 800;
-    public int Height {
+    private float _height = 5;
+    public float Height {
         get { return _height; }
-        set { _height = value; ChangeResolution(); }
+        set { _height = value; UpdateAreaSize(); }
     }
-    public Vector2 HeightLimit;
 
-    public float Ratio;
+    private float _metersPerPixel = 0.005f;
+    public float MetersPerPixel {
+        get { return _metersPerPixel; }
+        set { _metersPerPixel = value; }
+    }
 
     [Header("Points settings")]
     public bool _mute;
@@ -48,19 +54,19 @@ public class PointManager : MonoBehaviour {
     }
     private int _desiredPointsCount;
 
-    private Vector3 _pointSize = new Vector3(75, 75, 2);
+    private Vector3 _pointSize = new Vector3(0.4f, 0.4f, 1.8f);
     public Vector3 PointSize {
         get { return _pointSize; }
         set { _pointSize = value;
             if (InstantiatedPoints == null) return;
             foreach (var obj in InstantiatedPoints)
-                obj.Value.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
+                obj.Value.transform.localScale = new Vector3(PointSize.x, PointSize.y, PointSize.z);
 
             foreach (var obj in _incorrectInstantiatedPoints)
-                obj.Value.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
+                obj.Value.transform.localScale = new Vector3(PointSize.x, PointSize.y, PointSize.z);
 
             foreach (var obj in _flickeringPoints)
-                obj.Value.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
+                obj.Value.transform.localScale = new Vector3(PointSize.x, PointSize.y, PointSize.z);
         }
     }
 
@@ -132,7 +138,7 @@ public class PointManager : MonoBehaviour {
 
         _highestPid = 0;
 
-        ChangeResolution();
+        UpdateAreaSize();
     }
 
     void Update() {
@@ -150,10 +156,6 @@ public class PointManager : MonoBehaviour {
 
         //Create flickering
         CreateFlickeringPoints();
-
-        //Update camera
-        //!\ SHOULD PROBABLY ONLY BE DONE ON RESOLUTION CHANGE /!\\
-        ComputeOrthoCamera();
 
         //Send Augmenta scene message
         SendSceneUpdated();
@@ -460,39 +462,29 @@ public class PointManager : MonoBehaviour {
 
 	#endregion
 
-	#region Camera Handling
+	#region Area Handling
 
-	private void ComputeOrthoCamera()
-    {
-        if (Width <= 0) Width = 500;
-        if (Height <= 0) Height = 800;
+    private void UpdateAreaSize() {
 
-        Ratio = ((float)Width / (float)Height);
+        if (_width <= 0) _width = 1.0f;
+        if (_height <= 0) _height = 1.0f;
 
-        transform.localScale = new Vector3(Width, Height,1f) / 100;
-        backgroundMaterial.mainTextureScale = transform.localScale * 1.5f;
+        transform.localScale = new Vector3(_width, _height, 1);
 
-        Camera.main.aspect = Ratio;
-        Camera.main.orthographicSize = transform.localScale.y / 2;
+        UpdateBackgroundTexture();
+
     }
 
-    public void ChangeResolution()
+	private void UpdateBackgroundTexture()
     {
-        var ratio = (float)Width / (float)Height;
-        var newWidth = _width;
-        var newHeight = _height;
-
-        newWidth = (int)Mathf.Clamp(Width, WidthLimit.x, WidthLimit.y);
-        newHeight = (int)Mathf.Clamp(Height, HeightLimit.x, HeightLimit.y);
-
-        Screen.SetResolution(newWidth, newHeight, false);
+        backgroundMaterial.mainTextureScale = transform.localScale * 0.5f;
     }
 
 	#endregion
 
 	#region OSC Message
 
-	//OSC part
+	//OSC Protocol V1
 
 	/*
         0: pid (int)                        // Personal ID ex : 42th person to enter stage has pid=42
@@ -542,8 +534,8 @@ public class PointManager : MonoBehaviour {
 
         msg.Append(velocitySum.x);
         msg.Append(velocitySum.y);
-        msg.Append(Width);
-        msg.Append(Height);
+        msg.Append((int)(Width / MetersPerPixel));
+        msg.Append((int)(Height / MetersPerPixel));
         msg.Append(100);
 
         OSCManager.activeManager.SendAugmentaMessage(msg);
@@ -571,8 +563,9 @@ public class PointManager : MonoBehaviour {
 
         var msg = new UnityOSC.OSCMessage(address);
         var behaviour = obj.GetComponent<PointBehaviour>();
-        var worldToViewPort = Camera.main.WorldToViewportPoint(obj.transform.position);
-        worldToViewPort = new Vector3(worldToViewPort.x, Mathf.Abs(worldToViewPort.y - 1), worldToViewPort.z); //Switch from bot-left (0;0) to top-left(0;0)
+        float pointX = 0.5f + behaviour.transform.position.x / Width;
+        float pointY = 0.5f - behaviour.transform.position.y / Height;
+
 
         msg.Append(behaviour.pid);
 
@@ -581,8 +574,8 @@ public class PointManager : MonoBehaviour {
 
         msg.Append((int)behaviour.Age);
         //centroid
-        msg.Append(worldToViewPort.x);
-        msg.Append(worldToViewPort.y);
+        msg.Append(pointX);
+        msg.Append(pointY);
         //Velocity
         var normalizedVelocity = behaviour.NormalizedVelocity;
         msg.Append(-normalizedVelocity.x);
@@ -590,14 +583,14 @@ public class PointManager : MonoBehaviour {
         msg.Append((float)behaviour.pid);
 
         //Bounding
-        msg.Append(worldToViewPort.x - PointSize.x / 2);
-        msg.Append(worldToViewPort.y - PointSize.y / 2);
+        msg.Append(pointX - PointSize.x * 0.5f);
+        msg.Append(pointY - PointSize.y * 0.5f);
 
         msg.Append(PointSize.x);
         msg.Append(PointSize.y);
 
-        msg.Append(worldToViewPort.x);
-        msg.Append(worldToViewPort.y);
+        msg.Append(pointX);
+        msg.Append(pointY);
         msg.Append(PointSize.z);
 
         OSCManager.activeManager.SendAugmentaMessage(msg);

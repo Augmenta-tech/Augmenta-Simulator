@@ -80,18 +80,13 @@ public class PointBehaviour : MonoBehaviour {
             Speed = 0.0f;
         }
 
-        //Screen out
-        var actualPos = Camera.main.WorldToViewportPoint(transform.position);
-
+        //Update position
         var newPos = transform.position + Random.Range(-noiseIntensity, noiseIntensity) * Vector3.right + Random.Range(-noiseIntensity, noiseIntensity) * Vector3.up;
 
-        if (actualPos.x < 0.00f || actualPos.x > 1f || actualPos.y < 0.0f || actualPos.y > 1f)
-            newPos = Vector3.zero;
+        newPos.x = Mathf.Clamp(newPos.x, -(manager.Width + manager.PointSize.x) * 0.5f, (manager.Width - manager.PointSize.x) * 0.5f);
+        newPos.y = Mathf.Clamp(newPos.y, -(manager.Height + manager.PointSize.y) * 0.5f, (manager.Height - manager.PointSize.y) * 0.5f);
 
         transform.position = newPos;
-
-        if (manager == null)
-            return;
 
         //udpate text
         PointInfoText.text = "PID : " + pid + '\n' + '\n' + "OID : " + oid;
