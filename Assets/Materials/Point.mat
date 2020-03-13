@@ -4,9 +4,10 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Unlit
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Point
   m_Shader: {fileID: 4800000, guid: 51b5701e06e6c974588c8fac27d27d1b, type: 3}
   m_ShaderKeywords: _USETEX_ON
   m_LightmapFlags: 4
@@ -83,7 +84,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BackgroundColor: {r: 1, g: 1, b: 1, a: 1}
-    - _BorderColor: {r: 0.46318462, g: 1, b: 0.41911763, a: 1}
+    - _BorderColor: {r: 0.75, g: 0.11249998, b: 0.40312663, a: 1}
     - _CenterColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 0.07946544, g: 0.7058823, b: 0.057093434, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

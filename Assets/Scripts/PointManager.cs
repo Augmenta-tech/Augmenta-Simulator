@@ -8,6 +8,11 @@ using System.Linq;
 
 public class PointManager : MonoBehaviour {
 
+    [Header("Raycast Settings")]
+    public new Camera camera;
+    public LayerMask areaLayer;
+    public LayerMask pointsLayer;
+
     [Header("Output settings")]
     public List<string> ProtocolVersions;
     public string ProtocolVersion = "1";
@@ -111,20 +116,23 @@ public class PointManager : MonoBehaviour {
     public float PointFlickeringProbability = 0;
     public float PointFlickeringDuration = 0.1f;
 
-    public GameObject Prefab;
-    public bool CanMoveCursorPoint;
+    public GameObject PointPrefab;
 
     public static Dictionary<int, GameObject> InstantiatedPoints;
 
     public Material backgroundMaterial;
 
     private int _frameCounter;
-    private bool _clickStartedOutsideUI;
     private int _highestPid;
+
     private GameObject _cursorPoint;
+    private Ray ray;
+    private RaycastHit raycastHit;
 
     private Dictionary<int, GameObject> _incorrectInstantiatedPoints;
     private Dictionary<int, GameObject> _flickeringPoints;
+
+    private List<int> keysList;
 
     #region MonoBehaviour Implementation
 
@@ -133,8 +141,6 @@ public class PointManager : MonoBehaviour {
         InstantiatedPoints = new Dictionary<int, GameObject>();
         _incorrectInstantiatedPoints = new Dictionary<int, GameObject>();
         _flickeringPoints = new Dictionary<int, GameObject>();
-
-        CanMoveCursorPoint = true;
 
         _highestPid = 0;
 
@@ -169,17 +175,13 @@ public class PointManager : MonoBehaviour {
     }
 
     public void OnMouseDrag() {
-        if (_cursorPoint == null || !CanMoveCursorPoint || !_clickStartedOutsideUI) return;
+        if (_cursorPoint == null) return;
 
-        var newPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-        newPos.z = 0;
+        ray = camera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out raycastHit, 100.0f, areaLayer)) {
 
-        newPos.x = Mathf.Clamp(newPos.x, 0f, 1f);
-        newPos.y = Mathf.Clamp(newPos.y, 0f, 1f);
-
-        newPos = Camera.main.ViewportToWorldPoint(newPos);
-        newPos.z = 0;
-        _cursorPoint.transform.position = newPos;
+            _cursorPoint.transform.position = new Vector3(raycastHit.point.x, raycastHit.point.y, 0);
+        }
     }
 
 	#endregion
@@ -206,51 +208,41 @@ public class PointManager : MonoBehaviour {
     /// </summary>
     public void ProcessMouseInputs() {
 
-        //Weird behaviour "fix"
-        if (_pointsCount == 0)
-            CanMoveCursorPoint = true;
-
+        //Left clic
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) {
-            _clickStartedOutsideUI = true;
+            ray = camera.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out raycastHit, 100.0f, pointsLayer)) {
+
+                //Point hit
+                _cursorPoint = raycastHit.transform.gameObject;
+
+            } else if(Physics.Raycast(ray, out raycastHit, 100.0f, areaLayer)) {
+
+                //Area hit
+                InstantiatePoint(false, true);
+            }
         }
 
+        //Left release
         if (Input.GetMouseButtonUp(0)) {
-            _clickStartedOutsideUI = false;
+            if (!_cursorPoint)
+                return;
+
+            _cursorPoint = null;
         }
 
-        if (Input.GetMouseButton(1) && !EventSystem.current.IsPointerOverGameObject()) {
-            if (_cursorPoint != null) {
-                _pointsCount--;
-                SendPersonLeft(InstantiatedPoints[0]);
-                InstantiatedPoints.Remove(0);
-                Destroy(_cursorPoint);
-            }
-        } else if (Input.GetMouseButton(0) && CanMoveCursorPoint && !EventSystem.current.IsPointerOverGameObject()) {
-            if (_cursorPoint == null) {
-                _cursorPoint = Instantiate(Prefab);
+        //Right clic
+        if (Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject()) {
+            ray = camera.ScreenPointToRay(Input.mousePosition);
 
-                PointBehaviour cursorPointBehaviour = _cursorPoint.GetComponent<PointBehaviour>();
+            if (Physics.Raycast(ray, out raycastHit, 100.0f, pointsLayer)) {
 
-                cursorPointBehaviour.PointColor = Color.HSVToRGB(Random.value, 0.85f, 0.75f);
-                UpdatePointColor(cursorPointBehaviour);
-                _cursorPoint.transform.parent = transform;
-                var newPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-                newPos.z = 0;
-                newPos.x = Mathf.Clamp(newPos.x, 0.05f, 0.95f);
-                newPos.y = Mathf.Clamp(newPos.y, 0.05f, 0.95f);
-                newPos = Camera.main.ViewportToWorldPoint(newPos);
-                newPos.z = 0;
-                _cursorPoint.transform.position = newPos;
-                _cursorPoint.transform.GetChild(0).GetComponent<TextMesh>().text = "ID : 0";
-                _cursorPoint.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
-                cursorPointBehaviour.pid = 0;
-                cursorPointBehaviour.oid = 0;
-                cursorPointBehaviour.manager = this;
-                cursorPointBehaviour.isMouse = true;
-                InstantiatedPoints.Add(0, _cursorPoint);
-                _pointsCount++;
+                RemovePoint(raycastHit.transform.GetComponent<PointBehaviour>().pid);
+
             }
         }
+
     }
 
     public void UpdatePointColor(PointBehaviour target) {
@@ -339,14 +331,9 @@ public class PointManager : MonoBehaviour {
     /// <summary>
     /// Instantiate new point
     /// </summary>
-    public void InstantiatePoint(bool isIncorrectDetection = false) {
+    public void InstantiatePoint(bool isIncorrectDetection = false, bool isFromCursor = false) {
 
-		_highestPid++;
-
-		if (_highestPid <= 0)
-			_highestPid = 1;
-
-		GameObject newPoint = Instantiate(Prefab);
+		GameObject newPoint = Instantiate(PointPrefab);
 
 		PointBehaviour newPointBehaviour = newPoint.GetComponent<PointBehaviour>();
 
@@ -371,13 +358,19 @@ public class PointManager : MonoBehaviour {
             SendPersonEntered(InstantiatedPoints[_highestPid]);
         }
 
+        if (isFromCursor) {
+            _cursorPoint = newPoint;
+            OnMouseDrag();
+        }
+
+        _highestPid++;
         _pointsCount++;
 	}
 
-	/// <summary>
-	/// Remove point with highest pid
-	/// </summary>
-	public void RemovePoint() {
+    /// <summary>
+    /// Remove point with highest pid
+    /// </summary>
+    public void RemovePoint() {
 
         if (InstantiatedPoints.Count == 0)
             return;
@@ -437,13 +430,18 @@ public class PointManager : MonoBehaviour {
     /// </summary>
     private void UpdateOIDs() {
 
-        for (int i = 0; i < InstantiatedPoints.Count; i++) {
-            if(InstantiatedPoints.ElementAt(i).Key != 0)
-                InstantiatedPoints.ElementAt(i).Value.GetComponent<PointBehaviour>().oid = i + 1;
+        keysList = InstantiatedPoints.Keys.ToList();
+        keysList.Sort();
+
+        for(int i=0; i<InstantiatedPoints.Count; i++) {
+            InstantiatedPoints[keysList[i]].GetComponent<PointBehaviour>().oid = i;
         }
 
+        keysList = _incorrectInstantiatedPoints.Keys.ToList();
+        keysList.Sort();
+
         for (int i = 0; i < _incorrectInstantiatedPoints.Count; i++) {
-            _incorrectInstantiatedPoints.ElementAt(i).Value.GetComponent<PointBehaviour>().oid = InstantiatedPoints.Count + i + 1;
+            _incorrectInstantiatedPoints[keysList[i]].GetComponent<PointBehaviour>().oid = i;
         }
 
     }

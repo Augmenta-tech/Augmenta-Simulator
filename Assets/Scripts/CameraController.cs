@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour
@@ -35,7 +36,8 @@ public class CameraController : MonoBehaviour
 
     void UpdateCameraSize() {
 
-        camera.orthographicSize -= Input.mouseScrollDelta.y * zoomSpeed;
+        if(!EventSystem.current.IsPointerOverGameObject())
+            camera.orthographicSize -= Input.mouseScrollDelta.y * zoomSpeed;
 
         if (camera.orthographicSize < minSize)
             camera.orthographicSize = minSize;

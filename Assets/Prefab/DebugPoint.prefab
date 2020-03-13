@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4517994547990216}
   - component: {fileID: 33301770736740770}
   - component: {fileID: 23512407315576470}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -90,7 +90,7 @@ GameObject:
   - component: {fileID: 4245185241543150}
   - component: {fileID: 23726017486516012}
   - component: {fileID: 102360146734640142}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -187,7 +187,7 @@ GameObject:
   - component: {fileID: 4373641623416888}
   - component: {fileID: 33404523835414736}
   - component: {fileID: 23035681279270052}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Speed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -264,7 +264,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4131514715415182}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Pivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -296,9 +296,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4523601773261354}
   - component: {fileID: 114412786907613634}
-  - component: {fileID: 61483718719694580}
-  - component: {fileID: 50022626842310180}
-  m_Layer: 0
+  - component: {fileID: 2776326774191610709}
+  - component: {fileID: 5069877076318906407}
+  m_Layer: 10
   m_Name: DebugPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -339,61 +339,44 @@ MonoBehaviour:
   PointInfoText: {fileID: 102360146734640142}
   Point: {fileID: 4517994547990216}
   VelocityVisualizer: {fileID: 4131514715415182}
+  rigidbody: {fileID: 2776326774191610709}
   VelocityThickness: 0.025
   pid: 0
   oid: 0
   direction: {x: 0, y: 0, z: 0}
-  isMouse: 0
+  isMovedByMouse: 0
   PointColor: {r: 0, g: 0, b: 0, a: 0}
   NormalizedVelocity: {x: 0, y: 0, z: 0}
   _oldPosition: {x: 0, y: 0, z: 0}
   noiseIntensity: 0
   isIncorrectDetection: 0
   isFlickering: 0
---- !u!61 &61483718719694580
-BoxCollider2D:
+--- !u!54 &2776326774191610709
+Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1897133376265846}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 6200000, guid: cc539cdfbf73ce8459814c4fe4e1acb6, type: 2}
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
---- !u!50 &50022626842310180
-Rigidbody2D:
-  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!65 &5069877076318906407
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1897133376265846}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 1
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0
-  m_GravityScale: 0
-  m_Material: {fileID: 6200000, guid: cc539cdfbf73ce8459814c4fe4e1acb6, type: 2}
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 4
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: -0.5}

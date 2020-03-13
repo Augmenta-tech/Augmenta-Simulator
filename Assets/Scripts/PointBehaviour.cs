@@ -10,6 +10,7 @@ public class PointBehaviour : MonoBehaviour {
     public TextMesh PointInfoText;
     public Transform Point;
     public Transform VelocityVisualizer;
+    public new Rigidbody rigidbody;
 
     public float VelocityThickness;
 
@@ -17,14 +18,14 @@ public class PointBehaviour : MonoBehaviour {
     public float Speed {
         get { return _speed; }
         set { _speed = value;
-            GetComponent<Rigidbody2D>().velocity = direction * Speed;
+            rigidbody.velocity = direction * Speed;
         }
     }
 
     public int pid;
     public int oid;
     public Vector3 direction;
-    public bool isMouse;
+    public bool isMovedByMouse;
     public Color PointColor;
 
     public Vector3 NormalizedVelocity;
@@ -38,17 +39,23 @@ public class PointBehaviour : MonoBehaviour {
 
     private float timer = 0;
 
+    private Ray ray;
+    private RaycastHit raycastHit;
+
 	#region MonoBehaviour Implementation
 
 	void Start () {
         direction = Random.onUnitSphere;
         direction.z = 0;
 
-        var rndVelocity = direction * Speed;
-        if (!isMouse) 
-            GetComponent<Rigidbody2D>().velocity = rndVelocity;
-        else
-            GetComponent<Rigidbody2D>().isKinematic = true;
+        //Get velocity
+        if (isIncorrectDetection) {
+            rigidbody.velocity = Vector3.zero;
+            Speed = 0.0f;
+        } else {
+            var rndVelocity = direction * Speed;
+            rigidbody.velocity = rndVelocity;
+        }
 
         VelocityVisualizer.localScale = Vector3.zero;
 
@@ -73,12 +80,6 @@ public class PointBehaviour : MonoBehaviour {
         }
 
         Age++;
-
-        //Compute velocity
-        if (isMouse || isIncorrectDetection) {
-            GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-            Speed = 0.0f;
-        }
 
         //Update position
         var newPos = transform.position + Random.Range(-noiseIntensity, noiseIntensity) * Vector3.right + Random.Range(-noiseIntensity, noiseIntensity) * Vector3.up;
@@ -105,25 +106,7 @@ public class PointBehaviour : MonoBehaviour {
         VelocityVisualizer.localScale = new Vector3(VelocityThickness, NormalizedVelocity.magnitude, VelocityThickness);
     }
 
-    private void OnMouseDown() {
-        manager.CanMoveCursorPoint = false;
-    }
-
-    private void OnMouseDrag() {
-        var newPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-        newPos.z = 0;
-        newPos.x = Mathf.Clamp(newPos.x, 0.05f, 0.95f);
-        newPos.y = Mathf.Clamp(newPos.y, 0.05f, 0.95f);
-        newPos = Camera.main.ViewportToWorldPoint(newPos);
-        newPos.z = 0;
-        transform.position = newPos;
-    }
-
-    private void OnMouseUp() {
-        manager.CanMoveCursorPoint = true;
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision) {
+    private void OnTriggerEnter(Collider collision) {
         if (collision.name == "Left" || collision.name == "Right") {
             direction = new Vector2(-direction.x, direction.y);
         }
@@ -131,7 +114,16 @@ public class PointBehaviour : MonoBehaviour {
             direction = new Vector2(direction.x, -direction.y);
         }
 
-        GetComponent<Rigidbody2D>().velocity = direction * Speed;
+        rigidbody.velocity = direction * Speed;
+    }
+
+    public void OnMouseDrag() {
+
+        ray = manager.camera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out raycastHit, 100.0f, manager.areaLayer)) {
+
+            transform.position = new Vector3(raycastHit.point.x, raycastHit.point.y, 0);
+        }
     }
 
     #endregion
