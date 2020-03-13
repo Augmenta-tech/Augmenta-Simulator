@@ -5,21 +5,23 @@ using Mono.Zeroconf;
 
 public class ZeroconfManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        RegisterServices();   
-    }
+    private RegisterService service;
 
-    void RegisterServices() {
+    void OnEnable() {
 
         //_osc._udp.
-        RegisterService service = new RegisterService();
+        service = new RegisterService();
         service.Name = "Augmenta Simulator";
         service.RegType = "_osc._udp";
         service.ReplyDomain = "local.";
         service.UPort = 36278;
 
         service.Register();
+    }
+
+    void OnDisable() {
+
+        service.Dispose();
+
     }
 }
