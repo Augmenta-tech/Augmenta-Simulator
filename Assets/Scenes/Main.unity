@@ -437,6 +437,7 @@ MonoBehaviour:
     m_Bits: 1024
   ProtocolVersions:
   - 1
+  - 2
   ProtocolVersion: 1
   _mute: 0
   IncorrectDetectionProbability: 0

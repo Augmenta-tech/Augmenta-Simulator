@@ -119,16 +119,11 @@ public class PointBehaviour : MonoBehaviour {
 
     private void ComputeNormalizedVelocity()
     {
-        var worldToViewPort = Camera.main.WorldToViewportPoint(transform.position);
-        //Switch from bot-left (0;0) to top-left(0;0)
-        worldToViewPort = new Vector3(worldToViewPort.x, Mathf.Abs(worldToViewPort.y - 1), worldToViewPort.z);
-        var oldPositionNormalized = Camera.main.WorldToViewportPoint(_oldPosition);
-        //Switch from bot-left (0;0) to top-left(0;0)
-        oldPositionNormalized = new Vector3(oldPositionNormalized.x, Mathf.Abs(oldPositionNormalized.y - 1), oldPositionNormalized.z);
+        NormalizedVelocity = ((transform.position - _oldPosition) / Time.deltaTime);
+
+        NormalizedVelocity = new Vector3(-NormalizedVelocity.x / manager.Width, NormalizedVelocity.y / manager.Height, 0);
 
         _oldPosition = transform.position;
-
-        NormalizedVelocity = (oldPositionNormalized - worldToViewPort) / Time.deltaTime;
     }
 
     public void UpdatePointColor(Color color)

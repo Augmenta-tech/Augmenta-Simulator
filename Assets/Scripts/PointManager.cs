@@ -535,8 +535,13 @@ public class PointManager : MonoBehaviour {
 
         msg.Append(velocitySum.x);
         msg.Append(velocitySum.y);
-        msg.Append((int)(Width / MetersPerPixel));
-        msg.Append((int)(Height / MetersPerPixel));
+        if(ProtocolVersion == "1") {
+            msg.Append((int)(Width / MetersPerPixel));
+            msg.Append((int)(Height / MetersPerPixel));
+        } else if( ProtocolVersion == "2") {
+            msg.Append(Width);
+            msg.Append(Height);
+        }
         msg.Append(100);
 
         OSCManager.activeManager.SendAugmentaMessage(msg);
@@ -578,9 +583,8 @@ public class PointManager : MonoBehaviour {
         msg.Append(pointX);
         msg.Append(pointY);
         //Velocity
-        var normalizedVelocity = behaviour.NormalizedVelocity;
-        msg.Append(-normalizedVelocity.x);
-        msg.Append(-normalizedVelocity.y);
+        msg.Append(-behaviour.NormalizedVelocity.x);
+        msg.Append(-behaviour.NormalizedVelocity.y);
         msg.Append((float)behaviour.pid);
 
         //Bounding
