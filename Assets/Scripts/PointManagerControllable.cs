@@ -13,30 +13,33 @@ public class PointManagerControllable : Controllable {
 
     [Header("AREA SETTINGS")]
     [OSCProperty]
-    [Tooltip("in meters")]
     public float Width;
     [OSCProperty]
     [Tooltip("in meters")]
     public float Height;
-    [OSCProperty]
+    [OSCProperty][Tooltip("when using protocol V1")]
     public float MetersPerPixel;
 
 
 
-    [Header("POINTS SETTINGS")]
+    [Header("POINTS GENERAL SETTINGS")]
     [OSCProperty(isInteractible = false)]
     public int PointsCount;
     [OSCProperty][Range(0, 30)]
     public int DesiredPointsCount;
     [OSCProperty]
-    public float PointSizeX;
-    [OSCProperty]
-    public float PointSizeY;
-    [OSCProperty]
-    public float PointSizeZ;
-
-    [OSCProperty][Range(0.0f,10.0f)]
+    [Range(0.0f, 10.0f)]
     public float Speed;
+
+    [Header("POINTS SIZE SETTINGS")]
+    [OSCProperty]
+    public Vector3 MinPointSize;
+    [OSCProperty][Tooltip("in meters")]
+    public Vector3 MaxPointSize;
+    [OSCProperty]
+    public bool ChangePointSizeOverTime;
+    [OSCProperty][Range(0.0f, 10.0f)]
+    public float PointSizeVariationFrequency;
 
     [Header("NOISY DATA SIMULATION")]
     [OSCProperty][Range(0.0f, 1.0f)][Tooltip("Movement noise")]
@@ -61,7 +64,6 @@ public class PointManagerControllable : Controllable {
     public override void OnUiValueChanged(string name)
     {
         base.OnUiValueChanged(name);
-        ((PointManager)TargetScript).PointSize = new Vector3(PointSizeX / Width, PointSizeY / Height, PointSizeZ);
         ((PointManager)TargetScript).ProtocolVersion = ProtocolVersion;
     }
 

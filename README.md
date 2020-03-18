@@ -8,14 +8,23 @@ Work without Augmenta hardware by simulating people moving in space.
 
 Windows & Mac OS : https://github.com/Theoriz/Augmenta-Simulator/releases
 
-## Shortcuts
+## Controls
 
+### Application Shortcuts
+
+Left clic : Create point or move existing point
+Right clic : Delete point
+M : Mute/Unmute all outputs
 H : Toggle UI
+R : Reset camera position
+Escap : Quit application
 
-## Window Size
+### Camera Control
 
-The window is resizeable which means that it can have a different aspect ratio than the Augmenta Area aspect ratio.
-This won't change the data output, it is only a visual change.
+Use mousewheel to zoom.
+Press and drag mousewheel to pan.
+Press Alt + Left clic to rotate.
+Press R to reset camera position.
 
 ## Zeroconf
 
@@ -23,6 +32,4 @@ For the simulator to create a Zeroconf service on Windows, you need to have Appl
 
 ## Version
 
-Unity : 2019.3.5f1
-
-GenUI : https://github.com/theoriz/genui
+Unity 2019.3.5f1

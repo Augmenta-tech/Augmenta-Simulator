@@ -42,6 +42,7 @@ public class PointManager : MonoBehaviour {
         get { return _mute; }
         set { _mute = value;
             if (InstantiatedPoints == null) return;
+
             foreach (var point in InstantiatedPoints.Values)
                 UpdatePointColor(point.GetComponent<PointBehaviour>());
 
@@ -65,27 +66,12 @@ public class PointManager : MonoBehaviour {
     }
     private int _desiredPointsCount;
 
-    private Vector3 _pointSize = new Vector3(0.4f, 0.4f, 1.8f);
-    public Vector3 PointSize {
-        get { return _pointSize; }
-        set { _pointSize = value;
-            if (InstantiatedPoints == null) return;
-            foreach (var obj in InstantiatedPoints)
-                obj.Value.transform.localScale = new Vector3(PointSize.x, PointSize.y, PointSize.z);
-
-            foreach (var obj in _incorrectInstantiatedPoints)
-                obj.Value.transform.localScale = new Vector3(PointSize.x, PointSize.y, PointSize.z);
-
-            foreach (var obj in _flickeringPoints)
-                obj.Value.transform.localScale = new Vector3(PointSize.x, PointSize.y, PointSize.z);
-        }
-    }
-
     private float _speed = 1;
     public float Speed {
         get { return _speed; }
         set { _speed = value;
             if (InstantiatedPoints == null) return;
+
             foreach (var obj in InstantiatedPoints)
                 obj.Value.GetComponent<PointBehaviour>().Speed = Speed;
 
@@ -94,6 +80,63 @@ public class PointManager : MonoBehaviour {
 
             foreach (var obj in _flickeringPoints)
                 obj.Value.GetComponent<PointBehaviour>().Speed = Speed;
+        }
+    }
+
+    //Points size
+
+    private Vector3 _minPointSize = new Vector3(0.3f, 0.3f, 1.5f);
+    public Vector3 MinPointSize {
+        get { return _minPointSize; }
+        set {
+            _minPointSize = value;
+            UpdatePointsSize();
+        }
+    }
+
+    private Vector3 _maxPointSize = new Vector3(0.7f, 0.7f, 2.0f);
+    public Vector3 MaxPointSize {
+        get { return _maxPointSize; }
+        set {
+            _maxPointSize = value;
+            UpdatePointsSize();
+        }
+    }
+
+    private bool _changePointSizeOverTime = false;
+    public bool ChangePointSizeOverTime {
+        get { return _changePointSizeOverTime; }
+        set { _changePointSizeOverTime = value;
+
+            if (InstantiatedPoints == null) return;
+
+            foreach (var obj in InstantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().changeSizeOverTime = _changePointSizeOverTime;
+
+            foreach (var obj in _incorrectInstantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().changeSizeOverTime = _changePointSizeOverTime;
+
+            foreach (var obj in _flickeringPoints)
+                obj.Value.GetComponent<PointBehaviour>().changeSizeOverTime = _changePointSizeOverTime;
+        }
+    }
+
+    private float _pointSizeVariationFrequency = .2f;
+    public float PointSizeVariationFrequency {
+        get { return _pointSizeVariationFrequency; }
+        set {
+            _pointSizeVariationFrequency = value;
+
+            if (InstantiatedPoints == null) return;
+
+            foreach (var obj in InstantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().sizeVariationFrequency = _pointSizeVariationFrequency;
+
+            foreach (var obj in _incorrectInstantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().sizeVariationFrequency = _pointSizeVariationFrequency;
+
+            foreach (var obj in _flickeringPoints)
+                obj.Value.GetComponent<PointBehaviour>().sizeVariationFrequency = _pointSizeVariationFrequency;
         }
     }
 
@@ -192,7 +235,7 @@ public class PointManager : MonoBehaviour {
 
 	#endregion
 
-	#region Points Handling
+	#region Inputs Handling
 
 	/// <summary>
 	/// Process keyboard key presses
@@ -249,11 +292,48 @@ public class PointManager : MonoBehaviour {
 
     }
 
-    public void UpdatePointColor(PointBehaviour target) {
+	#endregion
+
+	#region Points Handling
+
+    /// <summary>
+    /// Update point color
+    /// </summary>
+    /// <param name="target"></param>
+	public void UpdatePointColor(PointBehaviour target) {
         if (Mute)
             target.UpdatePointColor(Color.gray);
         else
             target.UpdatePointColor(target.PointColor);
+    }
+
+    /// <summary>
+    /// Update points size to match min/max size criteria
+    /// </summary>
+    void UpdatePointsSize() {
+
+        if (InstantiatedPoints == null) return;
+
+        PointBehaviour tmpBehaviour;
+
+        foreach (var obj in InstantiatedPoints) {
+            tmpBehaviour = obj.Value.GetComponent<PointBehaviour>();
+            tmpBehaviour.size = Vector3.Min(tmpBehaviour.size, MaxPointSize);
+            tmpBehaviour.size = Vector3.Max(tmpBehaviour.size, MinPointSize);
+        }
+
+        foreach (var obj in _incorrectInstantiatedPoints) {
+            tmpBehaviour = obj.Value.GetComponent<PointBehaviour>();
+            tmpBehaviour.size = Vector3.Min(tmpBehaviour.size, MaxPointSize);
+            tmpBehaviour.size = Vector3.Max(tmpBehaviour.size, MinPointSize);
+        }
+
+        foreach (var obj in _flickeringPoints) {
+            tmpBehaviour = obj.Value.GetComponent<PointBehaviour>();
+            tmpBehaviour.size = Vector3.Min(tmpBehaviour.size, MaxPointSize);
+            tmpBehaviour.size = Vector3.Max(tmpBehaviour.size, MinPointSize);
+        }
+
     }
 
     /// <summary>
@@ -345,10 +425,14 @@ public class PointManager : MonoBehaviour {
 		newPointBehaviour.manager = this;
 		UpdatePointColor(newPointBehaviour);
 		newPoint.transform.parent = transform;
-		newPoint.transform.localPosition = new Vector3(Random.Range(-0.5f + (PointSize.x / Width), 0.5f - (PointSize.x / Width)), Random.Range(-0.5f + (PointSize.y / Height), 0.5f - (PointSize.y / Height)));
+        newPoint.transform.localPosition = GetNewPointPosition();
 		newPointBehaviour.Speed = Speed;
 		newPointBehaviour.pid = _highestPid;
-		newPoint.transform.localScale = new Vector3(PointSize.x, PointSize.y, 2f);
+        newPointBehaviour.size = new Vector3(Random.Range(MinPointSize.x, MaxPointSize.x), 
+                                             Random.Range(MinPointSize.y, MaxPointSize.y), 
+                                             Random.Range(MinPointSize.z, MaxPointSize.z));
+        newPointBehaviour.changeSizeOverTime = ChangePointSizeOverTime;
+        newPointBehaviour.sizeVariationFrequency = PointSizeVariationFrequency;
         newPointBehaviour.isIncorrectDetection = isIncorrectDetection;
         newPointBehaviour.isFlickering = false;
 
@@ -370,6 +454,24 @@ public class PointManager : MonoBehaviour {
         _highestPid++;
         _pointsCount++;
 	}
+
+    /// <summary>
+    /// Return a local position for a new point
+    /// </summary>
+    /// <returns></returns>
+    Vector3 GetNewPointPosition() {
+
+        float x = Random.Range(0.0f, 1.0f);
+        float y = Random.Range(0.0f, 1.0f);
+        
+        if(x >= 0.25f && x < 0.75f) {
+            //X is in the center, Y must be on the border
+            if (y > 0.25f && y <= 0.5f) y -= 0.25f;
+            if (y > 0.5f && y <= 0.75f) y += 0.25f;
+        }
+
+        return new Vector3(x - 0.5f, y - 0.5f, 0);
+    }
 
     /// <summary>
     /// Remove point with highest pid
@@ -527,7 +629,7 @@ public class PointManager : MonoBehaviour {
         var msg = new UnityOSC.OSCMessage("/au/scene");
         msg.Append(_frameCounter);
         //Compute point size
-        msg.Append(InstantiatedPoints.Count * PointSize.x * PointSize.y);
+        msg.Append(InstantiatedPoints.Count * 0.25f * (MaxPointSize.x + MinPointSize.x) * (MaxPointSize.y + MinPointSize.y));
         msg.Append(_pointsCount);
         //Compute average motion
         var velocitySum = Vector3.zero;
@@ -592,15 +694,15 @@ public class PointManager : MonoBehaviour {
         msg.Append((float)behaviour.pid);
 
         //Bounding
-        msg.Append(pointX - PointSize.x * 0.5f);
-        msg.Append(pointY - PointSize.y * 0.5f);
+        msg.Append(pointX - behaviour.size.x * 0.5f / Width);
+        msg.Append(pointY - behaviour.size.y * 0.5f / Height);
 
-        msg.Append(PointSize.x);
-        msg.Append(PointSize.y);
+        msg.Append(behaviour.size.x / Width);
+        msg.Append(behaviour.size.y / Height);
 
         msg.Append(pointX);
         msg.Append(pointY);
-        msg.Append(PointSize.z);
+        msg.Append(behaviour.size.z);
 
         OSCManager.activeManager.SendAugmentaMessage(msg);
     }

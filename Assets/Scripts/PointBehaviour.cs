@@ -29,6 +29,11 @@ public class PointBehaviour : MonoBehaviour {
     public bool isMovedByMouse;
     public Color PointColor;
 
+    public Vector3 size;
+
+    public bool changeSizeOverTime;
+    public float sizeVariationFrequency;
+
     public Vector3 NormalizedVelocity;
 
     public Vector3 _oldPosition;
@@ -42,6 +47,8 @@ public class PointBehaviour : MonoBehaviour {
 
     private Ray ray;
     private RaycastHit raycastHit;
+
+    private float relativeTime = 0;
 
 	#region MonoBehaviour Implementation
 
@@ -61,9 +68,13 @@ public class PointBehaviour : MonoBehaviour {
         VelocityVisualizer.localScale = Vector3.zero;
 
         timer = 0;
+        relativeTime = 0;
+
+        UpdatePointSize();
     }
 
     private void Update() {
+
         //Handle IncorrectDetection points
         if (isIncorrectDetection) {
             timer += Time.deltaTime;
@@ -82,15 +93,13 @@ public class PointBehaviour : MonoBehaviour {
 
         Age++;
 
+        //Update size
+        UpdatePointSize();
+
         //Update position
-        var newPos = transform.position + Random.Range(-noiseIntensity, noiseIntensity) * Vector3.right + Random.Range(-noiseIntensity, noiseIntensity) * Vector3.up;
+        UpdatePointPosition();
 
-        newPos.x = Mathf.Clamp(newPos.x, -(manager.Width + manager.PointSize.x) * 0.5f, (manager.Width - manager.PointSize.x) * 0.5f);
-        newPos.y = Mathf.Clamp(newPos.y, -(manager.Height + manager.PointSize.y) * 0.5f, (manager.Height - manager.PointSize.y) * 0.5f);
-
-        transform.position = newPos;
-
-        //udpate text
+        //Udpate text
         PointInfoText.text = "PID : " + pid + '\n' + '\n' + "OID : " + oid;
     }
 
@@ -130,6 +139,30 @@ public class PointBehaviour : MonoBehaviour {
     public void UpdatePointColor(Color color)
     {
         Point.GetComponent<MeshRenderer>().material.SetColor("_BorderColor", color);
+    }
+
+    void UpdatePointSize() {
+
+        if (changeSizeOverTime) {
+
+            relativeTime += Time.deltaTime * sizeVariationFrequency;
+            size.x = Mathf.Lerp(manager.MinPointSize.x, manager.MaxPointSize.x, Mathf.PerlinNoise(pid * 10, relativeTime));
+            size.y = Mathf.Lerp(manager.MinPointSize.y, manager.MaxPointSize.y, Mathf.PerlinNoise(pid * 20, relativeTime));
+            size.z = Mathf.Lerp(manager.MinPointSize.z, manager.MaxPointSize.z, Mathf.PerlinNoise(pid * 30, relativeTime));
+
+        }
+
+        transform.localScale = Vector3.one;
+        transform.localScale = new Vector3(size.x / transform.lossyScale.x, size.y / transform.lossyScale.y, size.z / transform.lossyScale.z);
+    }
+
+    private void UpdatePointPosition() {
+        var newPos = transform.position + Random.Range(-noiseIntensity, noiseIntensity) * Vector3.right + Random.Range(-noiseIntensity, noiseIntensity) * Vector3.up;
+
+        newPos.x = Mathf.Clamp(newPos.x, -(manager.Width + size.x) * 0.5f, (manager.Width - size.x) * 0.5f);
+        newPos.y = Mathf.Clamp(newPos.y, -(manager.Height + size.y) * 0.5f, (manager.Height - size.y) * 0.5f);
+
+        transform.position = newPos;
     }
 
     public void StartFlickering() {
