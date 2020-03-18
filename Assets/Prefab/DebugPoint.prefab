@@ -340,6 +340,7 @@ MonoBehaviour:
   Point: {fileID: 4517994547990216}
   VelocityVisualizer: {fileID: 4131514715415182}
   rigidbody: {fileID: 2776326774191610709}
+  collider: {fileID: 5069877076318906407}
   VelocityThickness: 0.025
   pid: 0
   oid: 0

@@ -3,38 +3,49 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-[RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour
 {
+    public new Camera camera;
+
     public float zoomSpeed = 0.5f;
     public float minSize = 1.0f;
     public float dragSpeed = .01f;
+    public float rotationSpeed = 1.0f;
 
-    private new Camera camera;
     private Vector3 dragMouseOrigin;
-    private Vector3 dragCameraOrigin;
+    private Vector3 dragCameraLocalPositionOrigin;
+    private Quaternion dragRigOrientationOrigin;
+
+    private float cameraStartingSize;
+    private Vector3 cameraStartingLocalPosition;
+    private Quaternion rigStartingRotation;
 
 	#region MonoBehaviour Implementation
-	// Start is called before the first frame update
-	void Start()
-    {
-        camera = GetComponent<Camera>();
+
+    void Start() {
+
+        cameraStartingLocalPosition = camera.transform.localPosition;
+        rigStartingRotation = transform.rotation;
+        cameraStartingSize = camera.orthographicSize;
     }
 
     // Update is called once per frame
     void Update()
     {
-        UpdateCameraPosition();
-        UpdateCameraSize();
+        UpdateCameraRig();
+        UpdateCameraFOV();
 
         if (Input.GetKeyDown(KeyCode.R)) {
-            transform.position = -10 * Vector3.forward;
+            ResetCamera();
         }
     }
 
     #endregion
 
-    void UpdateCameraSize() {
+    /// <summary>
+    /// Update camera field of view according to mouse inputs
+    /// </summary>
+    void UpdateCameraFOV() {
 
         if(!EventSystem.current.IsPointerOverGameObject())
             camera.orthographicSize -= Input.mouseScrollDelta.y * zoomSpeed;
@@ -43,17 +54,53 @@ public class CameraController : MonoBehaviour
             camera.orthographicSize = minSize;
     }
 
-    void UpdateCameraPosition() {
+    /// <summary>
+    /// Move and rotate camera rig according to inputs
+    /// </summary>
+    void UpdateCameraRig() {
+
+        UpdateCameraRigPosition();
+        UpdateCameraRigRotation();
+    }
+
+    void UpdateCameraRigPosition() {
 
         if (Input.GetMouseButtonDown(2)) {
             dragMouseOrigin = Input.mousePosition;
-            dragCameraOrigin = transform.position;
+            dragCameraLocalPositionOrigin = camera.transform.localPosition;
             return;
         }
 
         if (Input.GetMouseButton(2)) {
 
-            transform.position = dragCameraOrigin - (Input.mousePosition - dragMouseOrigin) * dragSpeed * camera.orthographicSize * 0.2f;
+            camera.transform.localPosition = dragCameraLocalPositionOrigin - (Input.mousePosition - dragMouseOrigin) * dragSpeed * camera.orthographicSize;
         }
+    }
+
+    void UpdateCameraRigRotation() {
+
+        if (Input.GetMouseButtonDown(0) && Input.GetKey(KeyCode.LeftAlt)) {
+            dragMouseOrigin = Input.mousePosition;
+            dragRigOrientationOrigin = transform.rotation;
+            return;
+        }
+
+        if (Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftAlt)) {
+
+            transform.rotation = Quaternion.Euler(dragRigOrientationOrigin.eulerAngles.x - (Input.mousePosition.y - dragMouseOrigin.y) * rotationSpeed,
+                                                  dragRigOrientationOrigin.eulerAngles.y + (Input.mousePosition.x - dragMouseOrigin.x) * rotationSpeed,
+                                                  0);
+        }
+
+    }
+
+    /// <summary>
+    /// Reset camera to its starting position and field of view
+    /// </summary>
+    void ResetCamera() {
+
+        camera.transform.localPosition = cameraStartingLocalPosition;
+        transform.rotation = rigStartingRotation;
+        camera.orthographicSize = cameraStartingSize;
     }
 }

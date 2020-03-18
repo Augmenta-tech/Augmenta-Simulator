@@ -44,6 +44,12 @@ public class PointManager : MonoBehaviour {
             if (InstantiatedPoints == null) return;
             foreach (var point in InstantiatedPoints.Values)
                 UpdatePointColor(point.GetComponent<PointBehaviour>());
+
+            foreach (var point in _incorrectInstantiatedPoints.Values)
+                UpdatePointColor(point.GetComponent<PointBehaviour>());
+
+            foreach (var point in _flickeringPoints.Values)
+                UpdatePointColor(point.GetComponent<PointBehaviour>());
         }
     }
 
@@ -198,9 +204,6 @@ public class PointManager : MonoBehaviour {
 
         if (Input.GetKeyUp(KeyCode.Escape))
             Application.Quit();
-
-        if (Input.GetKeyUp(KeyCode.R))
-            RemovePoints();
     }
 
     /// <summary>
@@ -209,7 +212,8 @@ public class PointManager : MonoBehaviour {
     public void ProcessMouseInputs() {
 
         //Left clic
-        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) {
+        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()
+            && !Input.GetKey(KeyCode.LeftAlt)) {
             ray = camera.ScreenPointToRay(Input.mousePosition);
 
             if (Physics.Raycast(ray, out raycastHit, 100.0f, pointsLayer)) {

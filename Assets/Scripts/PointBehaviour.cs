@@ -11,6 +11,7 @@ public class PointBehaviour : MonoBehaviour {
     public Transform Point;
     public Transform VelocityVisualizer;
     public new Rigidbody rigidbody;
+    public new Collider collider;
 
     public float VelocityThickness;
 
@@ -143,6 +144,7 @@ public class PointBehaviour : MonoBehaviour {
         PointInfoText.gameObject.SetActive(false);
         Point.gameObject.SetActive(false);
         VelocityVisualizer.gameObject.SetActive(false);
+        collider.enabled = false;
     }
 
     public void ShowPoint() {
@@ -150,5 +152,6 @@ public class PointBehaviour : MonoBehaviour {
         PointInfoText.gameObject.SetActive(true);
         Point.gameObject.SetActive(true);
         VelocityVisualizer.gameObject.SetActive(true);
+        collider.enabled = true;
     }
 }

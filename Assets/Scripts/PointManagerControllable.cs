@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class PointManagerControllable : Controllable {
 
-    [Header("Output Settings")]
+    [Header("OUTPUT SETTINGS")]
     [OSCProperty]
     public bool Mute;
 
     public List<string> ProtocolVersions;
     [OSCProperty(TargetList ="ProtocolVersions", IncludeInPresets = true)] public string ProtocolVersion;
 
-    [Header("Area Settings")]
+    [Header("AREA SETTINGS")]
     [OSCProperty]
     [Tooltip("in meters")]
     public float Width;
@@ -23,7 +23,7 @@ public class PointManagerControllable : Controllable {
 
 
 
-    [Header("Points Settings")]
+    [Header("POINTS SETTINGS")]
     [OSCProperty(isInteractible = false)]
     public int PointsCount;
     [OSCProperty][Range(0, 30)]
@@ -38,16 +38,16 @@ public class PointManagerControllable : Controllable {
     [OSCProperty][Range(0.0f,10.0f)]
     public float Speed;
 
-    [Header("Noisy Data Simulation")]
-    [OSCProperty][Range(0.0f, 1.0f)]
+    [Header("NOISY DATA SIMULATION")]
+    [OSCProperty][Range(0.0f, 1.0f)][Tooltip("Movement noise")]
     public float NoiseIntensity;
 
-    [OSCProperty][Range(0.0f, 1.0f)]
+    [OSCProperty][Range(0.0f, 1.0f)][Tooltip("False positives")]
     public float IncorrectDetectionProbability = 0;
     [OSCProperty]
     public float IncorrectDetectionDuration = 0.1f;
 
-    [OSCProperty][Range(0.0f, 1.0f)]
+    [OSCProperty][Range(0.0f, 1.0f)][Tooltip("False negatives")]
     public float PointFlickeringProbability = 0;
     [OSCProperty]
     public float PointFlickeringDuration = 0.1f;

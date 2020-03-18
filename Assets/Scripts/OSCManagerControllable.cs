@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class OSCManagerControllable : Controllable
 {
-    [Header("Output settings")]
+    [Header("OUTPUT SETTINGS")]
     [OSCProperty]
     public int OutputPort;
     [OSCProperty]
