@@ -13,17 +13,25 @@ Windows & Mac OS : https://github.com/Theoriz/Augmenta-Simulator/releases
 ### Application Shortcuts
 
 Left clic : Create point or move existing point
+
 Right clic : Delete point
+
 M : Mute/Unmute all outputs
+
 H : Toggle UI
+
 R : Reset camera position
+
 Escap : Quit application
 
 ### Camera Control
 
 Use mousewheel to zoom.
+
 Press and drag mousewheel to pan.
+
 Press Alt + Left clic to rotate.
+
 Press R to reset camera position.
 
 ## Zeroconf
