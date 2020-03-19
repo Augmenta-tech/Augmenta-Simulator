@@ -31,14 +31,14 @@ public class PointBehaviour : MonoBehaviour {
 
     public Vector3 size;
 
-    public bool changeSizeOverTime;
-    public float sizeVariationFrequency;
+    public bool animateSize;
+    public float sizeVariationSpeed;
 
     public Vector3 NormalizedVelocity;
 
     public Vector3 _oldPosition;
 
-    public float noiseIntensity = 0;
+    public float movementNoise = 0;
 
     public bool isIncorrectDetection = false;
     public bool isFlickering = false;
@@ -143,9 +143,9 @@ public class PointBehaviour : MonoBehaviour {
 
     void UpdatePointSize() {
 
-        if (changeSizeOverTime) {
+        if (animateSize) {
 
-            relativeTime += Time.deltaTime * sizeVariationFrequency;
+            relativeTime += Time.deltaTime * sizeVariationSpeed;
             size.x = Mathf.Lerp(manager.MinPointSize.x, manager.MaxPointSize.x, Mathf.PerlinNoise(pid * 10, relativeTime));
             size.y = Mathf.Lerp(manager.MinPointSize.y, manager.MaxPointSize.y, Mathf.PerlinNoise(pid * 20, relativeTime));
             size.z = Mathf.Lerp(manager.MinPointSize.z, manager.MaxPointSize.z, Mathf.PerlinNoise(pid * 30, relativeTime));
@@ -157,7 +157,7 @@ public class PointBehaviour : MonoBehaviour {
     }
 
     private void UpdatePointPosition() {
-        var newPos = transform.position + Random.Range(-noiseIntensity, noiseIntensity) * Vector3.right + Random.Range(-noiseIntensity, noiseIntensity) * Vector3.up;
+        var newPos = transform.position + Random.Range(-movementNoise, movementNoise) * Vector3.right + Random.Range(-movementNoise, movementNoise) * Vector3.up;
 
         newPos.x = Mathf.Clamp(newPos.x, -(manager.Width + size.x) * 0.5f, (manager.Width - size.x) * 0.5f);
         newPos.y = Mathf.Clamp(newPos.y, -(manager.Height + size.y) * 0.5f, (manager.Height - size.y) * 0.5f);

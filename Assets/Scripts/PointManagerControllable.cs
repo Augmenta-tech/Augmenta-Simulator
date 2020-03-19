@@ -17,8 +17,8 @@ public class PointManagerControllable : Controllable {
     [OSCProperty]
     [Tooltip("in meters")]
     public float Height;
-    [OSCProperty][Tooltip("when using protocol V1")]
-    public float MetersPerPixel;
+    [OSCProperty][Tooltip("Only when using protocol V1")]
+    public float PixelSize;
 
 
 
@@ -37,13 +37,13 @@ public class PointManagerControllable : Controllable {
     [OSCProperty][Tooltip("in meters")]
     public Vector3 MaxPointSize;
     [OSCProperty]
-    public bool ChangePointSizeOverTime;
+    public bool AnimateSize;
     [OSCProperty][Range(0.0f, 10.0f)]
-    public float PointSizeVariationFrequency;
+    public float SizeVariationSpeed;
 
     [Header("NOISY DATA SIMULATION")]
-    [OSCProperty][Range(0.0f, 1.0f)][Tooltip("Movement noise")]
-    public float NoiseIntensity;
+    [OSCProperty][Range(0.0f, 1.0f)]
+    public float MovementNoise;
 
     [OSCProperty][Range(0.0f, 1.0f)][Tooltip("False positives")]
     public float IncorrectDetectionProbability = 0;

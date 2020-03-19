@@ -30,10 +30,10 @@ public class PointManager : MonoBehaviour {
         set { _height = value; UpdateAreaSize(); }
     }
 
-    private float _metersPerPixel = 0.005f;
-    public float MetersPerPixel {
-        get { return _metersPerPixel; }
-        set { _metersPerPixel = value; }
+    private float _pixelSize = 0.005f;
+    public float PixelSize {
+        get { return _pixelSize; }
+        set { _pixelSize = value; }
     }
 
     [Header("Points settings")]
@@ -103,59 +103,59 @@ public class PointManager : MonoBehaviour {
         }
     }
 
-    private bool _changePointSizeOverTime = false;
-    public bool ChangePointSizeOverTime {
-        get { return _changePointSizeOverTime; }
-        set { _changePointSizeOverTime = value;
+    private bool _animateSize = false;
+    public bool AnimateSize {
+        get { return _animateSize; }
+        set { _animateSize = value;
 
             if (InstantiatedPoints == null) return;
 
             foreach (var obj in InstantiatedPoints)
-                obj.Value.GetComponent<PointBehaviour>().changeSizeOverTime = _changePointSizeOverTime;
+                obj.Value.GetComponent<PointBehaviour>().animateSize = _animateSize;
 
             foreach (var obj in _incorrectInstantiatedPoints)
-                obj.Value.GetComponent<PointBehaviour>().changeSizeOverTime = _changePointSizeOverTime;
+                obj.Value.GetComponent<PointBehaviour>().animateSize = _animateSize;
 
             foreach (var obj in _flickeringPoints)
-                obj.Value.GetComponent<PointBehaviour>().changeSizeOverTime = _changePointSizeOverTime;
+                obj.Value.GetComponent<PointBehaviour>().animateSize = _animateSize;
         }
     }
 
-    private float _pointSizeVariationFrequency = .2f;
-    public float PointSizeVariationFrequency {
-        get { return _pointSizeVariationFrequency; }
+    private float _sizeVariationSpeed = .2f;
+    public float SizeVariationSpeed {
+        get { return _sizeVariationSpeed; }
         set {
-            _pointSizeVariationFrequency = value;
+            _sizeVariationSpeed = value;
 
             if (InstantiatedPoints == null) return;
 
             foreach (var obj in InstantiatedPoints)
-                obj.Value.GetComponent<PointBehaviour>().sizeVariationFrequency = _pointSizeVariationFrequency;
+                obj.Value.GetComponent<PointBehaviour>().sizeVariationSpeed = _sizeVariationSpeed;
 
             foreach (var obj in _incorrectInstantiatedPoints)
-                obj.Value.GetComponent<PointBehaviour>().sizeVariationFrequency = _pointSizeVariationFrequency;
+                obj.Value.GetComponent<PointBehaviour>().sizeVariationSpeed = _sizeVariationSpeed;
 
             foreach (var obj in _flickeringPoints)
-                obj.Value.GetComponent<PointBehaviour>().sizeVariationFrequency = _pointSizeVariationFrequency;
+                obj.Value.GetComponent<PointBehaviour>().sizeVariationSpeed = _sizeVariationSpeed;
         }
     }
 
     //Noise Parameters
 
-    private float _noiseIntensity = 0;
-    public float NoiseIntensity {
-        get { return _noiseIntensity; }
-        set { _noiseIntensity = value;
+    private float _movementNoise = 0;
+    public float MovementNoise {
+        get { return _movementNoise; }
+        set { _movementNoise = value;
             if (InstantiatedPoints == null) return;
 
             foreach (var obj in InstantiatedPoints)
-                obj.Value.GetComponent<PointBehaviour>().noiseIntensity = _noiseIntensity;
+                obj.Value.GetComponent<PointBehaviour>().movementNoise = _movementNoise;
 
             foreach (var obj in _incorrectInstantiatedPoints)
-                obj.Value.GetComponent<PointBehaviour>().noiseIntensity = _noiseIntensity;
+                obj.Value.GetComponent<PointBehaviour>().movementNoise = _movementNoise;
 
             foreach (var obj in _flickeringPoints)
-                obj.Value.GetComponent<PointBehaviour>().noiseIntensity = _noiseIntensity;
+                obj.Value.GetComponent<PointBehaviour>().movementNoise = _movementNoise;
         }
     }
 
@@ -244,9 +244,6 @@ public class PointManager : MonoBehaviour {
     {
         if (Input.GetKeyUp(KeyCode.M))
             Mute = !Mute;
-
-        if (Input.GetKeyUp(KeyCode.Escape))
-            Application.Quit();
     }
 
     /// <summary>
@@ -431,8 +428,9 @@ public class PointManager : MonoBehaviour {
         newPointBehaviour.size = new Vector3(Random.Range(MinPointSize.x, MaxPointSize.x), 
                                              Random.Range(MinPointSize.y, MaxPointSize.y), 
                                              Random.Range(MinPointSize.z, MaxPointSize.z));
-        newPointBehaviour.changeSizeOverTime = ChangePointSizeOverTime;
-        newPointBehaviour.sizeVariationFrequency = PointSizeVariationFrequency;
+        newPointBehaviour.animateSize = AnimateSize;
+        newPointBehaviour.sizeVariationSpeed = SizeVariationSpeed;
+        newPointBehaviour.movementNoise = MovementNoise;
         newPointBehaviour.isIncorrectDetection = isIncorrectDetection;
         newPointBehaviour.isFlickering = false;
 
@@ -642,8 +640,8 @@ public class PointManager : MonoBehaviour {
         msg.Append(velocitySum.x);
         msg.Append(velocitySum.y);
         if(ProtocolVersion == "1") {
-            msg.Append((int)(Width / MetersPerPixel));
-            msg.Append((int)(Height / MetersPerPixel));
+            msg.Append((int)(Width / PixelSize));
+            msg.Append((int)(Height / PixelSize));
         } else if( ProtocolVersion == "2") {
             msg.Append(Width);
             msg.Append(Height);

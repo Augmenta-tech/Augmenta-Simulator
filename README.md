@@ -20,9 +20,7 @@ M : Mute/Unmute all outputs
 
 H : Toggle UI
 
-R : Reset camera position
-
-Escap : Quit application
+F1 : Toggle Help
 
 ### Camera Control
 
@@ -40,4 +38,4 @@ For the simulator to create a Zeroconf service on Windows, you need to have Appl
 
 ## Version
 
-Unity 2019.3.5f1
+Unity 2019.3.6f1
