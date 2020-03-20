@@ -129,10 +129,12 @@ public class PointBehaviour : MonoBehaviour {
 
     private void ComputeNormalizedVelocity()
     {
-        NormalizedVelocity = ((transform.position - _oldPosition) / Time.deltaTime);
-
-        NormalizedVelocity = new Vector3(-NormalizedVelocity.x / manager.Width, NormalizedVelocity.y / manager.Height, 0);
-
+        if (Age > 1) {
+            NormalizedVelocity = ((transform.position - _oldPosition) / Time.deltaTime);
+            NormalizedVelocity = new Vector3(-NormalizedVelocity.x / manager.Width, NormalizedVelocity.y / manager.Height, 0);
+        } else { 
+            NormalizedVelocity = Vector3.zero; 
+        }
         _oldPosition = transform.position;
     }
 
