@@ -49,6 +49,7 @@ public class PointBehaviour : MonoBehaviour {
     private RaycastHit raycastHit;
 
     private float relativeTime = 0;
+    private bool oldPositionIsValid = false;
 
 	#region MonoBehaviour Implementation
 
@@ -129,13 +130,14 @@ public class PointBehaviour : MonoBehaviour {
 
     private void ComputeNormalizedVelocity()
     {
-        if (Age > 1) {
+        if (oldPositionIsValid) {
             NormalizedVelocity = ((transform.position - _oldPosition) / Time.deltaTime);
             NormalizedVelocity = new Vector3(-NormalizedVelocity.x / manager.Width, NormalizedVelocity.y / manager.Height, 0);
         } else { 
             NormalizedVelocity = Vector3.zero; 
         }
         _oldPosition = transform.position;
+        oldPositionIsValid = true;
     }
 
     public void UpdatePointColor(Color color)
