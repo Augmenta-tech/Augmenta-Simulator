@@ -6,54 +6,56 @@ public class PointManagerControllable : Controllable {
 
     [Header("OUTPUT SETTINGS")]
     [OSCProperty]
-    public bool Mute;
+    public bool mute;
 
-    public List<string> ProtocolVersions;
-    [OSCProperty(TargetList ="ProtocolVersions", IncludeInPresets = true)] public string ProtocolVersion;
+    public List<string> protocolVersions;
+    [OSCProperty(TargetList ="protocolVersions", IncludeInPresets = true)] public string protocolVersion;
 
     [Header("AREA SETTINGS")]
     [OSCProperty]
-    public float Width;
+    public float width;
     [OSCProperty]
     [Tooltip("in meters")]
-    public float Height;
+    public float height;
     [OSCProperty][Tooltip("Meter to pixel conversion when using protocol V1")]
-    public float MeterPerPixel;
+    public float meterPerPixel;
 
 
 
     [Header("POINTS GENERAL SETTINGS")]
     [OSCProperty(isInteractible = false)]
-    public int PointsCount;
+    public int pointsCount;
     [OSCProperty][Range(0, 30)]
-    public int DesiredPointsCount;
+    public int desiredPointsCount;
     [OSCProperty]
     [Range(0.0f, 10.0f)]
-    public float Speed;
+    public float speed;
 
     [Header("POINTS SIZE SETTINGS")]
     [OSCProperty]
-    public Vector3 MinPointSize;
+    public Vector3 minPointSize;
     [OSCProperty][Tooltip("in meters")]
-    public Vector3 MaxPointSize;
+    public Vector3 maxPointSize;
     [OSCProperty]
-    public bool AnimateSize;
+    public bool animateSize;
     [OSCProperty][Range(0.0f, 10.0f)]
-    public float SizeVariationSpeed;
+    public float sizeVariationSpeed;
 
     [Header("NOISY DATA SIMULATION")]
-    [OSCProperty][Range(0.0f, 1.0f)]
-    public float MovementNoise;
+    [OSCProperty][Range(0.0f, 0.1f)]
+    public float movementNoiseAmplitude;
+    [OSCProperty][Range(0.0f, 20.0f)]
+    public float movementNoiseFrequency;
 
     [OSCProperty][Range(0.0f, 1.0f)][Tooltip("False positives")]
-    public float IncorrectDetectionProbability = 0;
+    public float incorrectDetectionProbability = 0;
     [OSCProperty]
-    public float IncorrectDetectionDuration = 0.1f;
+    public float incorrectDetectionDuration = 0.1f;
 
     [OSCProperty][Range(0.0f, 1.0f)][Tooltip("False negatives")]
-    public float PointFlickeringProbability = 0;
+    public float pointFlickeringProbability = 0;
     [OSCProperty]
-    public float PointFlickeringDuration = 0.1f;
+    public float pointFlickeringDuration = 0.1f;
 
     [OSCMethod]
     public void RemoveAll()
@@ -64,12 +66,12 @@ public class PointManagerControllable : Controllable {
     public override void OnUiValueChanged(string name)
     {
         base.OnUiValueChanged(name);
-        ((PointManager)TargetScript).ProtocolVersion = ProtocolVersion;
+        ((PointManager)TargetScript).protocolVersion = protocolVersion;
     }
 
     public override void OnScriptValueChanged(string name) {
         base.OnScriptValueChanged(name);
-        ProtocolVersion = ((PointManager)TargetScript).ProtocolVersion;
-        ProtocolVersions = ((PointManager)TargetScript).ProtocolVersions;
+        protocolVersion = ((PointManager)TargetScript).protocolVersion;
+        protocolVersions = ((PointManager)TargetScript).protocolVersions;
     }
 }

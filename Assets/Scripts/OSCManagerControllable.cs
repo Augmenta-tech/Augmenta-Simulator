@@ -6,10 +6,10 @@ public class OSCManagerControllable : Controllable
 {
     [Header("OUTPUT SETTINGS")]
     [OSCProperty]
-    public int OutputPort;
+    public int outputPort;
     [OSCProperty]
-    public string OutputIP;
+    public string outputIP;
     [OSCProperty]
     [Tooltip("Time in s before a connection without heartbeat is deleted. 0 = Never.")]
-    public float ConnectionTimeout;
+    public float connectionTimeout;
 }

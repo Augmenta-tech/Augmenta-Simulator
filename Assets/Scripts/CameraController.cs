@@ -108,7 +108,7 @@ public class CameraController : MonoBehaviour
         var manager = FindObjectOfType<PointManager>();
 
         if (manager) {
-            camera.orthographicSize = manager.Height / 1.5f;
+            camera.orthographicSize = manager.height / 1.5f;
         } else {
             camera.orthographicSize = cameraStartingSize;
         }

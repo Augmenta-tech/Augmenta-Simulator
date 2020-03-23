@@ -11,27 +11,27 @@ public class OSCManager : MonoBehaviour
 
     [Header("Output settings")]
     private int _outputPort = 12000;
-    public int OutputPort {
+    public int outputPort {
         get { return _outputPort; }
         set { _outputPort = value; CreateAugmentaClient(); }
     }
 
     private string _outputIp = "127.0.0.1";
-    public string OutputIP {
+    public string outputIP {
         get { return _outputIp; }
         set { _outputIp = value; CreateAugmentaClient(); }
     }
 
     [Tooltip("Time in s before a connection without heartbeat is deleted. 0 = Never.")]
-    public float ConnectionTimeout = 60;
+    public float connectionTimeout = 60;
 
     public bool debug = false;
 
-    private Dictionary<string, float> augmentaOutputs; // <ID, timer>
-    private KeyValuePair<string, float> tmpOutput;
-    private List<string> outputsToDelete;
+    private Dictionary<string, float> _augmentaOutputs; // <ID, timer>
+    private KeyValuePair<string, float> _tmpOutput;
+    private List<string> _outputsToDelete;
 
-    private OSCManagerControllable controllable;
+    private OSCManagerControllable _controllable;
 
     #region MonoBehaviour Implementation
 
@@ -39,14 +39,14 @@ public class OSCManager : MonoBehaviour
 
         activeManager = this;
 
-        augmentaOutputs = new Dictionary<string, float>();
-        outputsToDelete = new List<string>();
+        _augmentaOutputs = new Dictionary<string, float>();
+        _outputsToDelete = new List<string>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        controllable = FindObjectOfType<OSCManagerControllable>();
+        _controllable = FindObjectOfType<OSCManagerControllable>();
 
         CreateYoServer();
         CreateAugmentaClient();
@@ -66,31 +66,31 @@ public class OSCManager : MonoBehaviour
     /// </summary>
     void UpdateOutputsTimers() {
 
-        outputsToDelete.Clear();
+        _outputsToDelete.Clear();
 
-        for(int i=0; i<augmentaOutputs.Count; i++) {
+        for(int i=0; i<_augmentaOutputs.Count; i++) {
 
-            tmpOutput = augmentaOutputs.ElementAt(i);
+            _tmpOutput = _augmentaOutputs.ElementAt(i);
 
             //Increase output timers
-            augmentaOutputs[tmpOutput.Key] = tmpOutput.Value + Time.deltaTime;
+            _augmentaOutputs[_tmpOutput.Key] = _tmpOutput.Value + Time.deltaTime;
 
             //Check for deletion only if connection timeout is strictly positive
-            if (ConnectionTimeout <= 0)
+            if (connectionTimeout <= 0)
                 continue;
 
             //Mark for deletion
-            if (augmentaOutputs[tmpOutput.Key] > ConnectionTimeout)
-                outputsToDelete.Add(tmpOutput.Key);
+            if (_augmentaOutputs[_tmpOutput.Key] > connectionTimeout)
+                _outputsToDelete.Add(_tmpOutput.Key);
         }
 
         //Delete timed out outputs
-        foreach(var output in outputsToDelete) {
+        foreach(var output in _outputsToDelete) {
 
             if(OSCMaster.Clients.ContainsKey(output))
                 OSCMaster.RemoveClient(output);
 
-            augmentaOutputs.Remove(output);
+            _augmentaOutputs.Remove(output);
 
             if (debug)
                 Debug.Log("Output " + output + " timed out.");
@@ -106,7 +106,7 @@ public class OSCManager : MonoBehaviour
             if (OSCMaster.Clients.ContainsKey("AugmentaSimulatorOutput")) {
                 OSCMaster.RemoveClient("AugmentaSimulatorOutput");
             }
-            OSCMaster.CreateClient("AugmentaSimulatorOutput", IPAddress.Parse(OutputIP), OutputPort);
+            OSCMaster.CreateClient("AugmentaSimulatorOutput", IPAddress.Parse(outputIP), outputPort);
     }
 
     /// <summary>
@@ -117,7 +117,7 @@ public class OSCManager : MonoBehaviour
 
         OSCMaster.Clients["AugmentaSimulatorOutput"].Send(message);
 
-        foreach(var output in augmentaOutputs)
+        foreach(var output in _augmentaOutputs)
             OSCMaster.Clients[output.Key].Send(message);
     }
 
@@ -172,8 +172,8 @@ public class OSCManager : MonoBehaviour
                 if (!OSCMaster.Clients.ContainsKey(outputID))
                     OSCMaster.CreateClient(outputID, outputIP, outputPort);
 
-                if(!augmentaOutputs.ContainsKey(outputID))
-                    augmentaOutputs.Add(outputID, 0);
+                if(!_augmentaOutputs.ContainsKey(outputID))
+                    _augmentaOutputs.Add(outputID, 0);
 
                 if (debug)
                     Debug.Log("Created output " + outputID);
@@ -195,7 +195,7 @@ public class OSCManager : MonoBehaviour
                     if (debug)
                         Debug.Log("Removed output " + disconnectID);
                                                              
-                    augmentaOutputs.Remove(disconnectID);
+                    _augmentaOutputs.Remove(disconnectID);
                 }
 
                 break;
@@ -227,12 +227,12 @@ public class OSCManager : MonoBehaviour
                 infoMessage.Append("Augmenta Simulator");
                 infoMessage.Append(NetworkManager.GetMacAddress());
                 infoMessage.Append(Application.version);
-                infoMessage.Append(controllable.currentPreset != "" ? controllable.currentPreset : "None");
+                infoMessage.Append(_controllable.currentPreset != "" ? _controllable.currentPreset : "None");
                 infoMessage.Append("Simulator");
                 infoMessage.Append("Simulated");
 
                 if (debug)
-                    Debug.Log("Answering info from " + infoIP + ":" + infoPort + " with " + NetworkManager.GetIpv4() + " Augmenta Simulator " + NetworkManager.GetMacAddress() + " " + Application.version + " " + controllable.currentPreset + " Simulator Simulated"); ;
+                    Debug.Log("Answering info from " + infoIP + ":" + infoPort + " with " + NetworkManager.GetIpv4() + " Augmenta Simulator " + NetworkManager.GetMacAddress() + " " + Application.version + " " + _controllable.currentPreset + " Simulator Simulated"); ;
 
                 OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
                 break;
@@ -248,8 +248,8 @@ public class OSCManager : MonoBehaviour
                 if (debug)
                     Debug.Log("Received heartbeat for " + heartbeatID);
 
-                if (augmentaOutputs.ContainsKey(heartbeatID))
-                    augmentaOutputs[heartbeatID] = 0;
+                if (_augmentaOutputs.ContainsKey(heartbeatID))
+                    _augmentaOutputs[heartbeatID] = 0;
 
                 break;
         }

@@ -4,22 +4,24 @@ using UnityEngine;
 
 public class PointBehaviour : MonoBehaviour {
 
-    public PointManager manager;
-    public long Age;
-
-    public TextMesh PointInfoText;
-    public Transform Point;
-    public Transform VelocityVisualizer;
+    [Header("Parameters to fill")]
+    public TextMesh pointInfoText;
+    public Transform point;
+    public Transform velocityVisualizer;
     public new Rigidbody rigidbody;
     public new Collider collider;
 
-    public float VelocityThickness;
+    public float velocityThickness = 0.03f;
+
+    [Header("Autofilled Parameters")]
+    public PointManager manager;
+    public long age;
 
     private float _speed;
-    public float Speed {
+    public float speed {
         get { return _speed; }
         set { _speed = value;
-            rigidbody.velocity = direction * Speed;
+            rigidbody.velocity = direction * speed;
         }
     }
 
@@ -27,29 +29,29 @@ public class PointBehaviour : MonoBehaviour {
     public int oid;
     public Vector3 direction;
     public bool isMovedByMouse;
-    public Color PointColor;
+    public Color pointColor;
 
     public Vector3 size;
 
     public bool animateSize;
     public float sizeVariationSpeed;
 
-    public Vector3 NormalizedVelocity;
+    public Vector3 normalizedVelocity;
 
-    public Vector3 _oldPosition;
-
-    public float movementNoise = 0;
+    public float movementNoiseAmplitude = 0;
+    public float movementNoiseFrequency = 20;
 
     public bool isIncorrectDetection = false;
     public bool isFlickering = false;
 
-    private float timer = 0;
+    private Vector3 _oldPosition;
+    private float _timer = 0;
 
-    private Ray ray;
-    private RaycastHit raycastHit;
+    private Ray _ray;
+    private RaycastHit _raycastHit;
 
-    private float relativeTime = 0;
-    private bool oldPositionIsValid = false;
+    private float _relativeTime = 0;
+    private bool _oldPositionIsValid = false;
 
 	#region MonoBehaviour Implementation
 
@@ -60,16 +62,16 @@ public class PointBehaviour : MonoBehaviour {
         //Get velocity
         if (isIncorrectDetection) {
             rigidbody.velocity = Vector3.zero;
-            Speed = 0.0f;
+            speed = 0.0f;
         } else {
-            var rndVelocity = direction * Speed;
+            var rndVelocity = direction * speed;
             rigidbody.velocity = rndVelocity;
         }
 
-        VelocityVisualizer.localScale = Vector3.zero;
+        velocityVisualizer.localScale = Vector3.zero;
 
-        timer = 0;
-        relativeTime = 0;
+        _timer = 0;
+        _relativeTime = 0;
 
         UpdatePointSize();
     }
@@ -78,21 +80,21 @@ public class PointBehaviour : MonoBehaviour {
 
         //Handle IncorrectDetection points
         if (isIncorrectDetection) {
-            timer += Time.deltaTime;
-            if (timer > manager.IncorrectDetectionDuration) {
+            _timer += Time.deltaTime;
+            if (_timer > manager.incorrectDetectionDuration) {
                 manager.RemoveIncorrectPoint(pid);
             }
         }
 
         //Handle flickering
         if (isFlickering) {
-            timer += Time.deltaTime;
-            if (timer > manager.PointFlickeringDuration) {
+            _timer += Time.deltaTime;
+            if (_timer > manager.pointFlickeringDuration) {
                 manager.StopFlickering(pid);
             }
         }
 
-        Age++;
+        age++;
 
         //Update size
         UpdatePointSize();
@@ -101,28 +103,28 @@ public class PointBehaviour : MonoBehaviour {
         UpdatePointPosition();
 
         //Udpate text
-        PointInfoText.text = "PID : " + pid + '\n' + '\n' + "OID : " + oid;
+        pointInfoText.text = "PID : " + pid + '\n' + '\n' + "OID : " + oid;
     }
 
     private void FixedUpdate() {
 
         ComputeNormalizedVelocity();
         //Update velocity
-        float angle = Mathf.Atan2(NormalizedVelocity.y, NormalizedVelocity.x) * 180 / Mathf.PI;
+        float angle = Mathf.Atan2(normalizedVelocity.y, normalizedVelocity.x) * 180 / Mathf.PI;
         if (float.IsNaN(angle))
             return;
 
-        VelocityVisualizer.localRotation = Quaternion.Euler(new Vector3(0, 0, -angle + 90));
+        velocityVisualizer.localRotation = Quaternion.Euler(new Vector3(0, 0, -angle + 90));
 
-        VelocityVisualizer.localScale = new Vector3(VelocityThickness, NormalizedVelocity.magnitude, VelocityThickness);
+        velocityVisualizer.localScale = new Vector3(velocityThickness, normalizedVelocity.magnitude, velocityThickness);
     }
 
     public void OnMouseDrag() {
 
-        ray = manager.camera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out raycastHit, 100.0f, manager.areaLayer)) {
+        _ray = manager.camera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(_ray, out _raycastHit, 100.0f, manager.areaLayer)) {
 
-            transform.position = new Vector3(raycastHit.point.x, raycastHit.point.y, 0);
+            transform.position = new Vector3(_raycastHit.point.x, _raycastHit.point.y, 0);
         }
     }
 
@@ -130,29 +132,29 @@ public class PointBehaviour : MonoBehaviour {
 
     private void ComputeNormalizedVelocity()
     {
-        if (oldPositionIsValid) {
-            NormalizedVelocity = ((transform.position - _oldPosition) / Time.deltaTime);
-            NormalizedVelocity = new Vector3(-NormalizedVelocity.x / manager.Width, NormalizedVelocity.y / manager.Height, 0);
+        if (_oldPositionIsValid) {
+            normalizedVelocity = ((transform.position - _oldPosition) / Time.deltaTime);
+            normalizedVelocity = new Vector3(-normalizedVelocity.x / manager.width, normalizedVelocity.y / manager.height, 0);
         } else { 
-            NormalizedVelocity = Vector3.zero; 
+            normalizedVelocity = Vector3.zero; 
         }
         _oldPosition = transform.position;
-        oldPositionIsValid = true;
+        _oldPositionIsValid = true;
     }
 
     public void UpdatePointColor(Color color)
     {
-        Point.GetComponent<MeshRenderer>().material.SetColor("_BorderColor", color);
+        point.GetComponent<MeshRenderer>().material.SetColor("_BorderColor", color);
     }
 
     void UpdatePointSize() {
 
         if (animateSize) {
 
-            relativeTime += Time.deltaTime * sizeVariationSpeed;
-            size.x = Mathf.Lerp(manager.MinPointSize.x, manager.MaxPointSize.x, Mathf.PerlinNoise(pid * 10, relativeTime));
-            size.y = Mathf.Lerp(manager.MinPointSize.y, manager.MaxPointSize.y, Mathf.PerlinNoise(pid * 20, relativeTime));
-            size.z = Mathf.Lerp(manager.MinPointSize.z, manager.MaxPointSize.z, Mathf.PerlinNoise(pid * 30, relativeTime));
+            _relativeTime += Time.deltaTime * sizeVariationSpeed;
+            size.x = Mathf.Lerp(manager.minPointSize.x, manager.maxPointSize.x, Mathf.PerlinNoise(pid * 10, _relativeTime));
+            size.y = Mathf.Lerp(manager.minPointSize.y, manager.maxPointSize.y, Mathf.PerlinNoise(pid * 20, _relativeTime));
+            size.z = Mathf.Lerp(manager.minPointSize.z, manager.maxPointSize.z, Mathf.PerlinNoise(pid * 30, _relativeTime));
 
         }
 
@@ -161,34 +163,40 @@ public class PointBehaviour : MonoBehaviour {
     }
 
     private void UpdatePointPosition() {
-        var newPos = transform.position + Random.Range(-movementNoise, movementNoise) * Vector3.right + Random.Range(-movementNoise, movementNoise) * Vector3.up;
+        //var newPos = transform.position
+        //    + Random.Range(-movementNoise, movementNoise) * Vector3.right
+        //    + Random.Range(-movementNoise, movementNoise) * Vector3.up;
 
-        newPos.x = Mathf.Clamp(newPos.x, -(manager.Width + size.x) * 0.5f, (manager.Width - size.x) * 0.5f);
-        newPos.y = Mathf.Clamp(newPos.y, -(manager.Height + size.y) * 0.5f, (manager.Height - size.y) * 0.5f);
+        Vector3 newPos = transform.position
+                        + (Mathf.PerlinNoise(pid * 15, Time.time * movementNoiseFrequency) - 0.5f) * 2.0f * movementNoiseAmplitude * Vector3.right
+                        + (Mathf.PerlinNoise(pid * 25, Time.time * movementNoiseFrequency) - 0.5f) * 2.0f * movementNoiseAmplitude * Vector3.up;
+
+        newPos.x = Mathf.Clamp(newPos.x, -(manager.width + size.x) * 0.5f, (manager.width - size.x) * 0.5f);
+        newPos.y = Mathf.Clamp(newPos.y, -(manager.height + size.y) * 0.5f, (manager.height - size.y) * 0.5f);
 
         transform.position = newPos;
     }
 
     public void StartFlickering() {
 
-        timer = 0;
+        _timer = 0;
         HidePoint();
         isFlickering = true;
     }
 
     public void HidePoint() {
 
-        PointInfoText.gameObject.SetActive(false);
-        Point.gameObject.SetActive(false);
-        VelocityVisualizer.gameObject.SetActive(false);
+        pointInfoText.gameObject.SetActive(false);
+        point.gameObject.SetActive(false);
+        velocityVisualizer.gameObject.SetActive(false);
         collider.enabled = false;
     }
 
     public void ShowPoint() {
 
-        PointInfoText.gameObject.SetActive(true);
-        Point.gameObject.SetActive(true);
-        VelocityVisualizer.gameObject.SetActive(true);
+        pointInfoText.gameObject.SetActive(true);
+        point.gameObject.SetActive(true);
+        velocityVisualizer.gameObject.SetActive(true);
         collider.enabled = true;
     }
 }

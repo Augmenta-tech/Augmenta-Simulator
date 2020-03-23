@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class HelpController : MonoBehaviour
 {
-    public GameObject HelpText;
+    public GameObject helpText;
 
     private void Start() {
-        HelpText.SetActive(false);
+        helpText.SetActive(false);
     }
 
     private void Update() {
@@ -17,6 +17,6 @@ public class HelpController : MonoBehaviour
     }
 
     public void ToggleHelp() {
-        HelpText.SetActive(!HelpText.activeInHierarchy);
+        helpText.SetActive(!helpText.activeInHierarchy);
     }
 }

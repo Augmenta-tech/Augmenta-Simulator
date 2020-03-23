@@ -189,13 +189,13 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1.1
-  m_Text: "           <b><size=18>CONTROLS</size></b>\n\n- <b><color=#0088ffff>LeftMouse</color></b>
-    : Create point or move existing point.\n- <b><color=#0088ffff>RightMouse</color></b>
-    : Delete point. \n\n- <b><color=#0088ffff>M</color></b> : Mute / Unmute all outputs.\n\n-
-    <b><color=#0088ffff>H</color></b> : Toggle UI.\n- <b><color=#0088ffff>F1</color></b>
-    : Toggle Help.\n\n- <b><color=#0088ffff>Mousewheel Scroll</color></b> : Camera
-    zoom. \n- <b><color=#0088ffff>Mousewheel Clic</color></b> : Pan camera. \n- <b><color=#0088ffff>Alt+LeftMouse</color></b>
-    : Rotate camera.\n- <b><color=#0088ffff>R</color></b> : Reset camera."
+  m_Text: "           <b><size=18>CONTROLS</size></b>\n\n<b><color=#0088ffff>LeftMouse</color></b>
+    : Create point or move existing point.\n<b><color=#0088ffff>RightMouse</color></b>
+    : Delete point. \n\n<b><color=#0088ffff>M</color></b> : Mute / Unmute all outputs.\n\n<b><color=#0088ffff>H</color></b>
+    : Toggle UI.\n<b><color=#0088ffff>F1</color></b> : Toggle Help.\n\n<b><color=#0088ffff>Mousewheel
+    Scroll</color></b> : Camera zoom. \n<b><color=#0088ffff>Mousewheel Clic</color></b>
+    : Pan camera. \n<b><color=#0088ffff>Alt+LeftMouse</color></b> : Rotate camera.\n<b><color=#0088ffff>R</color></b>
+    : Reset camera."
 --- !u!222 &8106416
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -234,7 +234,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4c8e32f3cdcfe04caee8594416a7f5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ConnectionTimeout: 60
+  connectionTimeout: 60
   debug: 0
 --- !u!4 &18100216
 Transform:
@@ -274,9 +274,9 @@ MonoBehaviour:
   hasPresets: 0
   currentPreset: 
   presetList: []
-  OutputPort: 0
-  OutputIP: 
-  ConnectionTimeout: 0
+  outputPort: 0
+  outputIP: 
+  connectionTimeout: 0
 --- !u!1 &282840810
 GameObject:
   m_ObjectHideFlags: 0
@@ -503,16 +503,16 @@ MonoBehaviour:
   pointsLayer:
     serializedVersion: 2
     m_Bits: 1024
-  ProtocolVersions:
+  protocolVersions:
   - 1
   - 2
-  ProtocolVersion: 1
+  protocolVersion: 1
   _mute: 0
-  IncorrectDetectionProbability: 0
-  IncorrectDetectionDuration: 0.1
-  PointFlickeringProbability: 0
-  PointFlickeringDuration: 0.1
-  PointPrefab: {fileID: 1897133376265846, guid: f52716752aba2a44281446caa8282db8,
+  incorrectDetectionProbability: 0
+  incorrectDetectionDuration: 0.1
+  pointFlickeringProbability: 0
+  pointFlickeringDuration: 0.1
+  pointPrefab: {fileID: 1897133376265846, guid: f52716752aba2a44281446caa8282db8,
     type: 3}
   backgroundMaterial: {fileID: 2100000, guid: 7cd67c5e337e6c44c89a4bea7e8985f3, type: 2}
 --- !u!33 &575826800
@@ -600,24 +600,24 @@ MonoBehaviour:
   hasPresets: 0
   currentPreset: 
   presetList: []
-  Mute: 0
-  ProtocolVersions: []
-  ProtocolVersion: 
-  Width: 0
-  Height: 0
-  PixelSize: 0
-  PointsCount: 0
-  DesiredPointsCount: 0
-  Speed: 0
-  MinPointSize: {x: 0, y: 0, z: 0}
-  MaxPointSize: {x: 0, y: 0, z: 0}
-  AnimateSize: 0
-  SizeVariationSpeed: 0
-  MovementNoise: 0
-  IncorrectDetectionProbability: 0
-  IncorrectDetectionDuration: 0.1
-  PointFlickeringProbability: 0
-  PointFlickeringDuration: 0.1
+  mute: 0
+  protocolVersions: []
+  protocolVersion: 
+  width: 0
+  height: 0
+  meterPerPixel: 0
+  pointsCount: 0
+  desiredPointsCount: 0
+  speed: 0
+  minPointSize: {x: 0, y: 0, z: 0}
+  maxPointSize: {x: 0, y: 0, z: 0}
+  animateSize: 0
+  sizeVariationSpeed: 0
+  movementNoise: 0
+  incorrectDetectionProbability: 0
+  incorrectDetectionDuration: 0.1
+  pointFlickeringProbability: 0
+  pointFlickeringDuration: 0.1
 --- !u!1 &650069216
 GameObject:
   m_ObjectHideFlags: 0
@@ -998,7 +998,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcc2a1f9f5737134f9ed35168d88d372, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HelpText: {fileID: 1022483127}
+  helpText: {fileID: 1022483127}
 --- !u!114 &936487854
 MonoBehaviour:
   m_ObjectHideFlags: 0

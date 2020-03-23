@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 33301770736740770}
   - component: {fileID: 23512407315576470}
   m_Layer: 10
-  m_Name: Cube
+  m_Name: Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -91,7 +91,7 @@ GameObject:
   - component: {fileID: 23726017486516012}
   - component: {fileID: 102360146734640142}
   m_Layer: 10
-  m_Name: Text
+  m_Name: InfoText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -265,7 +265,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4131514715415182}
   m_Layer: 10
-  m_Name: Pivot
+  m_Name: VelocityVisualizer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -335,21 +335,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 0}
-  Age: 0
-  PointInfoText: {fileID: 102360146734640142}
-  Point: {fileID: 4517994547990216}
-  VelocityVisualizer: {fileID: 4131514715415182}
+  age: 0
+  pointInfoText: {fileID: 102360146734640142}
+  point: {fileID: 4517994547990216}
+  velocityVisualizer: {fileID: 4131514715415182}
   rigidbody: {fileID: 2776326774191610709}
   collider: {fileID: 5069877076318906407}
-  VelocityThickness: 0.025
+  velocityThickness: 0.03
   pid: 0
   oid: 0
   direction: {x: 0, y: 0, z: 0}
   isMovedByMouse: 0
-  PointColor: {r: 0, g: 0, b: 0, a: 0}
-  NormalizedVelocity: {x: 0, y: 0, z: 0}
-  _oldPosition: {x: 0, y: 0, z: 0}
-  noiseIntensity: 0
+  pointColor: {r: 0, g: 0, b: 0, a: 0}
+  size: {x: 0, y: 0, z: 0}
+  animateSize: 0
+  sizeVariationSpeed: 0
+  normalizedVelocity: {x: 0, y: 0, z: 0}
+  movementNoise: 0
   isIncorrectDetection: 0
   isFlickering: 0
 --- !u!54 &2776326774191610709

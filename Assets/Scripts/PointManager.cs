@@ -14,36 +14,32 @@ public class PointManager : MonoBehaviour {
     public LayerMask pointsLayer;
 
     [Header("Output settings")]
-    public List<string> ProtocolVersions;
-    public string ProtocolVersion = "1";
+    public List<string> protocolVersions;
+    public string protocolVersion = "1";
 
     [Header("Area settings")]
     private float _width = 5;
-    public float Width {
+    public float width {
         get { return _width; }
         set { _width = value; UpdateAreaSize(); }
     }
 
     private float _height = 5;
-    public float Height {
+    public float height {
         get { return _height; }
         set { _height = value; UpdateAreaSize(); }
     }
 
-    private float _meterPerPixel = 0.005f;
-    public float MeterPerPixel {
-        get { return _meterPerPixel; }
-        set { _meterPerPixel = value; }
-    }
+	public float meterPerPixel { get; set; } = 0.005f;
 
     [Header("Points settings")]
     public bool _mute;
-    public bool Mute {
+    public bool mute {
         get { return _mute; }
         set { _mute = value;
-            if (InstantiatedPoints == null) return;
+            if (instantiatedPoints == null) return;
 
-            foreach (var point in InstantiatedPoints.Values)
+            foreach (var point in instantiatedPoints.Values)
                 UpdatePointColor(point.GetComponent<PointBehaviour>());
 
             foreach (var point in _incorrectInstantiatedPoints.Values)
@@ -54,39 +50,39 @@ public class PointManager : MonoBehaviour {
         }
     }
 
-    public int PointsCount {
+    public int pointsCount {
         get { return _pointsCount; }
         set { }
     }
     private int _pointsCount;
 
-    public int DesiredPointsCount {
+    public int desiredPointsCount {
         get { return _desiredPointsCount; }
         set { _desiredPointsCount = value; UpdateInstantiatedPointsCount(); }
     }
     private int _desiredPointsCount;
 
     private float _speed = 1;
-    public float Speed {
+    public float speed {
         get { return _speed; }
         set { _speed = value;
-            if (InstantiatedPoints == null) return;
+            if (instantiatedPoints == null) return;
 
-            foreach (var obj in InstantiatedPoints)
-                obj.Value.GetComponent<PointBehaviour>().Speed = Speed;
+            foreach (var obj in instantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().speed = speed;
 
             foreach (var obj in _incorrectInstantiatedPoints)
-                obj.Value.GetComponent<PointBehaviour>().Speed = Speed;
+                obj.Value.GetComponent<PointBehaviour>().speed = speed;
 
             foreach (var obj in _flickeringPoints)
-                obj.Value.GetComponent<PointBehaviour>().Speed = Speed;
+                obj.Value.GetComponent<PointBehaviour>().speed = speed;
         }
     }
 
     //Points size
 
     private Vector3 _minPointSize = new Vector3(0.3f, 0.3f, 1.5f);
-    public Vector3 MinPointSize {
+    public Vector3 minPointSize {
         get { return _minPointSize; }
         set {
             _minPointSize = value;
@@ -95,7 +91,7 @@ public class PointManager : MonoBehaviour {
     }
 
     private Vector3 _maxPointSize = new Vector3(0.7f, 0.7f, 2.0f);
-    public Vector3 MaxPointSize {
+    public Vector3 maxPointSize {
         get { return _maxPointSize; }
         set {
             _maxPointSize = value;
@@ -104,13 +100,13 @@ public class PointManager : MonoBehaviour {
     }
 
     private bool _animateSize = false;
-    public bool AnimateSize {
+    public bool animateSize {
         get { return _animateSize; }
         set { _animateSize = value;
 
-            if (InstantiatedPoints == null) return;
+            if (instantiatedPoints == null) return;
 
-            foreach (var obj in InstantiatedPoints)
+            foreach (var obj in instantiatedPoints)
                 obj.Value.GetComponent<PointBehaviour>().animateSize = _animateSize;
 
             foreach (var obj in _incorrectInstantiatedPoints)
@@ -122,14 +118,14 @@ public class PointManager : MonoBehaviour {
     }
 
     private float _sizeVariationSpeed = .2f;
-    public float SizeVariationSpeed {
+    public float sizeVariationSpeed {
         get { return _sizeVariationSpeed; }
         set {
             _sizeVariationSpeed = value;
 
-            if (InstantiatedPoints == null) return;
+            if (instantiatedPoints == null) return;
 
-            foreach (var obj in InstantiatedPoints)
+            foreach (var obj in instantiatedPoints)
                 obj.Value.GetComponent<PointBehaviour>().sizeVariationSpeed = _sizeVariationSpeed;
 
             foreach (var obj in _incorrectInstantiatedPoints)
@@ -142,32 +138,51 @@ public class PointManager : MonoBehaviour {
 
     //Noise Parameters
 
-    private float _movementNoise = 0;
-    public float MovementNoise {
-        get { return _movementNoise; }
-        set { _movementNoise = value;
-            if (InstantiatedPoints == null) return;
+    private float _movementNoiseAmplitude = 0;
+    public float movementNoiseAmplitude {
+        get { return _movementNoiseAmplitude; }
+        set {
+            _movementNoiseAmplitude = value;
+            if (instantiatedPoints == null) return;
 
-            foreach (var obj in InstantiatedPoints)
-                obj.Value.GetComponent<PointBehaviour>().movementNoise = _movementNoise;
+            foreach (var obj in instantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().movementNoiseAmplitude = _movementNoiseAmplitude;
 
             foreach (var obj in _incorrectInstantiatedPoints)
-                obj.Value.GetComponent<PointBehaviour>().movementNoise = _movementNoise;
+                obj.Value.GetComponent<PointBehaviour>().movementNoiseAmplitude = _movementNoiseAmplitude;
 
             foreach (var obj in _flickeringPoints)
-                obj.Value.GetComponent<PointBehaviour>().movementNoise = _movementNoise;
+                obj.Value.GetComponent<PointBehaviour>().movementNoiseAmplitude = _movementNoiseAmplitude;
         }
     }
 
-    public float IncorrectDetectionProbability = 0;
-    public float IncorrectDetectionDuration = 0.1f;
+    private float _movementNoiseFrequency = 20;
+    public float movementNoiseFrequency {
+        get { return _movementNoiseFrequency; }
+        set {
+            _movementNoiseFrequency = value;
+            if (instantiatedPoints == null) return;
 
-    public float PointFlickeringProbability = 0;
-    public float PointFlickeringDuration = 0.1f;
+            foreach (var obj in instantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().movementNoiseFrequency = _movementNoiseFrequency;
 
-    public GameObject PointPrefab;
+            foreach (var obj in _incorrectInstantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().movementNoiseFrequency = _movementNoiseFrequency;
 
-    public static Dictionary<int, GameObject> InstantiatedPoints;
+            foreach (var obj in _flickeringPoints)
+                obj.Value.GetComponent<PointBehaviour>().movementNoiseFrequency = _movementNoiseFrequency;
+        }
+    }
+
+    public float incorrectDetectionProbability = 0;
+    public float incorrectDetectionDuration = 0.1f;
+
+    public float pointFlickeringProbability = 0;
+    public float pointFlickeringDuration = 0.1f;
+
+    public GameObject pointPrefab;
+
+    public static Dictionary<int, GameObject> instantiatedPoints;
 
     public Material backgroundMaterial;
 
@@ -175,19 +190,19 @@ public class PointManager : MonoBehaviour {
     private int _highestPid;
 
     private GameObject _cursorPoint;
-    private Ray ray;
-    private RaycastHit raycastHit;
+    private Ray _ray;
+    private RaycastHit _raycastHit;
 
     private Dictionary<int, GameObject> _incorrectInstantiatedPoints;
     private Dictionary<int, GameObject> _flickeringPoints;
 
-    private List<int> keysList;
+    private List<int> _keysList;
 
     #region MonoBehaviour Implementation
 
     void Start () {
 
-        InstantiatedPoints = new Dictionary<int, GameObject>();
+        instantiatedPoints = new Dictionary<int, GameObject>();
         _incorrectInstantiatedPoints = new Dictionary<int, GameObject>();
         _flickeringPoints = new Dictionary<int, GameObject>();
 
@@ -216,7 +231,7 @@ public class PointManager : MonoBehaviour {
         SendSceneUpdated();
 
         //Send Augmenta persons messages
-        foreach (var point in InstantiatedPoints)
+        foreach (var point in instantiatedPoints)
             SendPersonUpdated(point.Value);
 
         foreach (var point in _incorrectInstantiatedPoints)
@@ -226,10 +241,10 @@ public class PointManager : MonoBehaviour {
     public void OnMouseDrag() {
         if (_cursorPoint == null) return;
 
-        ray = camera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out raycastHit, 100.0f, areaLayer)) {
+        _ray = camera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(_ray, out _raycastHit, 100.0f, areaLayer)) {
 
-            _cursorPoint.transform.position = new Vector3(raycastHit.point.x, raycastHit.point.y, 0);
+            _cursorPoint.transform.position = new Vector3(_raycastHit.point.x, _raycastHit.point.y, 0);
         }
     }
 
@@ -243,7 +258,7 @@ public class PointManager : MonoBehaviour {
 	public void ProcessKeyboardInputs()
     {
         if (Input.GetKeyUp(KeyCode.M))
-            Mute = !Mute;
+            mute = !mute;
     }
 
     /// <summary>
@@ -254,14 +269,14 @@ public class PointManager : MonoBehaviour {
         //Left clic
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()
             && !Input.GetKey(KeyCode.LeftAlt)) {
-            ray = camera.ScreenPointToRay(Input.mousePosition);
+            _ray = camera.ScreenPointToRay(Input.mousePosition);
 
-            if (Physics.Raycast(ray, out raycastHit, 100.0f, pointsLayer)) {
+            if (Physics.Raycast(_ray, out _raycastHit, 100.0f, pointsLayer)) {
 
                 //Point hit
-                _cursorPoint = raycastHit.transform.gameObject;
+                _cursorPoint = _raycastHit.transform.gameObject;
 
-            } else if(Physics.Raycast(ray, out raycastHit, 100.0f, areaLayer)) {
+            } else if(Physics.Raycast(_ray, out _raycastHit, 100.0f, areaLayer)) {
 
                 //Area hit
                 InstantiatePoint(false, true);
@@ -278,11 +293,11 @@ public class PointManager : MonoBehaviour {
 
         //Right clic
         if (Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject()) {
-            ray = camera.ScreenPointToRay(Input.mousePosition);
+            _ray = camera.ScreenPointToRay(Input.mousePosition);
 
-            if (Physics.Raycast(ray, out raycastHit, 100.0f, pointsLayer)) {
+            if (Physics.Raycast(_ray, out _raycastHit, 100.0f, pointsLayer)) {
 
-                RemovePoint(raycastHit.transform.GetComponent<PointBehaviour>().pid);
+                RemovePoint(_raycastHit.transform.GetComponent<PointBehaviour>().pid);
 
             }
         }
@@ -298,10 +313,10 @@ public class PointManager : MonoBehaviour {
     /// </summary>
     /// <param name="target"></param>
 	public void UpdatePointColor(PointBehaviour target) {
-        if (Mute)
+        if (mute)
             target.UpdatePointColor(Color.gray);
         else
-            target.UpdatePointColor(target.PointColor);
+            target.UpdatePointColor(target.pointColor);
     }
 
     /// <summary>
@@ -309,26 +324,26 @@ public class PointManager : MonoBehaviour {
     /// </summary>
     void UpdatePointsSize() {
 
-        if (InstantiatedPoints == null) return;
+        if (instantiatedPoints == null) return;
 
         PointBehaviour tmpBehaviour;
 
-        foreach (var obj in InstantiatedPoints) {
+        foreach (var obj in instantiatedPoints) {
             tmpBehaviour = obj.Value.GetComponent<PointBehaviour>();
-            tmpBehaviour.size = Vector3.Min(tmpBehaviour.size, MaxPointSize);
-            tmpBehaviour.size = Vector3.Max(tmpBehaviour.size, MinPointSize);
+            tmpBehaviour.size = Vector3.Min(tmpBehaviour.size, maxPointSize);
+            tmpBehaviour.size = Vector3.Max(tmpBehaviour.size, minPointSize);
         }
 
         foreach (var obj in _incorrectInstantiatedPoints) {
             tmpBehaviour = obj.Value.GetComponent<PointBehaviour>();
-            tmpBehaviour.size = Vector3.Min(tmpBehaviour.size, MaxPointSize);
-            tmpBehaviour.size = Vector3.Max(tmpBehaviour.size, MinPointSize);
+            tmpBehaviour.size = Vector3.Min(tmpBehaviour.size, maxPointSize);
+            tmpBehaviour.size = Vector3.Max(tmpBehaviour.size, minPointSize);
         }
 
         foreach (var obj in _flickeringPoints) {
             tmpBehaviour = obj.Value.GetComponent<PointBehaviour>();
-            tmpBehaviour.size = Vector3.Min(tmpBehaviour.size, MaxPointSize);
-            tmpBehaviour.size = Vector3.Max(tmpBehaviour.size, MinPointSize);
+            tmpBehaviour.size = Vector3.Min(tmpBehaviour.size, maxPointSize);
+            tmpBehaviour.size = Vector3.Max(tmpBehaviour.size, minPointSize);
         }
 
     }
@@ -338,7 +353,7 @@ public class PointManager : MonoBehaviour {
     /// </summary>
     private void CreateIncorrectDetection() {
 
-        if(Random.Range(0.0f, 1.0f) <= IncorrectDetectionProbability) {
+        if(Random.Range(0.0f, 1.0f) <= incorrectDetectionProbability) {
             InstantiatePoint(true);
         }
     }
@@ -348,21 +363,21 @@ public class PointManager : MonoBehaviour {
     /// </summary>
     private void CreateFlickeringPoints() {
 
-        if (InstantiatedPoints.Count == 0)
+        if (instantiatedPoints.Count == 0)
             return;
 
-        if (Random.Range(0.0f, 1.0f) <= PointFlickeringProbability) {
+        if (Random.Range(0.0f, 1.0f) <= pointFlickeringProbability) {
 
-            int flickeringIndex = Random.Range(1, InstantiatedPoints.Count);
+            int flickeringIndex = Random.Range(0, instantiatedPoints.Count);
 
             try {
-                int pidToFlicker = InstantiatedPoints.ElementAt(flickeringIndex).Key;
+                int pidToFlicker = instantiatedPoints.ElementAt(flickeringIndex).Key;
 
-                _flickeringPoints.Add(pidToFlicker, InstantiatedPoints.ElementAt(flickeringIndex).Value);
+                _flickeringPoints.Add(pidToFlicker, instantiatedPoints.ElementAt(flickeringIndex).Value);
 
-                SendPersonLeft(InstantiatedPoints[pidToFlicker]);
-                InstantiatedPoints.ElementAt(flickeringIndex).Value.GetComponent<PointBehaviour>().StartFlickering();
-                InstantiatedPoints.Remove(pidToFlicker);
+                SendPersonLeft(instantiatedPoints[pidToFlicker]);
+                instantiatedPoints.ElementAt(flickeringIndex).Value.GetComponent<PointBehaviour>().StartFlickering();
+                instantiatedPoints.Remove(pidToFlicker);
                 _pointsCount--;
 
                 //Update OIDs
@@ -379,7 +394,7 @@ public class PointManager : MonoBehaviour {
     /// <param name="pid"></param>
     public void StopFlickering(int pid) {
 
-        InstantiatedPoints.Add(pid, _flickeringPoints[pid]);
+        instantiatedPoints.Add(pid, _flickeringPoints[pid]);
         _pointsCount++;
 
         var pointBehaviour = _flickeringPoints[pid].GetComponent<PointBehaviour>();
@@ -388,7 +403,7 @@ public class PointManager : MonoBehaviour {
 
         _flickeringPoints.Remove(pid);
         UpdateOIDs();
-        SendPersonEntered(InstantiatedPoints[pid]);
+        SendPersonEntered(instantiatedPoints[pid]);
     }
 
     /// <summary>
@@ -399,12 +414,12 @@ public class PointManager : MonoBehaviour {
         if (_desiredPointsCount <= 0) _desiredPointsCount = 0;
 
         //Create new points
-        while (InstantiatedPoints.Count < _desiredPointsCount) {
+        while (instantiatedPoints.Count < _desiredPointsCount) {
             InstantiatePoint();
         }
 
         //Remove points
-        while (InstantiatedPoints.Count > _desiredPointsCount) {
+        while (instantiatedPoints.Count > _desiredPointsCount) {
             RemovePoint();
         }
     }
@@ -414,23 +429,24 @@ public class PointManager : MonoBehaviour {
     /// </summary>
     public void InstantiatePoint(bool isIncorrectDetection = false, bool isFromCursor = false) {
 
-		GameObject newPoint = Instantiate(PointPrefab);
+		GameObject newPoint = Instantiate(pointPrefab);
 
 		PointBehaviour newPointBehaviour = newPoint.GetComponent<PointBehaviour>();
 
-		newPointBehaviour.PointColor = Color.HSVToRGB(Random.value, 0.85f, 0.75f);
+		newPointBehaviour.pointColor = Color.HSVToRGB(Random.value, 0.85f, 0.75f);
 		newPointBehaviour.manager = this;
 		UpdatePointColor(newPointBehaviour);
 		newPoint.transform.parent = transform;
         newPoint.transform.localPosition = GetNewPointPosition();
-		newPointBehaviour.Speed = Speed;
+		newPointBehaviour.speed = speed;
 		newPointBehaviour.pid = _highestPid;
-        newPointBehaviour.size = new Vector3(Random.Range(MinPointSize.x, MaxPointSize.x), 
-                                             Random.Range(MinPointSize.y, MaxPointSize.y), 
-                                             Random.Range(MinPointSize.z, MaxPointSize.z));
-        newPointBehaviour.animateSize = AnimateSize;
-        newPointBehaviour.sizeVariationSpeed = SizeVariationSpeed;
-        newPointBehaviour.movementNoise = MovementNoise;
+        newPointBehaviour.size = new Vector3(Random.Range(minPointSize.x, maxPointSize.x), 
+                                             Random.Range(minPointSize.y, maxPointSize.y), 
+                                             Random.Range(minPointSize.z, maxPointSize.z));
+        newPointBehaviour.animateSize = animateSize;
+        newPointBehaviour.sizeVariationSpeed = sizeVariationSpeed;
+        newPointBehaviour.movementNoiseAmplitude = movementNoiseAmplitude;
+        newPointBehaviour.movementNoiseFrequency = movementNoiseFrequency;
         newPointBehaviour.isIncorrectDetection = isIncorrectDetection;
         newPointBehaviour.isFlickering = false;
 
@@ -439,9 +455,9 @@ public class PointManager : MonoBehaviour {
             UpdateOIDs();
             SendPersonEntered(_incorrectInstantiatedPoints[_highestPid]);
         } else {
-            InstantiatedPoints.Add(_highestPid, newPoint);
+            instantiatedPoints.Add(_highestPid, newPoint);
             UpdateOIDs();
-            SendPersonEntered(InstantiatedPoints[_highestPid]);
+            SendPersonEntered(instantiatedPoints[_highestPid]);
         }
 
         if (isFromCursor) {
@@ -476,18 +492,18 @@ public class PointManager : MonoBehaviour {
     /// </summary>
     public void RemovePoint() {
 
-        if (InstantiatedPoints.Count == 0)
+        if (instantiatedPoints.Count == 0)
             return;
 
-        int pidToRemove = InstantiatedPoints.ElementAt(InstantiatedPoints.Count - 1).Key;
+        int pidToRemove = instantiatedPoints.ElementAt(instantiatedPoints.Count - 1).Key;
 
         //Do not remove the cursor point unless it is the last one
-        if(pidToRemove == 0 && InstantiatedPoints.Count > 1)
-            pidToRemove = InstantiatedPoints.ElementAt(InstantiatedPoints.Count - 2).Key;
+        if(pidToRemove == 0 && instantiatedPoints.Count > 1)
+            pidToRemove = instantiatedPoints.ElementAt(instantiatedPoints.Count - 2).Key;
 
-		SendPersonLeft(InstantiatedPoints[pidToRemove]);
-		Destroy(InstantiatedPoints[pidToRemove]);
-		InstantiatedPoints.Remove(pidToRemove);
+		SendPersonLeft(instantiatedPoints[pidToRemove]);
+		Destroy(instantiatedPoints[pidToRemove]);
+		instantiatedPoints.Remove(pidToRemove);
 
         //Update OIDs
         UpdateOIDs();
@@ -500,10 +516,10 @@ public class PointManager : MonoBehaviour {
     /// </summary>
     public void RemovePoint(int pid) {
 
-        if (InstantiatedPoints.ContainsKey(pid)) {
-            SendPersonLeft(InstantiatedPoints[pid]);
-            Destroy(InstantiatedPoints[pid]);
-            InstantiatedPoints.Remove(pid);
+        if (instantiatedPoints.ContainsKey(pid)) {
+            SendPersonLeft(instantiatedPoints[pid]);
+            Destroy(instantiatedPoints[pid]);
+            instantiatedPoints.Remove(pid);
 
             //Update OIDs
             UpdateOIDs();
@@ -537,18 +553,18 @@ public class PointManager : MonoBehaviour {
     /// </summary>
     private void UpdateOIDs() {
 
-        keysList = InstantiatedPoints.Keys.ToList();
-        keysList.Sort();
+        _keysList = instantiatedPoints.Keys.ToList();
+        _keysList.Sort();
 
-        for(int i=0; i<InstantiatedPoints.Count; i++) {
-            InstantiatedPoints[keysList[i]].GetComponent<PointBehaviour>().oid = i;
+        for(int i=0; i<instantiatedPoints.Count; i++) {
+            instantiatedPoints[_keysList[i]].GetComponent<PointBehaviour>().oid = i;
         }
 
-        keysList = _incorrectInstantiatedPoints.Keys.ToList();
-        keysList.Sort();
+        _keysList = _incorrectInstantiatedPoints.Keys.ToList();
+        _keysList.Sort();
 
         for (int i = 0; i < _incorrectInstantiatedPoints.Count; i++) {
-            _incorrectInstantiatedPoints[keysList[i]].GetComponent<PointBehaviour>().oid = InstantiatedPoints.Count + i;
+            _incorrectInstantiatedPoints[_keysList[i]].GetComponent<PointBehaviour>().oid = instantiatedPoints.Count + i;
         }
 
     }
@@ -557,12 +573,12 @@ public class PointManager : MonoBehaviour {
         _pointsCount = 0;
         _highestPid = 0;
 
-        foreach (var obj in InstantiatedPoints) {
+        foreach (var obj in instantiatedPoints) {
             SendPersonLeft(obj.Value);
             Destroy(obj.Value);
         }
 
-        InstantiatedPoints.Clear();
+        instantiatedPoints.Clear();
     }
 
 	#endregion
@@ -622,29 +638,29 @@ public class PointManager : MonoBehaviour {
 
     public void SendSceneUpdated()
     {
-        if (Mute) return;
+        if (mute) return;
 
         var msg = new UnityOSC.OSCMessage("/au/scene");
         msg.Append(_frameCounter);
         //Compute point size
-        msg.Append(InstantiatedPoints.Count * 0.25f * (MaxPointSize.x + MinPointSize.x) * (MaxPointSize.y + MinPointSize.y));
+        msg.Append(instantiatedPoints.Count * 0.25f * (maxPointSize.x + minPointSize.x) * (maxPointSize.y + minPointSize.y));
         msg.Append(_pointsCount);
         //Compute average motion
         var velocitySum = Vector3.zero;
-        foreach(var element in InstantiatedPoints)
+        foreach(var element in instantiatedPoints)
         {
-            velocitySum += -element.Value.GetComponent<PointBehaviour>().NormalizedVelocity;
+            velocitySum += -element.Value.GetComponent<PointBehaviour>().normalizedVelocity;
         }
-        velocitySum /= InstantiatedPoints.Count;
+        velocitySum /= instantiatedPoints.Count;
 
         msg.Append(velocitySum.x);
         msg.Append(velocitySum.y);
-        if(ProtocolVersion == "1") {
-            msg.Append((int)(Width / MeterPerPixel));
-            msg.Append((int)(Height / MeterPerPixel));
-        } else if( ProtocolVersion == "2") {
-            msg.Append(Width);
-            msg.Append(Height);
+        if(protocolVersion == "1") {
+            msg.Append((int)(width / meterPerPixel));
+            msg.Append((int)(height / meterPerPixel));
+        } else if( protocolVersion == "2") {
+            msg.Append(width);
+            msg.Append(height);
         }
         msg.Append(100);
 
@@ -669,12 +685,12 @@ public class PointManager : MonoBehaviour {
 
     public void SendAugmentaMessage(string address, GameObject obj)
     {
-        if (Mute) return;
+        if (mute) return;
 
         var msg = new UnityOSC.OSCMessage(address);
         var behaviour = obj.GetComponent<PointBehaviour>();
-        float pointX = 0.5f + behaviour.transform.position.x / Width;
-        float pointY = 0.5f - behaviour.transform.position.y / Height;
+        float pointX = 0.5f + behaviour.transform.position.x / width;
+        float pointY = 0.5f - behaviour.transform.position.y / height;
 
 
         msg.Append(behaviour.pid);
@@ -682,22 +698,22 @@ public class PointManager : MonoBehaviour {
         //oid
         msg.Append(behaviour.oid);
 
-        msg.Append((int)behaviour.Age);
+        msg.Append((int)behaviour.age);
         //centroid
         msg.Append(pointX);
         msg.Append(pointY);
         //Velocity
-        msg.Append(-behaviour.NormalizedVelocity.x);
-        msg.Append(-behaviour.NormalizedVelocity.y);
+        msg.Append(-behaviour.normalizedVelocity.x);
+        msg.Append(-behaviour.normalizedVelocity.y);
 
         msg.Append(0);
 
         //Bounding
-        msg.Append(pointX - behaviour.size.x * 0.5f / Width);
-        msg.Append(pointY - behaviour.size.y * 0.5f / Height);
+        msg.Append(pointX - behaviour.size.x * 0.5f / width);
+        msg.Append(pointY - behaviour.size.y * 0.5f / height);
 
-        msg.Append(behaviour.size.x / Width);
-        msg.Append(behaviour.size.y / Height);
+        msg.Append(behaviour.size.x / width);
+        msg.Append(behaviour.size.y / height);
 
         msg.Append(pointX);
         msg.Append(pointY);
