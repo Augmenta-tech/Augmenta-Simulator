@@ -27,6 +27,8 @@ public class CameraController : MonoBehaviour
         cameraStartingLocalPosition = camera.transform.localPosition;
         rigStartingRotation = transform.rotation;
         cameraStartingSize = camera.orthographicSize;
+
+        ResetCamera();
     }
 
     // Update is called once per frame
@@ -101,6 +103,14 @@ public class CameraController : MonoBehaviour
 
         camera.transform.localPosition = cameraStartingLocalPosition;
         transform.rotation = rigStartingRotation;
-        camera.orthographicSize = cameraStartingSize;
+
+        //Set size to match area
+        var manager = FindObjectOfType<PointManager>();
+
+        if (manager) {
+            camera.orthographicSize = manager.Height / 1.5f;
+        } else {
+            camera.orthographicSize = cameraStartingSize;
+        }
     }
 }
