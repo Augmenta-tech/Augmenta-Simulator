@@ -689,7 +689,8 @@ public class PointManager : MonoBehaviour {
         //Velocity
         msg.Append(-behaviour.NormalizedVelocity.x);
         msg.Append(-behaviour.NormalizedVelocity.y);
-        msg.Append((float)behaviour.pid);
+
+        msg.Append(0);
 
         //Bounding
         msg.Append(pointX - behaviour.size.x * 0.5f / Width);
