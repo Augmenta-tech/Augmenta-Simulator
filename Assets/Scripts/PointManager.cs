@@ -30,10 +30,10 @@ public class PointManager : MonoBehaviour {
         set { _height = value; UpdateAreaSize(); }
     }
 
-    private float _pixelSize = 0.005f;
-    public float PixelSize {
-        get { return _pixelSize; }
-        set { _pixelSize = value; }
+    private float _meterPerPixel = 0.005f;
+    public float MeterPerPixel {
+        get { return _meterPerPixel; }
+        set { _meterPerPixel = value; }
     }
 
     [Header("Points settings")]
@@ -640,8 +640,8 @@ public class PointManager : MonoBehaviour {
         msg.Append(velocitySum.x);
         msg.Append(velocitySum.y);
         if(ProtocolVersion == "1") {
-            msg.Append((int)(Width / PixelSize));
-            msg.Append((int)(Height / PixelSize));
+            msg.Append((int)(Width / MeterPerPixel));
+            msg.Append((int)(Height / MeterPerPixel));
         } else if( ProtocolVersion == "2") {
             msg.Append(Width);
             msg.Append(Height);
