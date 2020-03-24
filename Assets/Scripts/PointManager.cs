@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Net.NetworkInformation;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
+
 using UnityEngine;
 using UnityEngine.EventSystems;
-using System.Net;
-using System.Linq;
 
 public class PointManager : MonoBehaviour {
 
@@ -42,6 +40,13 @@ public class PointManager : MonoBehaviour {
     public bool mute {
         get { return _mute; }
         set { _mute = value;
+
+            if (_mute) {
+                backgroundMaterial.SetColor("_BorderColor", Color.gray);
+            } else {
+                backgroundMaterial.SetColor("_BorderColor", borderColor);
+            }
+
             if (instantiatedPoints == null) return;
 
             foreach (var point in instantiatedPoints.Values)
@@ -63,7 +68,9 @@ public class PointManager : MonoBehaviour {
 
     public int desiredPointsCount {
         get { return _desiredPointsCount; }
-        set { _desiredPointsCount = value; UpdateInstantiatedPointsCount(); }
+        set { _desiredPointsCount = value; 
+            UpdateInstantiatedPointsCount();
+        }
     }
     private int _desiredPointsCount;
 
@@ -190,6 +197,7 @@ public class PointManager : MonoBehaviour {
     public static Dictionary<int, GameObject> instantiatedPoints;
 
     public Material backgroundMaterial;
+    public Color borderColor;
 
     private int _frameCounter;
     private int _highestPid;
@@ -203,15 +211,15 @@ public class PointManager : MonoBehaviour {
 
     private List<int> _keysList;
 
+    private bool _initialized = false;
+
     #region MonoBehaviour Implementation
 
     void Start () {
 
-        instantiatedPoints = new Dictionary<int, GameObject>();
-        _incorrectInstantiatedPoints = new Dictionary<int, GameObject>();
-        _flickeringPoints = new Dictionary<int, GameObject>();
-
-        _highestPid = 0;
+        if (!_initialized) {
+            Initialize();
+        }
 
         UpdateAreaSize();
     }
@@ -254,6 +262,17 @@ public class PointManager : MonoBehaviour {
     }
 
 	#endregion
+
+    void Initialize() {
+
+        instantiatedPoints = new Dictionary<int, GameObject>();
+        _incorrectInstantiatedPoints = new Dictionary<int, GameObject>();
+        _flickeringPoints = new Dictionary<int, GameObject>();
+
+        _highestPid = 0;
+
+        _initialized = true;
+    }
 
 	#region Inputs Handling
 
@@ -416,6 +435,10 @@ public class PointManager : MonoBehaviour {
     /// </summary>
     public void UpdateInstantiatedPointsCount() {
 
+        if (!_initialized) {
+            Initialize();
+        }
+
         if (_desiredPointsCount <= 0) _desiredPointsCount = 0;
 
         //Create new points
@@ -429,10 +452,10 @@ public class PointManager : MonoBehaviour {
         }
     }
 
-    /// <summary>
-    /// Instantiate new point
-    /// </summary>
-    public void InstantiatePoint(bool isIncorrectDetection = false, bool isFromCursor = false) {
+	/// <summary>
+	/// Instantiate new point
+	/// </summary>
+	public void InstantiatePoint(bool isIncorrectDetection = false, bool isFromCursor = false) {
 
 		GameObject newPoint = Instantiate(pointPrefab);
 
@@ -442,43 +465,43 @@ public class PointManager : MonoBehaviour {
 		newPointBehaviour.manager = this;
 		UpdatePointColor(newPointBehaviour);
 		newPoint.transform.parent = transform;
-        newPoint.transform.localPosition = GetNewPointPosition();
+		newPoint.transform.localPosition = GetNewPointPosition();
 		newPointBehaviour.speed = speed;
 		newPointBehaviour.pid = _highestPid;
-        newPointBehaviour.size = new Vector3(Random.Range(minPointSize.x, maxPointSize.x), 
-                                             Random.Range(minPointSize.y, maxPointSize.y), 
-                                             Random.Range(minPointSize.z, maxPointSize.z));
-        newPointBehaviour.animateSize = animateSize;
-        newPointBehaviour.sizeVariationSpeed = sizeVariationSpeed;
-        newPointBehaviour.movementNoiseAmplitude = movementNoiseAmplitude;
-        newPointBehaviour.movementNoiseFrequency = movementNoiseFrequency;
-        newPointBehaviour.isIncorrectDetection = isIncorrectDetection;
-        newPointBehaviour.isFlickering = false;
+		newPointBehaviour.size = new Vector3(Random.Range(minPointSize.x, maxPointSize.x),
+											 Random.Range(minPointSize.y, maxPointSize.y),
+											 Random.Range(minPointSize.z, maxPointSize.z));
+		newPointBehaviour.animateSize = animateSize;
+		newPointBehaviour.sizeVariationSpeed = sizeVariationSpeed;
+		newPointBehaviour.movementNoiseAmplitude = movementNoiseAmplitude;
+		newPointBehaviour.movementNoiseFrequency = movementNoiseFrequency;
+		newPointBehaviour.isIncorrectDetection = isIncorrectDetection;
+		newPointBehaviour.isFlickering = false;
 
-        if (isIncorrectDetection) {
-            _incorrectInstantiatedPoints.Add(_highestPid, newPoint);
-            UpdateOIDs();
-            SendPersonEntered(_incorrectInstantiatedPoints[_highestPid]);
-        } else {
-            instantiatedPoints.Add(_highestPid, newPoint);
-            UpdateOIDs();
-            SendPersonEntered(instantiatedPoints[_highestPid]);
-        }
+		if (isIncorrectDetection) {
+			_incorrectInstantiatedPoints.Add(_highestPid, newPoint);
+			UpdateOIDs();
+			SendPersonEntered(_incorrectInstantiatedPoints[_highestPid]);
+		} else {
+			instantiatedPoints.Add(_highestPid, newPoint);
+			UpdateOIDs();
+			SendPersonEntered(instantiatedPoints[_highestPid]);
+		}
 
-        if (isFromCursor) {
-            _cursorPoint = newPoint;
-            OnMouseDrag();
-        }
+		if (isFromCursor) {
+			_cursorPoint = newPoint;
+			OnMouseDrag();
+		}
 
-        _highestPid++;
-        _pointsCount++;
+		_highestPid++;
+		_pointsCount++;
 	}
 
-    /// <summary>
-    /// Return a local position for a new point
-    /// </summary>
-    /// <returns></returns>
-    Vector3 GetNewPointPosition() {
+	/// <summary>
+	/// Return a local position for a new point
+	/// </summary>
+	/// <returns></returns>
+	Vector3 GetNewPointPosition() {
 
         float x = Random.Range(0.0f, 1.0f);
         float y = Random.Range(0.0f, 1.0f);
@@ -598,7 +621,6 @@ public class PointManager : MonoBehaviour {
         transform.localScale = new Vector3(_width, _height, 1);
 
         UpdateBackgroundTexture();
-
     }
 
 	private void UpdateBackgroundTexture()

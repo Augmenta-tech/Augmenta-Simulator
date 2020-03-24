@@ -589,6 +589,7 @@ MonoBehaviour:
   pointPrefab: {fileID: 1897133376265846, guid: f52716752aba2a44281446caa8282db8,
     type: 3}
   backgroundMaterial: {fileID: 2100000, guid: 7cd67c5e337e6c44c89a4bea7e8985f3, type: 2}
+  borderColor: {r: 0.025517648, g: 0.3487412, b: 0.72300005, a: 1}
 --- !u!33 &575826800
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1722,10 +1723,20 @@ PrefabInstance:
       propertyPath: ipRefreshDelay
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 114445698576836282, guid: 79c2718dd59243e4c90e145349e7dadf,
+        type: 3}
+      propertyPath: ShowDebug
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 114736921750431862, guid: 79c2718dd59243e4c90e145349e7dadf,
         type: 3}
       propertyPath: CloseGenUIPanelAtStart
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114736921750431862, guid: 79c2718dd59243e4c90e145349e7dadf,
+        type: 3}
+      propertyPath: showDebug
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224261597021104126, guid: 79c2718dd59243e4c90e145349e7dadf,
         type: 3}

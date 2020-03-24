@@ -25,7 +25,7 @@ public class PointManagerControllable : Controllable {
     [Header("POINTS GENERAL SETTINGS")]
     [OSCProperty(isInteractible = false)]
     public int pointsCount;
-    [OSCProperty][Range(0, 30)]
+    [OSCProperty][Range(0, 50)]
     public int desiredPointsCount;
     [OSCProperty]
     [Range(0.0f, 10.0f)]
@@ -86,7 +86,7 @@ public class PointManagerControllable : Controllable {
 
         //Get pixel size objects
         foreach (var text in FindObjectsOfType<Text>()) {
-            if (text.text == "pixelSize") {
+            if (text.text == "Pixel Size") {
                 pixelSizeInputField = text.transform.parent.gameObject;
                 break;
             }

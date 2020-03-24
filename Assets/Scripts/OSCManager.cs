@@ -33,33 +33,36 @@ public class OSCManager : MonoBehaviour
 
     private OSCManagerControllable _controllable;
 
+    private bool _initialized = false;
+
     #region MonoBehaviour Implementation
 
     private void Awake() {
 
-        activeManager = this;
-
-        _augmentaOutputs = new Dictionary<string, float>();
-        _outputsToDelete = new List<string>();
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        _controllable = FindObjectOfType<OSCManagerControllable>();
-
-        CreateYoServer();
-        CreateAugmentaClient();
+        if (!_initialized)
+            Initialize();
     }
 
     private void Update() {
 
-        
         UpdateOutputsTimers();
-
     }
 
     #endregion
+
+    void Initialize() {
+        activeManager = this;
+
+        _augmentaOutputs = new Dictionary<string, float>();
+        _outputsToDelete = new List<string>();
+
+        _controllable = FindObjectOfType<OSCManagerControllable>();
+
+        CreateYoServer();
+        CreateAugmentaClient();
+
+        _initialized = true;
+    }
 
     /// <summary>
     /// Increase output timers and delete timed out outputs
@@ -115,9 +118,12 @@ public class OSCManager : MonoBehaviour
     /// <param name="msg"></param>
     public void SendAugmentaMessage(OSCMessage message) {
 
+        if (!_initialized)
+            Initialize();
+
         OSCMaster.Clients["AugmentaSimulatorOutput"].Send(message);
 
-        foreach(var output in _augmentaOutputs)
+        foreach (var output in _augmentaOutputs)
             OSCMaster.Clients[output.Key].Send(message);
     }
 
