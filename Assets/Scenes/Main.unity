@@ -191,11 +191,12 @@ MonoBehaviour:
     m_LineSpacing: 1.1
   m_Text: "           <b><size=18>CONTROLS</size></b>\n\n<b><color=#0088ffff>LeftMouse</color></b>
     : Create point or move existing point.\n<b><color=#0088ffff>RightMouse</color></b>
-    : Delete point. \n\n<b><color=#0088ffff>M</color></b> : Mute / Unmute all outputs.\n\n<b><color=#0088ffff>H</color></b>
-    : Toggle UI.\n<b><color=#0088ffff>F1</color></b> : Toggle Help.\n\n<b><color=#0088ffff>Mousewheel
-    Scroll</color></b> : Camera zoom. \n<b><color=#0088ffff>Mousewheel Clic</color></b>
-    : Pan camera. \n<b><color=#0088ffff>Alt+LeftMouse</color></b> : Rotate camera.\n<b><color=#0088ffff>R</color></b>
-    : Reset camera.\n<b><color=#0088ffff>P</color></b> : Switch camera projection."
+    : Delete point. \n\n<b><color=#0088ffff>M</color></b> : Mute / Unmute all OSC
+    outputs.\n\n<b><color=#0088ffff>H</color></b> : Toggle UI.\n<b><color=#0088ffff>F1</color></b>
+    : Toggle Help.\n\n<b><color=#0088ffff>Mousewheel Scroll</color></b> : Camera
+    zoom. \n<b><color=#0088ffff>Mousewheel Clic</color></b> : Pan camera. \n<b><color=#0088ffff>Alt+LeftMouse</color></b>
+    : Rotate camera.\n<b><color=#0088ffff>R</color></b> : Reset camera.\n<b><color=#0088ffff>P</color></b>
+    : Switch camera projection."
 --- !u!222 &8106416
 CanvasRenderer:
   m_ObjectHideFlags: 0
