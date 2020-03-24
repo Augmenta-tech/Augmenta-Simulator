@@ -339,7 +339,7 @@ MonoBehaviour:
   velocityVisualizer: {fileID: 4131514715415182}
   rigidbody: {fileID: 2776326774191610709}
   collider: {fileID: 5069877076318906407}
-  velocityThickness: 0.03
+  velocityThickness: 0.015
   manager: {fileID: 0}
   age: 0
   pid: 0

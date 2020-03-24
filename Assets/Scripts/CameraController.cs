@@ -96,7 +96,11 @@ public class CameraController : MonoBehaviour
 
         if (Input.GetMouseButton(2)) {
 
-            camera.transform.localPosition = dragCameraLocalPositionOrigin - (Input.mousePosition - dragMouseOrigin) * dragSpeed * camera.orthographicSize;
+            Vector3 offset = Input.mousePosition - dragMouseOrigin;
+            float tmp = offset.y;
+            offset.y = offset.z;
+            offset.z = tmp;
+            camera.transform.localPosition = dragCameraLocalPositionOrigin - offset * dragSpeed * camera.orthographicSize;
         }
     }
 

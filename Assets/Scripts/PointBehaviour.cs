@@ -11,7 +11,8 @@ public class PointBehaviour : MonoBehaviour {
     public new Rigidbody rigidbody;
     public new Collider collider;
 
-    public float velocityThickness = 0.03f;
+    public float velocityThickness = 0.015f;
+    public float textScaleMultiplier = 0.005f;
 
     [Header("Autofilled Parameters")]
     public PointManager manager;
@@ -160,6 +161,10 @@ public class PointBehaviour : MonoBehaviour {
 
         transform.localScale = Vector3.one;
         transform.localScale = new Vector3(size.x / transform.lossyScale.x, size.y / transform.lossyScale.y, size.z / transform.lossyScale.z);
+
+        float textScale = Mathf.Min(size.x, size.y) * textScaleMultiplier;
+        pointInfoText.transform.localScale = Vector3.one;
+        pointInfoText.transform.localScale = new Vector3(textScale / transform.lossyScale.x, textScale / transform.lossyScale.y, textScaleMultiplier);
     }
 
     private void UpdatePointPosition() {
