@@ -15,7 +15,12 @@ public class PointManager : MonoBehaviour {
 
     [Header("Output settings")]
     public List<string> protocolVersions;
-    public string protocolVersion = "1";
+
+    private string _protocolVersion = "2";
+    public string protocolVersion {
+        get { return _protocolVersion; }
+        set { _protocolVersion = value; }
+    }
 
     [Header("Area settings")]
     private float _width = 5;
@@ -30,7 +35,7 @@ public class PointManager : MonoBehaviour {
         set { _height = value; UpdateAreaSize(); }
     }
 
-	public float meterPerPixel { get; set; } = 0.005f;
+    public float pixelSize = 0.005f;
 
     [Header("Points settings")]
     public bool _mute;
@@ -244,7 +249,7 @@ public class PointManager : MonoBehaviour {
         _ray = camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(_ray, out _raycastHit, 100.0f, areaLayer)) {
 
-            _cursorPoint.transform.position = new Vector3(_raycastHit.point.x, _raycastHit.point.y, 0);
+            _cursorPoint.transform.position = new Vector3(_raycastHit.point.x, 0, _raycastHit.point.z);
         }
     }
 
@@ -651,13 +656,15 @@ public class PointManager : MonoBehaviour {
         {
             velocitySum += -element.Value.GetComponent<PointBehaviour>().normalizedVelocity;
         }
-        velocitySum /= instantiatedPoints.Count;
+
+        if(instantiatedPoints.Count > 0)
+            velocitySum /= instantiatedPoints.Count;
 
         msg.Append(velocitySum.x);
-        msg.Append(velocitySum.y);
+        msg.Append(velocitySum.z);
         if(protocolVersion == "1") {
-            msg.Append((int)(width / meterPerPixel));
-            msg.Append((int)(height / meterPerPixel));
+            msg.Append((int)(width / pixelSize));
+            msg.Append((int)(height / pixelSize));
         } else if( protocolVersion == "2") {
             msg.Append(width);
             msg.Append(height);
@@ -690,8 +697,7 @@ public class PointManager : MonoBehaviour {
         var msg = new UnityOSC.OSCMessage(address);
         var behaviour = obj.GetComponent<PointBehaviour>();
         float pointX = 0.5f + behaviour.transform.position.x / width;
-        float pointY = 0.5f - behaviour.transform.position.y / height;
-
+        float pointY = 0.5f - behaviour.transform.position.z / height;
 
         msg.Append(behaviour.pid);
 
@@ -704,7 +710,7 @@ public class PointManager : MonoBehaviour {
         msg.Append(pointY);
         //Velocity
         msg.Append(-behaviour.normalizedVelocity.x);
-        msg.Append(-behaviour.normalizedVelocity.y);
+        msg.Append(-behaviour.normalizedVelocity.z);
 
         msg.Append(0);
 

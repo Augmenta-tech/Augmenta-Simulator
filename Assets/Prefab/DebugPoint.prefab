@@ -106,7 +106,7 @@ Transform:
   m_GameObject: {fileID: 1169550248677634}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -1}
-  m_LocalScale: {x: 0.0068157823, y: 0.006815788, z: 0.006815788}
+  m_LocalScale: {x: 0.005, y: 0.005, z: 0.005}
   m_Children: []
   m_Father: {fileID: 4523601773261354}
   m_RootOrder: 0
@@ -312,7 +312,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1897133376265846}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -321,7 +321,7 @@ Transform:
   - {fileID: 4517994547990216}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!114 &114412786907613634
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -334,14 +334,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b419f78f5aa4c648954401a0a71fe8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 0}
-  age: 0
   pointInfoText: {fileID: 102360146734640142}
   point: {fileID: 4517994547990216}
   velocityVisualizer: {fileID: 4131514715415182}
   rigidbody: {fileID: 2776326774191610709}
   collider: {fileID: 5069877076318906407}
   velocityThickness: 0.03
+  manager: {fileID: 0}
+  age: 0
   pid: 0
   oid: 0
   direction: {x: 0, y: 0, z: 0}
@@ -351,7 +351,8 @@ MonoBehaviour:
   animateSize: 0
   sizeVariationSpeed: 0
   normalizedVelocity: {x: 0, y: 0, z: 0}
-  movementNoise: 0
+  movementNoiseAmplitude: 0
+  movementNoiseFrequency: 20
   isIncorrectDetection: 0
   isFlickering: 0
 --- !u!54 &2776326774191610709

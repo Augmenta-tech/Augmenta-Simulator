@@ -5,12 +5,17 @@ using UnityEngine.EventSystems;
 
 public class CameraController : MonoBehaviour
 {
+    [Header("Camera Control")]
     public new Camera camera;
 
     public float zoomSpeed = 0.5f;
     public float minSize = 1.0f;
     public float dragSpeed = .01f;
     public float rotationSpeed = 1.0f;
+
+    [Header("UI Control")]
+    public GameObject orthoUI;
+    public GameObject perspUI;
 
     private Vector3 dragMouseOrigin;
     private Vector3 dragCameraLocalPositionOrigin;
@@ -29,6 +34,7 @@ public class CameraController : MonoBehaviour
         cameraStartingSize = camera.orthographicSize;
 
         ResetCamera();
+        SwitchToOrthographic();
     }
 
     // Update is called once per frame
@@ -40,6 +46,10 @@ public class CameraController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R)) {
             ResetCamera();
         }
+
+        if (Input.GetKeyDown(KeyCode.P)) {
+            SwitchCameraProjection();
+        }
     }
 
     #endregion
@@ -49,11 +59,22 @@ public class CameraController : MonoBehaviour
     /// </summary>
     void UpdateCameraFOV() {
 
-        if(!EventSystem.current.IsPointerOverGameObject())
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
+
+        if (camera.orthographic) {
             camera.orthographicSize -= Input.mouseScrollDelta.y * zoomSpeed;
+        } else {
+            Vector3 cameraLocalPosition = camera.transform.localPosition;
+            cameraLocalPosition.y -= Input.mouseScrollDelta.y * zoomSpeed;
+            camera.transform.localPosition = cameraLocalPosition;
+        }
 
         if (camera.orthographicSize < minSize)
             camera.orthographicSize = minSize;
+
+        if (camera.transform.localPosition.y < minSize)
+            camera.transform.localPosition = new Vector3(camera.transform.localPosition.x, minSize, camera.transform.localPosition.z);
     }
 
     /// <summary>
@@ -113,4 +134,39 @@ public class CameraController : MonoBehaviour
             camera.orthographicSize = cameraStartingSize;
         }
     }
+
+    /// <summary>
+    /// Switch camera projection between orthographic and perspective
+    /// </summary>
+    public void SwitchCameraProjection() {
+
+        if (camera.orthographic) {
+            SwitchToPerspective();
+        } else {
+            SwitchToOrthographic();
+        }
+    }
+
+    /// <summary>
+    /// Switch camera to perspective projection
+    /// </summary>
+    public void SwitchToPerspective() {
+
+        camera.orthographic = false;
+
+        orthoUI.SetActive(false);
+        perspUI.SetActive(true);
+    }
+
+    /// <summary>
+    /// Switch camera to orthographic projection
+    /// </summary>
+    public void SwitchToOrthographic() {
+
+        camera.orthographic = true;
+
+        perspUI.SetActive(false);
+        orthoUI.SetActive(true);
+    }
+
 }

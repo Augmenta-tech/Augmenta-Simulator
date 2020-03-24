@@ -17,10 +17,9 @@ public class PointManagerControllable : Controllable {
     [OSCProperty]
     [Tooltip("in meters")]
     public float height;
-    [OSCProperty][Tooltip("Meter to pixel conversion when using protocol V1")]
-    public float meterPerPixel;
-
-
+    [OSCProperty]
+    [Tooltip("in meters. For protocol V1 only.")]
+    public float pixelSize;
 
     [Header("POINTS GENERAL SETTINGS")]
     [OSCProperty(isInteractible = false)]

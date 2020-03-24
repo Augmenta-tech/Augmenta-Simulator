@@ -57,7 +57,7 @@ public class PointBehaviour : MonoBehaviour {
 
 	void Start () {
         direction = Random.onUnitSphere;
-        direction.z = 0;
+        direction.y = 0;
 
         //Get velocity
         if (isIncorrectDetection) {
@@ -110,7 +110,7 @@ public class PointBehaviour : MonoBehaviour {
 
         ComputeNormalizedVelocity();
         //Update velocity
-        float angle = Mathf.Atan2(normalizedVelocity.y, normalizedVelocity.x) * 180 / Mathf.PI;
+        float angle = Mathf.Atan2(normalizedVelocity.z, normalizedVelocity.x) * 180 / Mathf.PI;
         if (float.IsNaN(angle))
             return;
 
@@ -124,7 +124,7 @@ public class PointBehaviour : MonoBehaviour {
         _ray = manager.camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(_ray, out _raycastHit, 100.0f, manager.areaLayer)) {
 
-            transform.position = new Vector3(_raycastHit.point.x, _raycastHit.point.y, 0);
+            transform.position = new Vector3(_raycastHit.point.x, 0, _raycastHit.point.z);
         }
     }
 
@@ -134,7 +134,7 @@ public class PointBehaviour : MonoBehaviour {
     {
         if (_oldPositionIsValid) {
             normalizedVelocity = ((transform.position - _oldPosition) / Time.deltaTime);
-            normalizedVelocity = new Vector3(-normalizedVelocity.x / manager.width, normalizedVelocity.y / manager.height, 0);
+            normalizedVelocity = new Vector3(-normalizedVelocity.x / manager.width, 0, normalizedVelocity.z / manager.height);
         } else { 
             normalizedVelocity = Vector3.zero; 
         }
@@ -163,16 +163,13 @@ public class PointBehaviour : MonoBehaviour {
     }
 
     private void UpdatePointPosition() {
-        //var newPos = transform.position
-        //    + Random.Range(-movementNoise, movementNoise) * Vector3.right
-        //    + Random.Range(-movementNoise, movementNoise) * Vector3.up;
 
         Vector3 newPos = transform.position
                         + (Mathf.PerlinNoise(pid * 15, Time.time * movementNoiseFrequency) - 0.5f) * 2.0f * movementNoiseAmplitude * Vector3.right
-                        + (Mathf.PerlinNoise(pid * 25, Time.time * movementNoiseFrequency) - 0.5f) * 2.0f * movementNoiseAmplitude * Vector3.up;
+                        + (Mathf.PerlinNoise(pid * 25, Time.time * movementNoiseFrequency) - 0.5f) * 2.0f * movementNoiseAmplitude * Vector3.forward;
 
         newPos.x = Mathf.Clamp(newPos.x, -(manager.width + size.x) * 0.5f, (manager.width - size.x) * 0.5f);
-        newPos.y = Mathf.Clamp(newPos.y, -(manager.height + size.y) * 0.5f, (manager.height - size.y) * 0.5f);
+        newPos.z = Mathf.Clamp(newPos.z, -(manager.height + size.y) * 0.5f, (manager.height - size.y) * 0.5f);
 
         transform.position = newPos;
     }

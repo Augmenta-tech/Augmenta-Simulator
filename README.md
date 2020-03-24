@@ -32,6 +32,8 @@ Press Alt + Left clic to rotate.
 
 Press R to reset camera position.
 
+Press P to switch camera projection between orthographic (iso) or perspective (pers).
+
 ## Zeroconf
 
 For the simulator to create a Zeroconf service on Windows, you need to have Apple Bonjour for Windows installed.
