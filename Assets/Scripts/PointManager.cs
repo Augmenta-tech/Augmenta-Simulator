@@ -663,8 +663,8 @@ public class PointManager : MonoBehaviour {
         msg.Append(velocitySum.x);
         msg.Append(velocitySum.z);
         if(protocolVersion == "1") {
-            msg.Append((int)(width / pixelSize));
-            msg.Append((int)(height / pixelSize));
+            msg.Append(Mathf.RoundToInt(width / pixelSize));
+            msg.Append(Mathf.RoundToInt(height / pixelSize));
         } else if( protocolVersion == "2") {
             msg.Append(width);
             msg.Append(height);

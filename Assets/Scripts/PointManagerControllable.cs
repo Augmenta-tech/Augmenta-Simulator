@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PointManagerControllable : Controllable {
 
@@ -18,7 +19,7 @@ public class PointManagerControllable : Controllable {
     [Tooltip("in meters")]
     public float height;
     [OSCProperty]
-    [Tooltip("in meters. For protocol V1 only.")]
+    [Tooltip("in meters, to convert the area size to pixels.")]
     public float pixelSize;
 
     [Header("POINTS GENERAL SETTINGS")]
@@ -62,15 +63,54 @@ public class PointManagerControllable : Controllable {
         ((PointManager)TargetScript).RemovePoints();
     }
 
+    private GameObject pixelSizeInputField;
+    private GameObject pixelSizeTooltip;
+
     public override void OnUiValueChanged(string name)
     {
         base.OnUiValueChanged(name);
         ((PointManager)TargetScript).protocolVersion = protocolVersion;
+
+        UpdatePixelSizeDisplay();
     }
 
     public override void OnScriptValueChanged(string name) {
         base.OnScriptValueChanged(name);
         protocolVersion = ((PointManager)TargetScript).protocolVersion;
         protocolVersions = ((PointManager)TargetScript).protocolVersions;
+
+        UpdatePixelSizeDisplay();
+    }
+
+    void InitializePixelSizeObjects() {
+
+        //Get pixel size objects
+        foreach (var text in FindObjectsOfType<Text>()) {
+            if (text.text == "pixelSize") {
+                pixelSizeInputField = text.transform.parent.gameObject;
+                break;
+            }
+        }
+
+        foreach (var text in FindObjectsOfType<Text>()) {
+            if (text.text == "in meters, to convert the area size to pixels.") {
+                pixelSizeTooltip = text.gameObject;
+                break;
+            }
+        }
+    }
+
+    void UpdatePixelSizeDisplay() {
+
+        if (!pixelSizeInputField || !pixelSizeTooltip)
+            InitializePixelSizeObjects();
+
+        if (protocolVersion == "1") {
+            pixelSizeInputField.SetActive(true);
+            pixelSizeTooltip.SetActive(true);
+        } else {
+            pixelSizeInputField.SetActive(false);
+            pixelSizeTooltip.SetActive(false);
+        }
     }
 }
