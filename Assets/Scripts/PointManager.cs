@@ -199,6 +199,8 @@ public class PointManager : MonoBehaviour {
     public Material backgroundMaterial;
     public Color borderColor;
 
+    private CameraController cameraController;
+
     private int _frameCounter;
     private int _highestPid;
 
@@ -621,6 +623,7 @@ public class PointManager : MonoBehaviour {
         transform.localScale = new Vector3(_width, _height, 1);
 
         UpdateBackgroundTexture();
+        UpdateCamera();
     }
 
 	private void UpdateBackgroundTexture()
@@ -628,13 +631,21 @@ public class PointManager : MonoBehaviour {
         backgroundMaterial.mainTextureScale = transform.localScale * 0.5f;
     }
 
-	#endregion
+    void UpdateCamera() {
 
-	#region OSC Message
+        if (!cameraController)
+            cameraController = FindObjectOfType<CameraController>();
 
-	//OSC Protocol V1
+        cameraController.SetDistanceFromAreaSize();
+    }
 
-	/*
+    #endregion
+
+    #region OSC Message
+
+    //OSC Protocol V1
+
+    /*
         0: pid (int)                        // Personal ID ex : 42th person to enter stage has pid=42
         1: oid (int)                        // Ordered ID ex : if 3 person on stage, 43th person might have oid=2
         2: age (int)                        // Time on stage (in frame number)

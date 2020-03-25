@@ -24,10 +24,15 @@ public class CameraController : MonoBehaviour
     private float cameraStartingSize;
     private Vector3 cameraStartingLocalPosition;
     private Quaternion rigStartingRotation;
+    private float cameraLastPerspectiveDistance;
+
+    private PointManager manager;
 
 	#region MonoBehaviour Implementation
 
     void Start() {
+
+        manager = FindObjectOfType<PointManager>();
 
         cameraStartingLocalPosition = camera.transform.localPosition;
         rigStartingRotation = transform.rotation;
@@ -129,14 +134,29 @@ public class CameraController : MonoBehaviour
         camera.transform.localPosition = cameraStartingLocalPosition;
         transform.rotation = rigStartingRotation;
 
-        //Set size to match area
-        var manager = FindObjectOfType<PointManager>();
-
         if (manager) {
             camera.orthographicSize = manager.height / 1.5f;
         } else {
             camera.orthographicSize = cameraStartingSize;
         }
+
+        camera.transform.localPosition = new Vector3(camera.transform.localPosition.x,
+                                            Mathf.Max(manager.width, manager.height) * 0.5f + 1.0f,
+                                            camera.transform.localPosition.z);
+        cameraLastPerspectiveDistance = camera.transform.localPosition.y;
+    }
+
+    /// <summary>
+    /// Set the camera distance according to the area size (to avoid clipping)
+    /// </summary>
+    public void SetDistanceFromAreaSize() {
+
+        if (camera.orthographic) {
+            camera.transform.localPosition = new Vector3(camera.transform.localPosition.x,
+                                                        Mathf.Max(manager.width, manager.height) * 0.5f + 1.0f,
+                                                        camera.transform.localPosition.z);
+        }
+
     }
 
     /// <summary>
@@ -160,6 +180,10 @@ public class CameraController : MonoBehaviour
 
         orthoUI.SetActive(false);
         perspUI.SetActive(true);
+
+        camera.transform.localPosition = new Vector3(camera.transform.localPosition.x,
+                                cameraLastPerspectiveDistance,
+                                camera.transform.localPosition.z);
     }
 
     /// <summary>
@@ -171,6 +195,10 @@ public class CameraController : MonoBehaviour
 
         perspUI.SetActive(false);
         orthoUI.SetActive(true);
+
+        cameraLastPerspectiveDistance = camera.transform.localPosition.y;
+
+        SetDistanceFromAreaSize();
     }
 
 }
