@@ -12,7 +12,7 @@ public class PointManagerControllable : Controllable {
     public List<string> protocolVersions;
     [OSCProperty(TargetList ="protocolVersions", IncludeInPresets = true)] public string protocolVersion;
 
-    [Header("AREA SETTINGS")]
+    [Header("SCENE SETTINGS")]
     [OSCProperty]
     public float width;
     [OSCProperty]

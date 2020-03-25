@@ -257,7 +257,7 @@ public class PointManager : MonoBehaviour {
         if (_cursorPoint == null) return;
 
         _ray = camera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(_ray, out _raycastHit, 100.0f, areaLayer)) {
+        if (Physics.Raycast(_ray, out _raycastHit, Mathf.Infinity, areaLayer)) {
 
             _cursorPoint.transform.position = new Vector3(_raycastHit.point.x, 0, _raycastHit.point.z);
         }
@@ -297,12 +297,12 @@ public class PointManager : MonoBehaviour {
             && !Input.GetKey(KeyCode.LeftAlt)) {
             _ray = camera.ScreenPointToRay(Input.mousePosition);
 
-            if (Physics.Raycast(_ray, out _raycastHit, 100.0f, pointsLayer)) {
+            if (Physics.Raycast(_ray, out _raycastHit, Mathf.Infinity, pointsLayer)) {
 
                 //Point hit
                 _cursorPoint = _raycastHit.transform.gameObject;
 
-            } else if(Physics.Raycast(_ray, out _raycastHit, 100.0f, areaLayer)) {
+            } else if(Physics.Raycast(_ray, out _raycastHit, Mathf.Infinity, areaLayer)) {
 
                 //Area hit
                 InstantiatePoint(false, true);
@@ -321,7 +321,7 @@ public class PointManager : MonoBehaviour {
         if (Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject()) {
             _ray = camera.ScreenPointToRay(Input.mousePosition);
 
-            if (Physics.Raycast(_ray, out _raycastHit, 100.0f, pointsLayer)) {
+            if (Physics.Raycast(_ray, out _raycastHit, Mathf.Infinity, pointsLayer)) {
 
                 RemovePoint(_raycastHit.transform.GetComponent<PointBehaviour>().pid);
 

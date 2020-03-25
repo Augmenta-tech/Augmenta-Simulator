@@ -123,7 +123,7 @@ public class PointBehaviour : MonoBehaviour {
     public void OnMouseDrag() {
 
         _ray = manager.camera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(_ray, out _raycastHit, 100.0f, manager.areaLayer)) {
+        if (Physics.Raycast(_ray, out _raycastHit, Mathf.Infinity, manager.areaLayer)) {
 
             transform.position = new Vector3(_raycastHit.point.x, 0, _raycastHit.point.z);
         }
