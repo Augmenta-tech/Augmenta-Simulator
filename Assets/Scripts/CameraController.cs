@@ -174,9 +174,12 @@ public class CameraController : MonoBehaviour
 
         camera.transform.localPosition = Vector3.up * defaultDistance;
 
-        Vector3 offsetCenter = camera.ScreenToWorldPoint(new Vector3((Screen.width - genUIScrollView.sizeDelta.x) * 0.5f + genUIScrollView.sizeDelta.x,
-                                                            0.5f * Screen.height,
-                                                            defaultDistance));
+        Vector3 offsetCenter = Vector3.zero;
+
+        if (genUIScrollView.gameObject.activeInHierarchy)
+            offsetCenter = camera.ScreenToWorldPoint(new Vector3((Screen.width - genUIScrollView.sizeDelta.x) * 0.5f + genUIScrollView.sizeDelta.x,
+                                                                  0.5f * Screen.height,
+                                                                  defaultDistance));
 
         return new Vector3(-offsetCenter.x, defaultDistance, 0); 
     }
