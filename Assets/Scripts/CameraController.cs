@@ -13,33 +13,48 @@ public class CameraController : MonoBehaviour
     public float dragSpeed = .01f;
     public float rotationSpeed = 1.0f;
 
+    public float defaultDistance = 10.0f;
+
     [Header("UI Control")]
     public GameObject orthoUI;
     public GameObject perspUI;
+    public RectTransform genUIScrollView;
 
     private Vector3 dragMouseOrigin;
     private Vector3 dragCameraLocalPositionOrigin;
     private Quaternion dragRigOrientationOrigin;
 
     private float cameraStartingSize;
-    private Vector3 cameraStartingLocalPosition;
-    private Quaternion rigStartingRotation;
     private float cameraLastPerspectiveDistance;
 
-    private PointManager manager;
+    private PointManager _manager;
+    private PointManager manager {
+        get { if(!_manager)
+                _manager = FindObjectOfType<PointManager>();
+            return _manager;
+        }
+        set { _manager = value; }
+    }
 
-	#region MonoBehaviour Implementation
+    //PlayerPrefs
+    private string cameraOrthographicKey = "CameraOrthographic";
+    private string cameraPositionXKey = "CameraPositionX";
+    private string cameraPositionYKey = "CameraPositionY";
+    private string cameraPositionZKey = "CameraPositionZ";
+    private string cameraOrientationXKey = "CameraOrientationX";
+    private string cameraOrientationYKey = "CameraOrientationY";
+    private string cameraOrientationZKey = "CameraOrientationZ";
+
+    #region MonoBehaviour Implementation
 
     void Start() {
 
-        manager = FindObjectOfType<PointManager>();
-
-        cameraStartingLocalPosition = camera.transform.localPosition;
-        rigStartingRotation = transform.rotation;
         cameraStartingSize = camera.orthographicSize;
 
         ResetCamera();
         SwitchToOrthographic();
+
+        LoadPlayerPrefs();
     }
 
     // Update is called once per frame
@@ -55,6 +70,11 @@ public class CameraController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.P)) {
             SwitchCameraProjection();
         }
+    }
+
+    private void OnDisable() {
+
+        SavePlayerPrefs();
     }
 
     #endregion
@@ -131,19 +151,34 @@ public class CameraController : MonoBehaviour
     /// </summary>
     void ResetCamera() {
 
-        camera.transform.localPosition = cameraStartingLocalPosition;
-        transform.rotation = rigStartingRotation;
-
         if (manager) {
             camera.orthographicSize = manager.height / 1.5f;
         } else {
             camera.orthographicSize = cameraStartingSize;
         }
 
+        camera.transform.localPosition = GetCameraDefaultPosition();
+        transform.rotation = Quaternion.Euler(Vector3.zero);
+
         camera.transform.localPosition = new Vector3(camera.transform.localPosition.x,
-                                            Mathf.Max(manager.width, manager.height) * 0.5f + 1.0f,
+                                            Mathf.Max(manager.width, manager.height) * 0.5f + 5.0f,
                                             camera.transform.localPosition.z);
         cameraLastPerspectiveDistance = camera.transform.localPosition.y;
+    }
+
+    /// <summary>
+    /// Compute default camera position centering the scene
+    /// </summary>
+    /// <returns></returns>
+    Vector3 GetCameraDefaultPosition() {
+
+        camera.transform.localPosition = Vector3.up * defaultDistance;
+
+        Vector3 offsetCenter = camera.ScreenToWorldPoint(new Vector3((Screen.width - genUIScrollView.sizeDelta.x) * 0.5f + genUIScrollView.sizeDelta.x,
+                                                            0.5f * Screen.height,
+                                                            defaultDistance));
+
+        return new Vector3(-offsetCenter.x, defaultDistance, 0); 
     }
 
     /// <summary>
@@ -201,4 +236,48 @@ public class CameraController : MonoBehaviour
         SetDistanceFromAreaSize();
     }
 
+    void LoadPlayerPrefs() {
+
+        //Camera projection type
+        if (PlayerPrefs.HasKey(cameraOrthographicKey)) {
+            if(PlayerPrefs.GetInt(cameraOrthographicKey) == 1) {
+                SwitchToOrthographic();
+            } else {
+                SwitchToPerspective();
+            }
+        }
+
+        //Camera position
+        if(PlayerPrefs.HasKey(cameraPositionXKey) && PlayerPrefs.HasKey(cameraPositionYKey) && PlayerPrefs.HasKey(cameraPositionZKey))
+            camera.transform.localPosition = new Vector3(PlayerPrefs.GetFloat(cameraPositionXKey), 
+                                                         PlayerPrefs.GetFloat(cameraPositionYKey),
+                                                         PlayerPrefs.GetFloat(cameraPositionZKey));
+
+        //Camera orientation
+        if (PlayerPrefs.HasKey(cameraOrientationXKey) && PlayerPrefs.HasKey(cameraOrientationYKey) && PlayerPrefs.HasKey(cameraOrientationZKey))
+            transform.rotation = Quaternion.Euler(PlayerPrefs.GetFloat(cameraOrientationXKey),
+                                                  PlayerPrefs.GetFloat(cameraOrientationYKey),
+                                                  PlayerPrefs.GetFloat(cameraOrientationZKey));
+
+    }
+
+    void SavePlayerPrefs() {
+
+        //Camera projection type
+        if (camera.orthographic) {
+            PlayerPrefs.SetInt(cameraOrthographicKey, 1);
+        } else {
+            PlayerPrefs.SetInt(cameraOrthographicKey, 0);
+        }
+
+        //Camera position
+        PlayerPrefs.SetFloat(cameraPositionXKey, camera.transform.localPosition.x);
+        PlayerPrefs.SetFloat(cameraPositionYKey, camera.transform.localPosition.y);
+        PlayerPrefs.SetFloat(cameraPositionZKey, camera.transform.localPosition.z);
+
+        //Camera orientation
+        PlayerPrefs.SetFloat(cameraOrientationXKey, transform.rotation.eulerAngles.x);
+        PlayerPrefs.SetFloat(cameraOrientationYKey, transform.rotation.eulerAngles.y);
+        PlayerPrefs.SetFloat(cameraOrientationZKey, transform.rotation.eulerAngles.z);
+    }
 }
