@@ -239,6 +239,9 @@ public class CameraController : MonoBehaviour
         SetDistanceFromAreaSize();
     }
 
+    /// <summary>
+    /// Load PlayerPrefs
+    /// </summary>
     void LoadPlayerPrefs() {
 
         //Camera projection type
@@ -264,6 +267,9 @@ public class CameraController : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Save to PlayerPrefs
+    /// </summary>
     void SavePlayerPrefs() {
 
         //Camera projection type
