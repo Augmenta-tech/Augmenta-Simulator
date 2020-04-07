@@ -129,7 +129,7 @@ MeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 83c8b011d724a1e4097c1ba4391323db, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -340,9 +340,11 @@ MonoBehaviour:
   rigidbody: {fileID: 2776326774191610709}
   collider: {fileID: 5069877076318906407}
   velocityThickness: 0.015
+  textScaleMultiplier: 0.005
   manager: {fileID: 0}
-  age: 0
-  pid: 0
+  ageInFrames: 0
+  ageInSeconds: 0
+  id: 0
   oid: 0
   direction: {x: 0, y: 0, z: 0}
   isMovedByMouse: 0
@@ -369,7 +371,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 48
   m_CollisionDetection: 1
 --- !u!65 &5069877076318906407
 BoxCollider:

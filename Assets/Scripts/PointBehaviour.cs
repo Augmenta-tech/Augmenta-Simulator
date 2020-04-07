@@ -16,7 +16,8 @@ public class PointBehaviour : MonoBehaviour {
 
     [Header("Autofilled Parameters")]
     public PointManager manager;
-    public long age;
+    public long ageInFrames;
+    public float ageInSeconds;
 
     private float _speed;
     public float speed {
@@ -26,14 +27,13 @@ public class PointBehaviour : MonoBehaviour {
         }
     }
 
-    public int pid;
+    public int id;
     public int oid;
     public Vector3 direction;
+    public float startingRotationSpeed;
     public bool isMovedByMouse;
     public Color pointColor;
-
     public Vector3 size;
-
     public bool animateSize;
     public float sizeVariationSpeed;
 
@@ -71,8 +71,13 @@ public class PointBehaviour : MonoBehaviour {
 
         velocityVisualizer.localScale = Vector3.zero;
 
+        rigidbody.AddTorque(0, startingRotationSpeed, 0, ForceMode.Impulse);
+
         _timer = 0;
         _relativeTime = 0;
+
+        ageInFrames = 0;
+        ageInSeconds = 0;
 
         UpdatePointSize();
     }
@@ -83,7 +88,7 @@ public class PointBehaviour : MonoBehaviour {
         if (isIncorrectDetection) {
             _timer += Time.deltaTime;
             if (_timer > manager.incorrectDetectionDuration) {
-                manager.RemoveIncorrectPoint(pid);
+                manager.RemoveIncorrectPoint(id);
             }
         }
 
@@ -91,11 +96,12 @@ public class PointBehaviour : MonoBehaviour {
         if (isFlickering) {
             _timer += Time.deltaTime;
             if (_timer > manager.pointFlickeringDuration) {
-                manager.StopFlickering(pid);
+                manager.StopFlickering(id);
             }
         }
 
-        age++;
+        ageInFrames++;
+        ageInSeconds += Time.deltaTime;
 
         //Update size
         UpdatePointSize();
@@ -104,7 +110,7 @@ public class PointBehaviour : MonoBehaviour {
         UpdatePointPosition();
 
         //Udpate text
-        pointInfoText.text = "PID : " + pid + '\n' + '\n' + "OID : " + oid;
+        pointInfoText.text = "ID : " + id + '\n' + '\n' + "OID : " + oid;
     }
 
     private void FixedUpdate() {
@@ -153,9 +159,9 @@ public class PointBehaviour : MonoBehaviour {
         if (animateSize) {
 
             _relativeTime += Time.deltaTime * sizeVariationSpeed;
-            size.x = Mathf.Lerp(manager.minPointSize.x, manager.maxPointSize.x, Mathf.PerlinNoise(pid * 10, _relativeTime));
-            size.y = Mathf.Lerp(manager.minPointSize.y, manager.maxPointSize.y, Mathf.PerlinNoise(pid * 20, _relativeTime));
-            size.z = Mathf.Lerp(manager.minPointSize.z, manager.maxPointSize.z, Mathf.PerlinNoise(pid * 30, _relativeTime));
+            size.x = Mathf.Lerp(manager.minPointSize.x, manager.maxPointSize.x, Mathf.PerlinNoise(id * 10, _relativeTime));
+            size.y = Mathf.Lerp(manager.minPointSize.y, manager.maxPointSize.y, Mathf.PerlinNoise(id * 20, _relativeTime));
+            size.z = Mathf.Lerp(manager.minPointSize.z, manager.maxPointSize.z, Mathf.PerlinNoise(id * 30, _relativeTime));
 
         }
 
@@ -170,8 +176,8 @@ public class PointBehaviour : MonoBehaviour {
     private void UpdatePointPosition() {
 
         Vector3 newPos = transform.position
-                        + (Mathf.PerlinNoise(pid * 15, Time.time * movementNoiseFrequency) - 0.5f) * 2.0f * movementNoiseAmplitude * Vector3.right
-                        + (Mathf.PerlinNoise(pid * 25, Time.time * movementNoiseFrequency) - 0.5f) * 2.0f * movementNoiseAmplitude * Vector3.forward;
+                        + (Mathf.PerlinNoise(id * 15, Time.time * movementNoiseFrequency) - 0.5f) * 2.0f * movementNoiseAmplitude * Vector3.right
+                        + (Mathf.PerlinNoise(id * 25, Time.time * movementNoiseFrequency) - 0.5f) * 2.0f * movementNoiseAmplitude * Vector3.forward;
 
         newPos.x = Mathf.Clamp(newPos.x, -(manager.width + size.x) * 0.5f, (manager.width - size.x) * 0.5f);
         newPos.z = Mathf.Clamp(newPos.z, -(manager.height + size.y) * 0.5f, (manager.height - size.y) * 0.5f);

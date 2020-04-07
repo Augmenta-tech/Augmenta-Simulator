@@ -4,21 +4,22 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+using UnityOSC;
+
+public enum AugmentaMessageType
+{
+    SceneUpdated,
+    AugmentaObjectEnter,
+    AugmentaObjectUpdate,
+    AugmentaObjectLeave
+}
+
 public class PointManager : MonoBehaviour {
 
     [Header("Raycast Settings")]
     public new Camera camera;
     public LayerMask areaLayer;
     public LayerMask pointsLayer;
-
-    [Header("Output settings")]
-    public List<string> protocolVersions;
-
-    private string _protocolVersion = "2";
-    public string protocolVersion {
-        get { return _protocolVersion; }
-        set { _protocolVersion = value; }
-    }
 
     [Header("Area settings")]
     private float _width = 5;
@@ -62,7 +63,6 @@ public class PointManager : MonoBehaviour {
 
     public int pointsCount {
         get { return _pointsCount; }
-        set { }
     }
     private int _pointsCount;
 
@@ -88,6 +88,24 @@ public class PointManager : MonoBehaviour {
 
             foreach (var obj in _flickeringPoints)
                 obj.Value.GetComponent<PointBehaviour>().speed = speed;
+        }
+    }
+
+    private float _startingRotationSpeed = 0;
+    public float startingRotationSpeed {
+        get { return _startingRotationSpeed; }
+        set {
+            _startingRotationSpeed = value;
+            if (instantiatedPoints == null) return;
+
+            foreach (var obj in instantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().startingRotationSpeed = startingRotationSpeed;
+
+            foreach (var obj in _incorrectInstantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().startingRotationSpeed = startingRotationSpeed;
+
+            foreach (var obj in _flickeringPoints)
+                obj.Value.GetComponent<PointBehaviour>().startingRotationSpeed = startingRotationSpeed;
         }
     }
 
@@ -202,7 +220,7 @@ public class PointManager : MonoBehaviour {
     private CameraController cameraController;
 
     private int _frameCounter;
-    private int _highestPid;
+    private int _highestId;
 
     private GameObject _cursorPoint;
     private Ray _ray;
@@ -243,14 +261,14 @@ public class PointManager : MonoBehaviour {
         CreateFlickeringPoints();
 
         //Send Augmenta scene message
-        SendSceneUpdated();
+        SendAugmentaMessage(AugmentaMessageType.SceneUpdated);
 
-        //Send Augmenta persons messages
+        //Send Augmenta persons update messages
         foreach (var point in instantiatedPoints)
-            SendPersonUpdated(point.Value);
+            SendAugmentaMessage(AugmentaMessageType.AugmentaObjectUpdate, point.Value);
 
         foreach (var point in _incorrectInstantiatedPoints)
-            SendPersonUpdated(point.Value);
+            SendAugmentaMessage(AugmentaMessageType.AugmentaObjectUpdate, point.Value);
     }
 
     public void OnMouseDrag() {
@@ -271,7 +289,7 @@ public class PointManager : MonoBehaviour {
         _incorrectInstantiatedPoints = new Dictionary<int, GameObject>();
         _flickeringPoints = new Dictionary<int, GameObject>();
 
-        _highestPid = 0;
+        _highestId = 0;
 
         _initialized = true;
     }
@@ -323,7 +341,7 @@ public class PointManager : MonoBehaviour {
 
             if (Physics.Raycast(_ray, out _raycastHit, Mathf.Infinity, pointsLayer)) {
 
-                RemovePoint(_raycastHit.transform.GetComponent<PointBehaviour>().pid);
+                RemovePoint(_raycastHit.transform.GetComponent<PointBehaviour>().id);
 
             }
         }
@@ -401,7 +419,7 @@ public class PointManager : MonoBehaviour {
 
                 _flickeringPoints.Add(pidToFlicker, instantiatedPoints.ElementAt(flickeringIndex).Value);
 
-                SendPersonLeft(instantiatedPoints[pidToFlicker]);
+                SendAugmentaMessage(AugmentaMessageType.AugmentaObjectLeave, instantiatedPoints[pidToFlicker]);
                 instantiatedPoints.ElementAt(flickeringIndex).Value.GetComponent<PointBehaviour>().StartFlickering();
                 instantiatedPoints.Remove(pidToFlicker);
                 _pointsCount--;
@@ -429,7 +447,7 @@ public class PointManager : MonoBehaviour {
 
         _flickeringPoints.Remove(pid);
         UpdateOIDs();
-        SendPersonEntered(instantiatedPoints[pid]);
+        SendAugmentaMessage(AugmentaMessageType.AugmentaObjectEnter, instantiatedPoints[pid]);
     }
 
     /// <summary>
@@ -469,7 +487,8 @@ public class PointManager : MonoBehaviour {
 		newPoint.transform.parent = transform;
 		newPoint.transform.localPosition = GetNewPointPosition();
 		newPointBehaviour.speed = speed;
-		newPointBehaviour.pid = _highestPid;
+        newPointBehaviour.startingRotationSpeed = startingRotationSpeed;
+		newPointBehaviour.id = _highestId;
 		newPointBehaviour.size = new Vector3(Random.Range(minPointSize.x, maxPointSize.x),
 											 Random.Range(minPointSize.y, maxPointSize.y),
 											 Random.Range(minPointSize.z, maxPointSize.z));
@@ -481,13 +500,13 @@ public class PointManager : MonoBehaviour {
 		newPointBehaviour.isFlickering = false;
 
 		if (isIncorrectDetection) {
-			_incorrectInstantiatedPoints.Add(_highestPid, newPoint);
+			_incorrectInstantiatedPoints.Add(_highestId, newPoint);
 			UpdateOIDs();
-			SendPersonEntered(_incorrectInstantiatedPoints[_highestPid]);
+			SendAugmentaMessage(AugmentaMessageType.AugmentaObjectEnter, _incorrectInstantiatedPoints[_highestId]);
 		} else {
-			instantiatedPoints.Add(_highestPid, newPoint);
+			instantiatedPoints.Add(_highestId, newPoint);
 			UpdateOIDs();
-			SendPersonEntered(instantiatedPoints[_highestPid]);
+			SendAugmentaMessage(AugmentaMessageType.AugmentaObjectEnter, instantiatedPoints[_highestId]);
 		}
 
 		if (isFromCursor) {
@@ -495,7 +514,7 @@ public class PointManager : MonoBehaviour {
 			OnMouseDrag();
 		}
 
-		_highestPid++;
+        _highestId++;
 		_pointsCount++;
 	}
 
@@ -531,7 +550,7 @@ public class PointManager : MonoBehaviour {
         if(pidToRemove == 0 && instantiatedPoints.Count > 1)
             pidToRemove = instantiatedPoints.ElementAt(instantiatedPoints.Count - 2).Key;
 
-		SendPersonLeft(instantiatedPoints[pidToRemove]);
+		SendAugmentaMessage(AugmentaMessageType.AugmentaObjectLeave, instantiatedPoints[pidToRemove]);
 		Destroy(instantiatedPoints[pidToRemove]);
 		instantiatedPoints.Remove(pidToRemove);
 
@@ -547,7 +566,7 @@ public class PointManager : MonoBehaviour {
     public void RemovePoint(int pid) {
 
         if (instantiatedPoints.ContainsKey(pid)) {
-            SendPersonLeft(instantiatedPoints[pid]);
+            SendAugmentaMessage(AugmentaMessageType.AugmentaObjectLeave, instantiatedPoints[pid]);
             Destroy(instantiatedPoints[pid]);
             instantiatedPoints.Remove(pid);
 
@@ -567,7 +586,7 @@ public class PointManager : MonoBehaviour {
     public void RemoveIncorrectPoint(int pid) {
 
         if (_incorrectInstantiatedPoints.ContainsKey(pid)) {
-            SendPersonLeft(_incorrectInstantiatedPoints[pid]);
+            SendAugmentaMessage(AugmentaMessageType.AugmentaObjectLeave, _incorrectInstantiatedPoints[pid]);
             Destroy(_incorrectInstantiatedPoints[pid]);
             _incorrectInstantiatedPoints.Remove(pid);
 
@@ -601,10 +620,10 @@ public class PointManager : MonoBehaviour {
 
     public void RemovePoints() {
         _pointsCount = 0;
-        _highestPid = 0;
+        _highestId = 0;
 
         foreach (var obj in instantiatedPoints) {
-            SendPersonLeft(obj.Value);
+            SendAugmentaMessage(AugmentaMessageType.AugmentaObjectLeave, obj.Value);
             Destroy(obj.Value);
         }
 
@@ -643,6 +662,27 @@ public class PointManager : MonoBehaviour {
 
     #region OSC Message
 
+    /// <summary>
+    /// Send an Augmenta OSC message 
+    /// </summary>
+    /// <param name="messageType"></param>
+    /// <param name="obj"></param>
+    public void SendAugmentaMessage(AugmentaMessageType messageType, GameObject obj = null) {
+
+        if (mute) return;
+
+        switch (ProtocolVersionManager.protocolVersion) {
+            case ProtocolVersionManager.AugmentaProtocolVersion.V1:
+                OSCManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageV1(messageType, obj));
+                break;
+
+            case ProtocolVersionManager.AugmentaProtocolVersion.V2:
+                OSCManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageV2(messageType, obj));
+                break;
+        }
+    }
+
+    #region Protocol V1
     //OSC Protocol V1
 
     /*
@@ -674,92 +714,227 @@ public class PointManager : MonoBehaviour {
         7: scene.depth (int)
     */
 
-    public void SendSceneUpdated()
-    {
-        if (mute) return;
+    /// <summary>
+    /// Create an Augmenta message with protocol V1.
+    /// </summary>
+    /// <param name="messageType"></param>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    private OSCMessage CreateAugmentaMessageV1(AugmentaMessageType messageType, GameObject obj = null) {
 
-        var msg = new UnityOSC.OSCMessage("/au/scene");
+        switch (messageType) {
+            case AugmentaMessageType.AugmentaObjectEnter:
+                return CreateAugmentaObjectMessageV1("/au/personEntered", obj);
+
+            case AugmentaMessageType.AugmentaObjectUpdate:
+                return CreateAugmentaObjectMessageV1("/au/personUpdated", obj);
+
+            case AugmentaMessageType.AugmentaObjectLeave:
+                return CreateAugmentaObjectMessageV1("/au/personWillLeave", obj);
+
+            case AugmentaMessageType.SceneUpdated:
+                return CreateSceneMessageV1("/au/scene");
+
+            default:
+                return null;
+        }
+    }
+
+    /// <summary>
+    /// Create an AugmentaObject message with protocol V1.
+    /// </summary>
+    /// <param name="address"></param>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    private OSCMessage CreateAugmentaObjectMessageV1(string address, GameObject obj) {
+
+        var msg = new OSCMessage(address);
+        var behaviour = obj.GetComponent<PointBehaviour>();
+
+        float pointX = 0.5f + behaviour.transform.position.x / width;
+        float pointY = 0.5f - behaviour.transform.position.z / height;
+
+        msg.Append(behaviour.id);
+        msg.Append(behaviour.oid);
+        msg.Append((int)behaviour.ageInFrames);
+        msg.Append(pointX);
+        msg.Append(pointY);
+        msg.Append(-behaviour.normalizedVelocity.x);
+        msg.Append(-behaviour.normalizedVelocity.z);
+        msg.Append(0.0f);
+        msg.Append(pointX - behaviour.size.x * 0.5f / width);
+        msg.Append(pointY - behaviour.size.y * 0.5f / height);
+        msg.Append(behaviour.size.x / width);
+        msg.Append(behaviour.size.y / height);
+        msg.Append(pointX);
+        msg.Append(pointY);
+        msg.Append(behaviour.size.z);
+
+        return msg;
+    }
+
+    private OSCMessage CreateSceneMessageV1(string address) {
+
+        var msg = new OSCMessage(address);
+
         msg.Append(_frameCounter);
         //Compute point size
         msg.Append(instantiatedPoints.Count * 0.25f * (maxPointSize.x + minPointSize.x) * (maxPointSize.y + minPointSize.y));
         msg.Append(_pointsCount);
         //Compute average motion
         var velocitySum = Vector3.zero;
-        foreach(var element in instantiatedPoints)
-        {
+        foreach (var element in instantiatedPoints) {
             velocitySum += -element.Value.GetComponent<PointBehaviour>().normalizedVelocity;
         }
 
-        if(instantiatedPoints.Count > 0)
+        if (instantiatedPoints.Count > 0)
             velocitySum /= instantiatedPoints.Count;
 
         msg.Append(velocitySum.x);
         msg.Append(velocitySum.z);
-        if(protocolVersion == "1") {
-            msg.Append(Mathf.RoundToInt(width / pixelSize));
-            msg.Append(Mathf.RoundToInt(height / pixelSize));
-        } else if( protocolVersion == "2") {
-            msg.Append(width);
-            msg.Append(height);
-        }
+        msg.Append(Mathf.RoundToInt(width / pixelSize));
+        msg.Append(Mathf.RoundToInt(height / pixelSize));
         msg.Append(100);
 
-        OSCManager.activeManager.SendAugmentaMessage(msg);
-    }
-
-    public void SendPersonEntered(GameObject obj)
-    {
-        SendAugmentaMessage("/au/personEntered", obj);
-    }
-
-    public void SendPersonUpdated(GameObject obj)
-    {
-        SendAugmentaMessage("/au/personUpdated", obj);
-    }
-
-    public void SendPersonLeft(GameObject obj)
-    {
-        SendAugmentaMessage("/au/personWillLeave", obj);
-    }
-
-
-    public void SendAugmentaMessage(string address, GameObject obj)
-    {
-        if (mute) return;
-
-        var msg = new UnityOSC.OSCMessage(address);
-        var behaviour = obj.GetComponent<PointBehaviour>();
-        float pointX = 0.5f + behaviour.transform.position.x / width;
-        float pointY = 0.5f - behaviour.transform.position.z / height;
-
-        msg.Append(behaviour.pid);
-
-        //oid
-        msg.Append(behaviour.oid);
-
-        msg.Append((int)behaviour.age);
-        //centroid
-        msg.Append(pointX);
-        msg.Append(pointY);
-        //Velocity
-        msg.Append(-behaviour.normalizedVelocity.x);
-        msg.Append(-behaviour.normalizedVelocity.z);
-
-        msg.Append(0.0f);
-
-        //Bounding
-        msg.Append(pointX - behaviour.size.x * 0.5f / width);
-        msg.Append(pointY - behaviour.size.y * 0.5f / height);
-
-        msg.Append(behaviour.size.x / width);
-        msg.Append(behaviour.size.y / height);
-
-        msg.Append(pointX);
-        msg.Append(pointY);
-        msg.Append(behaviour.size.z);
-
-        OSCManager.activeManager.SendAugmentaMessage(msg);
+        return msg;
     }
 
     #endregion
+
+    #region Protocol V2
+    /* Augmenta OSC Protocol v2.0
+
+        /object/enter arg0 arg1 ... argN
+        /object/leave arg0 arg1 ... argN
+        /object/update arg0 arg1 ... argN
+
+        where args are : 
+        0: frame(int)     // Frame number
+        1: id(int)                        // id ex : 42th object to enter stage has pid=42
+        2: oid(int)                        // Ordered id ex : if 3 objects on stage, 43th object might have oid=2 
+        3: age(float)                      // Alive time (in s)
+        4: centroid.x(float 0:1)           // Position projected to the ground (normalised)
+        5: centroid.y(float 0:1)               
+        6: velocity.x(float -1:1)           // Speed and direction vector (in unit.s-1) (normalised)
+        7: velocity.y(float -1:1)
+        8: orientation(float 0:360) // With respect to horizontal axis right (0° = (1,0)), rotate counterclockwise
+				                    // Estimation of the object orientation from its rotation and velocity
+        9: boundingRect.x(float 0:1)       // Bounding box center coord (normalised)	
+        10: boundingRect.y(float 0:1)       
+        11: boundingRect.width(float 0:1) // Bounding box width (normalised)
+        12: boundingRect.height(float 0:1)
+        13: boundingRect.rotation(float 0:360) // With respect to horizontal axis right counterclockwise
+        14: height(float)           // Height of the object (in m) (absolute)
+
+        /scene   arg0 arg1 ... argN
+        0: frame (int)                // Frame number
+        1: objectCount (int)                  // Number of objects
+        2: scene.width (float)             // Scene width in 
+        3: scene.height (float)
+       
+        /fusion arg0 arg1 ... argN
+
+        0: videoOut.PixelWidth (int)      // VideoOut width in fusion
+        1: videoOut.PixelHeight (int)
+        2: videoOut.coord.x (int)          // top left coord in fusion
+        3: videoOut.coord.y (int)
+        4: scene.coord.x (float)          // Scene top left coord (0 for node by default)
+        5: scene.coord.y (float)
+
+    */
+
+    /// <summary>
+    /// Create an Augmenta message with protocol V2.
+    /// </summary>
+    /// <param name="messageType"></param>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    private OSCMessage CreateAugmentaMessageV2(AugmentaMessageType messageType, GameObject obj = null) {
+
+        switch (messageType) {
+            case AugmentaMessageType.AugmentaObjectEnter:
+                return CreateAugmentaObjectMessageV2("/object/enter", obj);
+
+            case AugmentaMessageType.AugmentaObjectUpdate:
+                return CreateAugmentaObjectMessageV2("/object/update", obj);
+
+            case AugmentaMessageType.AugmentaObjectLeave:
+                return CreateAugmentaObjectMessageV2("/object/leave", obj);
+
+            case AugmentaMessageType.SceneUpdated:
+                return CreateSceneMessageV2("/scene");
+
+            default:
+                return null;
+        }
+    }
+
+    /// <summary>
+    /// Create an AugmentaObject message with protocol V2.
+    /// </summary>
+    /// <param name="address"></param>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    private OSCMessage CreateAugmentaObjectMessageV2(string address, GameObject obj) {
+
+        var msg = new OSCMessage(address);
+        var behaviour = obj.GetComponent<PointBehaviour>();
+
+        float pointX = 0.5f + behaviour.transform.position.x / width;
+        float pointY = 0.5f - behaviour.transform.position.z / height;
+
+        float rotation = behaviour.size.x > behaviour.size.y ? ClampAngle(behaviour.transform.localRotation.eulerAngles.z) : ClampAngle(behaviour.transform.localRotation.eulerAngles.z + 90.0f);
+
+        msg.Append(_frameCounter);                      // Frame number
+        msg.Append(behaviour.id);                       // id ex : 42th object to enter stage has id=42
+        msg.Append(behaviour.oid);                      // Ordered id ex : if 3 objects on stage, 43th object might have oid=2 
+        msg.Append(behaviour.ageInSeconds);             // Alive time (in s)
+        msg.Append(pointX);                             // Position projected to the ground (normalized)
+        msg.Append(pointY);
+        msg.Append(-behaviour.normalizedVelocity.x);    // Speed and direction vector (in unit.s-1) (normalized)
+        msg.Append(-behaviour.normalizedVelocity.z);
+        msg.Append(0.0f);                               // Orientation with respect to horizontal axis right (0° = (1,0)), rotate counterclockwise. Estimation of the object orientation from its rotation and velocity
+        msg.Append(pointX);                             // Bounding box center coord (normalized)
+        msg.Append(pointY); 
+        msg.Append(behaviour.size.x / width);           // Bounding box width (normalized)
+        msg.Append(behaviour.size.y / height);          
+        msg.Append(rotation);                               // With respect to horizontal axis right (0° = (1,0)), rotate counterclockwise
+        msg.Append(behaviour.size.z);                   // Height of the object (in m) (absolute)
+
+        return msg;
+    }
+
+    /// <summary>
+    /// Create an Augmenta scene message with protocol V2.
+    /// </summary>
+    /// <param name="address"></param>
+    /// <returns></returns>
+    private OSCMessage CreateSceneMessageV2(string address) {
+
+        var msg = new OSCMessage(address);
+
+        msg.Append(_frameCounter);  // Frame number
+        msg.Append(_pointsCount);   // Objects count
+        msg.Append(width);          // Scene width
+        msg.Append(height);         //Scene height
+
+        return msg;
+    }
+
+    #endregion
+
+    #endregion
+
+    /// <summary>
+    /// Clamp angle between 0 and 360 degrees
+    /// </summary>
+    /// <param name="angle"></param>
+    /// <returns></returns>
+    private float ClampAngle(float angle) {
+
+        while (angle < 0)
+            angle += 360.0f;
+
+        return angle % 360.0f;
+    }
 }

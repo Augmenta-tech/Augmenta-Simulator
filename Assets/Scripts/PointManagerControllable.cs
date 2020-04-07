@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,9 +9,6 @@ public class PointManagerControllable : Controllable {
     [Header("OUTPUT SETTINGS")]
     [OSCProperty]
     public bool mute;
-
-    public List<string> protocolVersions;
-    [OSCProperty(TargetList ="protocolVersions", IncludeInPresets = true)] public string protocolVersion;
 
     [Header("SCENE SETTINGS")]
     [OSCProperty]
@@ -30,6 +28,9 @@ public class PointManagerControllable : Controllable {
     [OSCProperty]
     [Range(0.0f, 10.0f)]
     public float speed;
+    [OSCProperty]
+    [Range(-3.0f, 3.0f)]
+    public float startingRotationSpeed;
 
     [Header("POINTS SIZE SETTINGS")]
     [OSCProperty]
@@ -66,20 +67,33 @@ public class PointManagerControllable : Controllable {
     private GameObject pixelSizeInputField;
     private GameObject pixelSizeTooltip;
 
+    public override void Awake() {
+
+        base.Awake();
+    }
+
+    public override void OnEnable() {
+
+        base.OnEnable();
+
+        UpdatePixelSizeDisplay();
+        ProtocolVersionManager.augmentaProtocolVersionChanged += UpdatePixelSizeDisplay;
+    }
+
+    public override void OnDisable() {
+
+        base.OnDisable();
+
+        ProtocolVersionManager.augmentaProtocolVersionChanged -= UpdatePixelSizeDisplay;
+    }
+
     public override void OnUiValueChanged(string name)
     {
         base.OnUiValueChanged(name);
-        ((PointManager)TargetScript).protocolVersion = protocolVersion;
-
-        UpdatePixelSizeDisplay();
     }
 
     public override void OnScriptValueChanged(string name) {
         base.OnScriptValueChanged(name);
-        protocolVersion = ((PointManager)TargetScript).protocolVersion;
-        protocolVersions = ((PointManager)TargetScript).protocolVersions;
-
-        UpdatePixelSizeDisplay();
     }
 
     void InitializePixelSizeObjects() {
@@ -105,7 +119,7 @@ public class PointManagerControllable : Controllable {
         if (!pixelSizeInputField || !pixelSizeTooltip)
             InitializePixelSizeObjects();
 
-        if (protocolVersion == "1") {
+        if (ProtocolVersionManager.protocolVersion == ProtocolVersionManager.AugmentaProtocolVersion.V1) {
             pixelSizeInputField.SetActive(true);
             pixelSizeTooltip.SetActive(true);
         } else {
