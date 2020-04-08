@@ -28,9 +28,6 @@ public class PointManagerControllable : Controllable {
     [OSCProperty]
     [Range(0.0f, 10.0f)]
     public float speed;
-    [OSCProperty]
-    [Range(-3.0f, 3.0f)]
-    public float startingRotationSpeed;
 
     [Header("POINTS SIZE SETTINGS")]
     [OSCProperty]
@@ -47,6 +44,10 @@ public class PointManagerControllable : Controllable {
     public float movementNoiseAmplitude;
     [OSCProperty][Range(0.0f, 20.0f)]
     public float movementNoiseFrequency;
+    [OSCProperty][Range(0.0f, 360.0f)]
+    public float rotationNoiseAmplitude;
+    [OSCProperty][Range(0.0f, 20.0f)]
+    public float rotationNoiseFrequency;
 
     [OSCProperty][Range(0.0f, 1.0f)][Tooltip("False positives")]
     public float incorrectDetectionProbability = 0;

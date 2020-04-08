@@ -91,24 +91,6 @@ public class PointManager : MonoBehaviour {
         }
     }
 
-    private float _startingRotationSpeed = 0;
-    public float startingRotationSpeed {
-        get { return _startingRotationSpeed; }
-        set {
-            _startingRotationSpeed = value;
-            if (instantiatedPoints == null) return;
-
-            foreach (var obj in instantiatedPoints)
-                obj.Value.GetComponent<PointBehaviour>().startingRotationSpeed = startingRotationSpeed;
-
-            foreach (var obj in _incorrectInstantiatedPoints)
-                obj.Value.GetComponent<PointBehaviour>().startingRotationSpeed = startingRotationSpeed;
-
-            foreach (var obj in _flickeringPoints)
-                obj.Value.GetComponent<PointBehaviour>().startingRotationSpeed = startingRotationSpeed;
-        }
-    }
-
     //Points size
 
     private Vector3 _minPointSize = new Vector3(0.3f, 0.3f, 1.5f);
@@ -201,6 +183,42 @@ public class PointManager : MonoBehaviour {
 
             foreach (var obj in _flickeringPoints)
                 obj.Value.GetComponent<PointBehaviour>().movementNoiseFrequency = _movementNoiseFrequency;
+        }
+    }
+
+    private float _rotationNoiseAmplitude = 0;
+    public float rotationNoiseAmplitude {
+        get { return _rotationNoiseAmplitude; }
+        set {
+            _rotationNoiseAmplitude = value;
+            if (instantiatedPoints == null) return;
+
+            foreach (var obj in instantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().rotationNoiseAmplitude = _rotationNoiseAmplitude;
+
+            foreach (var obj in _incorrectInstantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().rotationNoiseAmplitude = _rotationNoiseAmplitude;
+
+            foreach (var obj in _flickeringPoints)
+                obj.Value.GetComponent<PointBehaviour>().rotationNoiseAmplitude = _rotationNoiseAmplitude;
+        }
+    }
+
+    private float _rotationNoiseFrequency = 20;
+    public float rotationNoiseFrequency {
+        get { return _rotationNoiseFrequency; }
+        set {
+            _rotationNoiseFrequency = value;
+            if (instantiatedPoints == null) return;
+
+            foreach (var obj in instantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().rotationNoiseFrequency = _rotationNoiseFrequency;
+
+            foreach (var obj in _incorrectInstantiatedPoints)
+                obj.Value.GetComponent<PointBehaviour>().rotationNoiseFrequency = _rotationNoiseFrequency;
+
+            foreach (var obj in _flickeringPoints)
+                obj.Value.GetComponent<PointBehaviour>().rotationNoiseFrequency = _rotationNoiseFrequency;
         }
     }
 
@@ -487,7 +505,6 @@ public class PointManager : MonoBehaviour {
 		newPoint.transform.parent = transform;
 		newPoint.transform.localPosition = GetNewPointPosition();
 		newPointBehaviour.speed = speed;
-        newPointBehaviour.startingRotationSpeed = startingRotationSpeed;
 		newPointBehaviour.id = _highestId;
 		newPointBehaviour.size = new Vector3(Random.Range(minPointSize.x, maxPointSize.x),
 											 Random.Range(minPointSize.y, maxPointSize.y),
@@ -496,7 +513,9 @@ public class PointManager : MonoBehaviour {
 		newPointBehaviour.sizeVariationSpeed = sizeVariationSpeed;
 		newPointBehaviour.movementNoiseAmplitude = movementNoiseAmplitude;
 		newPointBehaviour.movementNoiseFrequency = movementNoiseFrequency;
-		newPointBehaviour.isIncorrectDetection = isIncorrectDetection;
+        newPointBehaviour.rotationNoiseAmplitude = rotationNoiseAmplitude;
+        newPointBehaviour.rotationNoiseFrequency = rotationNoiseFrequency;
+        newPointBehaviour.isIncorrectDetection = isIncorrectDetection;
 		newPointBehaviour.isFlickering = false;
 
 		if (isIncorrectDetection) {
@@ -883,7 +902,7 @@ public class PointManager : MonoBehaviour {
         float pointX = 0.5f + behaviour.transform.position.x / width;
         float pointY = 0.5f - behaviour.transform.position.z / height;
 
-        float rotation = behaviour.size.x > behaviour.size.y ? ClampAngle(behaviour.transform.localRotation.eulerAngles.z) : ClampAngle(behaviour.transform.localRotation.eulerAngles.z + 90.0f);
+        float rotation = behaviour.size.x > behaviour.size.y ? ClampAngle(behaviour.point.transform.localRotation.eulerAngles.z) : ClampAngle(behaviour.point.transform.localRotation.eulerAngles.z + 90.0f);
 
         msg.Append(_frameCounter);                      // Frame number
         msg.Append(behaviour.id);                       // id ex : 42th object to enter stage has id=42
@@ -898,7 +917,7 @@ public class PointManager : MonoBehaviour {
         msg.Append(pointY); 
         msg.Append(behaviour.size.x / width);           // Bounding box width (normalized)
         msg.Append(behaviour.size.y / height);          
-        msg.Append(rotation);                               // With respect to horizontal axis right (0° = (1,0)), rotate counterclockwise
+        msg.Append(rotation);                           // With respect to horizontal axis right (0° = (1,0)), rotate counterclockwise
         msg.Append(behaviour.size.z);                   // Height of the object (in m) (absolute)
 
         return msg;
