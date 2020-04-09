@@ -106,7 +106,7 @@ public class PointBehaviour : MonoBehaviour {
         pointInfoText.text = "ID : " + id + '\n' + '\n' + "OID : " + oid;
     }
 
-    private void FixedUpdate() {
+    private void LateUpdate() {
 
         ComputeNormalizedVelocity();
         UpdateVelocityVisualizer();
@@ -127,7 +127,7 @@ public class PointBehaviour : MonoBehaviour {
     private void ComputeNormalizedVelocity()
     {
         if (_oldPositionIsValid) {
-            normalizedVelocity = ((transform.position - _oldPosition) / Time.deltaTime);
+            normalizedVelocity = (transform.position - _oldPosition) / Time.deltaTime;
             normalizedVelocity = new Vector3(-normalizedVelocity.x / manager.width, 0, normalizedVelocity.z / manager.height);
         } else { 
             normalizedVelocity = Vector3.zero; 
@@ -175,7 +175,7 @@ public class PointBehaviour : MonoBehaviour {
 
 
         //Move along velocity
-        Vector3 newPos = transform.position + direction * speed * 0.01f;
+        Vector3 newPos = transform.position + direction * speed * Time.deltaTime;
 
         //Add noise
         newPos += (Mathf.PerlinNoise(id * 15, Time.time * movementNoiseFrequency) - 0.5f) * 2.0f * movementNoiseAmplitude * Vector3.right
