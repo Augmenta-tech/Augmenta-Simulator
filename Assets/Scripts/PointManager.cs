@@ -360,7 +360,7 @@ public class PointManager : MonoBehaviour {
             if (Physics.Raycast(_ray, out _raycastHit, Mathf.Infinity, pointsLayer)) {
 
                 RemovePoint(_raycastHit.transform.GetComponent<PointBehaviour>().id);
-
+                _desiredPointsCount--;
             }
         }
 
@@ -531,7 +531,8 @@ public class PointManager : MonoBehaviour {
 		if (isFromCursor) {
 			_cursorPoint = newPoint;
 			OnMouseDrag();
-		}
+            _desiredPointsCount++;
+        }
 
         _highestId++;
 		_pointsCount++;
