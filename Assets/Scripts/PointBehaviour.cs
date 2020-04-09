@@ -72,6 +72,8 @@ public class PointBehaviour : MonoBehaviour {
         ageInSeconds = 0;
 
         UpdatePointSize();
+        UpdatePointPosition();
+        UpdatePointRotation();
     }
 
     private void Update() {
