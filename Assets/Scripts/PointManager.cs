@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
@@ -11,7 +12,10 @@ public enum AugmentaMessageType
     SceneUpdated,
     AugmentaObjectEnter,
     AugmentaObjectUpdate,
-    AugmentaObjectLeave
+    AugmentaObjectLeave,
+    AugmentaObjectEnterExtra,
+    AugmentaObjectUpdateExtra,
+    AugmentaObjectLeaveExtra
 }
 
 public class PointManager : MonoBehaviour {
@@ -415,7 +419,7 @@ public class PointManager : MonoBehaviour {
     /// </summary>
     private void CreateIncorrectDetection() {
 
-        if(Random.Range(0.0f, 1.0f) <= incorrectDetectionProbability) {
+        if(UnityEngine.Random.Range(0.0f, 1.0f) <= incorrectDetectionProbability) {
             InstantiatePoint(true);
         }
     }
@@ -428,9 +432,9 @@ public class PointManager : MonoBehaviour {
         if (instantiatedPoints.Count == 0)
             return;
 
-        if (Random.Range(0.0f, 1.0f) <= pointFlickeringProbability) {
+        if (UnityEngine.Random.Range(0.0f, 1.0f) <= pointFlickeringProbability) {
 
-            int flickeringIndex = Random.Range(0, instantiatedPoints.Count);
+            int flickeringIndex = UnityEngine.Random.Range(0, instantiatedPoints.Count);
 
             try {
                 int pidToFlicker = instantiatedPoints.ElementAt(flickeringIndex).Key;
@@ -499,16 +503,16 @@ public class PointManager : MonoBehaviour {
 
 		PointBehaviour newPointBehaviour = newPoint.GetComponent<PointBehaviour>();
 
-		newPointBehaviour.pointColor = Color.HSVToRGB(Random.value, 0.85f, 0.75f);
+		newPointBehaviour.pointColor = Color.HSVToRGB(UnityEngine.Random.value, 0.85f, 0.75f);
 		newPointBehaviour.manager = this;
 		UpdatePointColor(newPointBehaviour);
 		newPoint.transform.parent = transform;
 		newPoint.transform.localPosition = GetNewPointPosition();
 		newPointBehaviour.speed = speed;
 		newPointBehaviour.id = _highestId;
-		newPointBehaviour.size = new Vector3(Random.Range(minPointSize.x, maxPointSize.x),
-											 Random.Range(minPointSize.y, maxPointSize.y),
-											 Random.Range(minPointSize.z, maxPointSize.z));
+		newPointBehaviour.size = new Vector3(UnityEngine.Random.Range(minPointSize.x, maxPointSize.x),
+                                             UnityEngine.Random.Range(minPointSize.y, maxPointSize.y),
+                                             UnityEngine.Random.Range(minPointSize.z, maxPointSize.z));
 		newPointBehaviour.animateSize = animateSize;
 		newPointBehaviour.sizeVariationSpeed = sizeVariationSpeed;
 		newPointBehaviour.movementNoiseAmplitude = movementNoiseAmplitude;
@@ -544,8 +548,8 @@ public class PointManager : MonoBehaviour {
 	/// <returns></returns>
 	Vector3 GetNewPointPosition() {
 
-        float x = Random.Range(0.0f, 1.0f);
-        float y = Random.Range(0.0f, 1.0f);
+        float x = UnityEngine.Random.Range(0.0f, 1.0f);
+        float y = UnityEngine.Random.Range(0.0f, 1.0f);
         
         if(x >= 0.25f && x < 0.75f) {
             //X is in the center, Y must be on the border
@@ -698,6 +702,9 @@ public class PointManager : MonoBehaviour {
 
             case ProtocolVersionManager.AugmentaProtocolVersion.V2:
                 OSCManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageV2(messageType, obj));
+                if(messageType != AugmentaMessageType.SceneUpdated)
+                    //Send corresponding /extra message
+                    OSCManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageV2((AugmentaMessageType)Enum.Parse(typeof(AugmentaMessageType), messageType.ToString()+"Extra"), obj));
                 break;
         }
     }
@@ -881,6 +888,15 @@ public class PointManager : MonoBehaviour {
             case AugmentaMessageType.AugmentaObjectLeave:
                 return CreateAugmentaObjectMessageV2("/object/leave", obj);
 
+            case AugmentaMessageType.AugmentaObjectEnterExtra:
+                return CreateAugmentaObjectExtraMessageV2("/object/enter/extra", obj);
+
+            case AugmentaMessageType.AugmentaObjectUpdateExtra:
+                return CreateAugmentaObjectExtraMessageV2("/object/update/extra", obj);
+
+            case AugmentaMessageType.AugmentaObjectLeaveExtra:
+                return CreateAugmentaObjectExtraMessageV2("/object/leave/extra", obj);
+
             case AugmentaMessageType.SceneUpdated:
                 return CreateSceneMessageV2("/scene");
 
@@ -920,6 +936,31 @@ public class PointManager : MonoBehaviour {
         msg.Append(behaviour.size.y / height);          
         msg.Append(rotation);                           // With respect to horizontal axis right (0° = (1,0)), rotate counterclockwise
         msg.Append(behaviour.size.z);                   // Height of the object (in m) (absolute)
+
+        return msg;
+    }
+
+    /// <summary>
+    /// Create an AugmentaObjectExtra message with protocol V2.
+    /// </summary>
+    /// <param name="address"></param>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    private OSCMessage CreateAugmentaObjectExtraMessageV2(string address, GameObject obj) {
+
+        var msg = new OSCMessage(address);
+        var behaviour = obj.GetComponent<PointBehaviour>();
+
+        float pointX = 0.5f + behaviour.transform.position.x / width;
+        float pointY = 0.5f - behaviour.transform.position.z / height;
+
+        msg.Append(_frameCounter);                      // Frame number
+        msg.Append(behaviour.id);                       // id ex : 42th object to enter stage has id=42
+        msg.Append(behaviour.oid);                      // Ordered id ex : if 3 objects on stage, 43th object might have oid=2 
+        msg.Append(pointX);                             // Highest point placement (normalized)
+        msg.Append(pointY);
+        msg.Append(Vector3.Distance(camera.transform.position, behaviour.transform.position)); //Sensor distance in meters
+        msg.Append(behaviour.pointColor.grayscale);     // Reflectivity value from lidar sensor
 
         return msg;
     }
