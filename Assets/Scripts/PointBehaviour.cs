@@ -163,6 +163,9 @@ public class PointBehaviour : MonoBehaviour {
 
         }
 
+        //Enforce that width >= height
+        size.x = Mathf.Max(size.x, size.y);
+
         point.transform.localScale = Vector3.one;
         point.transform.localScale = new Vector3(size.x / point.transform.lossyScale.x, size.y / point.transform.lossyScale.y, size.z / point.transform.lossyScale.z);
 

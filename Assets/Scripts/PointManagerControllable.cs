@@ -32,7 +32,7 @@ public class PointManagerControllable : Controllable {
     [Header("POINTS SIZE SETTINGS")]
     [OSCProperty]
     public Vector3 minPointSize;
-    [OSCProperty][Tooltip("in meters")]
+    [OSCProperty][Tooltip("in meters. X will always be >= Y")]
     public Vector3 maxPointSize;
     [OSCProperty]
     public bool animateSize;
