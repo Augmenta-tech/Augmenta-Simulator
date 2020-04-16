@@ -7,10 +7,11 @@ public class PointBehaviour : MonoBehaviour {
     [Header("Parameters to fill")]
     public TextMesh pointInfoText;
     public Transform point;
-    public Transform velocityVisualizer;
+    public Transform speedPivot;
+    public Transform orientationPivot;
     public new Collider collider;
 
-    public float velocityThickness = 0.015f;
+    public float vectorThickness = 0.015f;
     public float textScaleMultiplier = 0.005f;
 
     [Header("Autofilled Parameters")]
@@ -28,7 +29,7 @@ public class PointBehaviour : MonoBehaviour {
     public Vector3 size;
     public bool animateSize;
     public float sizeVariationSpeed;
-
+    public float orientation;
     public Vector3 normalizedVelocity;
 
     public float movementNoiseAmplitude = 0;
@@ -36,6 +37,8 @@ public class PointBehaviour : MonoBehaviour {
 
     public float rotationNoiseAmplitude = 0;
     public float rotationNoiseFrequency = 20;
+
+    public float speedThresholdForOrientation = 1;
 
     public bool isIncorrectDetection = false;
     public bool isFlickering = false;
@@ -48,6 +51,8 @@ public class PointBehaviour : MonoBehaviour {
 
     private float _relativeTime = 0;
     private bool _oldPositionIsValid = false;
+
+    private float speedAngle;
 
 	#region MonoBehaviour Implementation
 
@@ -63,7 +68,8 @@ public class PointBehaviour : MonoBehaviour {
             direction = direction.normalized;
         }
 
-        velocityVisualizer.localScale = Vector3.zero;
+        speedPivot.localScale = Vector3.zero;
+        orientationPivot.localScale = new Vector3(vectorThickness, 0.3f, vectorThickness);
 
         _timer = 0;
         _relativeTime = 0;
@@ -109,7 +115,10 @@ public class PointBehaviour : MonoBehaviour {
     private void LateUpdate() {
 
         ComputeNormalizedVelocity();
-        UpdateVelocityVisualizer();
+        UpdateSpeedVisualization();
+
+        ComputePointOrientation();
+        UpdateOrientationVisualization();
 
     }
 
@@ -136,15 +145,28 @@ public class PointBehaviour : MonoBehaviour {
         _oldPositionIsValid = true;
     }
 
-    private void UpdateVelocityVisualizer() {
+    private void UpdateSpeedVisualization() {
 
-        float angle = Mathf.Atan2(normalizedVelocity.z, -normalizedVelocity.x) * Mathf.Rad2Deg;
-        if (float.IsNaN(angle))
-            return;
+        speedPivot.localScale = new Vector3(vectorThickness, normalizedVelocity.magnitude, vectorThickness);
+        speedPivot.localPosition = new Vector3(0, 0, -(size.z + vectorThickness) * 0.5f);
 
-        velocityVisualizer.localPosition = new Vector3(0, 0, -(size.z + velocityThickness) * 0.5f);
-        velocityVisualizer.localRotation = Quaternion.Euler(0, 0, angle - 90);
-        velocityVisualizer.localScale = new Vector3(velocityThickness, normalizedVelocity.magnitude, velocityThickness);
+        if (normalizedVelocity.magnitude != 0) {
+
+            speedAngle = Mathf.Atan2(normalizedVelocity.z, -normalizedVelocity.x) * Mathf.Rad2Deg;
+            speedPivot.localRotation = Quaternion.Euler(0, 0, speedAngle - 90);
+        }
+        
+    }
+
+    private void ComputePointOrientation() {
+
+        orientation = Mathf.Lerp(point.transform.localRotation.eulerAngles.z, speedAngle, normalizedVelocity.magnitude * 5.0f / speedThresholdForOrientation);
+    }
+
+    private void UpdateOrientationVisualization() {
+
+        orientationPivot.localPosition = new Vector3(0, 0, -(size.z + vectorThickness) * 0.5f);
+        orientationPivot.localRotation = Quaternion.Euler(0, 0, orientation - 90);
     }
 
     public void UpdatePointColor(Color color)
@@ -221,13 +243,15 @@ public class PointBehaviour : MonoBehaviour {
 
         pointInfoText.gameObject.SetActive(false);
         point.gameObject.SetActive(false);
-        velocityVisualizer.gameObject.SetActive(false);
+        speedPivot.gameObject.SetActive(false);
+        orientationPivot.gameObject.SetActive(false);
     }
 
     public void ShowPoint() {
 
         pointInfoText.gameObject.SetActive(true);
         point.gameObject.SetActive(true);
-        velocityVisualizer.gameObject.SetActive(true);
+        speedPivot.gameObject.SetActive(true);
+        orientationPivot.gameObject.SetActive(true);
     }
 }

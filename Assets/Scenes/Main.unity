@@ -635,13 +635,14 @@ MonoBehaviour:
   pointsCount: 0
   desiredPointsCount: 0
   speed: 0
-  startingRotationSpeed: 0
   minPointSize: {x: 0, y: 0, z: 0}
   maxPointSize: {x: 0, y: 0, z: 0}
   animateSize: 0
   sizeVariationSpeed: 0
   movementNoiseAmplitude: 0
   movementNoiseFrequency: 0
+  rotationNoiseAmplitude: 0
+  rotationNoiseFrequency: 0
   incorrectDetectionProbability: 0
   incorrectDetectionDuration: 0.1
   pointFlickeringProbability: 0
