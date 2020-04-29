@@ -10,6 +10,10 @@ public class PointBehaviour : MonoBehaviour {
     public Transform speedPivot;
     public Transform orientationPivot;
     public new Collider collider;
+    public Material velocityMaterial;
+    public Material orientationMaterial;
+    public Color velocityColor;
+    public Color orientationColor;
 
     public float vectorThickness = 0.015f;
     public float textScaleMultiplier = 0.005f;
@@ -253,5 +257,19 @@ public class PointBehaviour : MonoBehaviour {
         point.gameObject.SetActive(true);
         speedPivot.gameObject.SetActive(true);
         orientationPivot.gameObject.SetActive(true);
+    }
+
+    public void MutePoint(bool mute) {
+
+        if (mute) {
+            UpdatePointColor(Color.gray);
+            velocityMaterial.SetColor("_BorderColor", Color.gray);
+            orientationMaterial.SetColor("_BorderColor", Color.gray);
+        } else {
+            UpdatePointColor(pointColor);
+            velocityMaterial.SetColor("_BorderColor", velocityColor);
+            orientationMaterial.SetColor("_BorderColor", orientationColor);
+        }
+
     }
 }

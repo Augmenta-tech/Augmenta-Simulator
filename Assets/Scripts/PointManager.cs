@@ -55,13 +55,13 @@ public class PointManager : MonoBehaviour {
             if (instantiatedPoints == null) return;
 
             foreach (var point in instantiatedPoints.Values)
-                UpdatePointColor(point.GetComponent<PointBehaviour>());
+                point.GetComponent<PointBehaviour>().MutePoint(_mute);
 
             foreach (var point in _incorrectInstantiatedPoints.Values)
-                UpdatePointColor(point.GetComponent<PointBehaviour>());
+                point.GetComponent<PointBehaviour>().MutePoint(_mute);
 
             foreach (var point in _flickeringPoints.Values)
-                UpdatePointColor(point.GetComponent<PointBehaviour>());
+                point.GetComponent<PointBehaviour>().MutePoint(_mute);
         }
     }
 
@@ -375,17 +375,6 @@ public class PointManager : MonoBehaviour {
 	#region Points Handling
 
     /// <summary>
-    /// Update point color
-    /// </summary>
-    /// <param name="target"></param>
-	public void UpdatePointColor(PointBehaviour target) {
-        if (mute)
-            target.UpdatePointColor(Color.gray);
-        else
-            target.UpdatePointColor(target.pointColor);
-    }
-
-    /// <summary>
     /// Update points size to match min/max size criteria
     /// </summary>
     void UpdatePointsSize() {
@@ -505,7 +494,7 @@ public class PointManager : MonoBehaviour {
 
 		newPointBehaviour.pointColor = Color.HSVToRGB(UnityEngine.Random.value, 0.85f, 0.75f);
 		newPointBehaviour.manager = this;
-		UpdatePointColor(newPointBehaviour);
+        newPointBehaviour.UpdatePointColor(mute ? Color.gray : newPointBehaviour.pointColor);
 		newPoint.transform.parent = transform;
 		newPoint.transform.localPosition = GetNewPointPosition();
 		newPointBehaviour.speed = speed;
