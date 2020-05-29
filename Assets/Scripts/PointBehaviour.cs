@@ -57,6 +57,7 @@ public class PointBehaviour : MonoBehaviour {
     private bool _oldPositionIsValid = false;
 
     private float speedAngle;
+    private float previousRotationAngle = 0;
 
 	#region MonoBehaviour Implementation
 
@@ -81,9 +82,7 @@ public class PointBehaviour : MonoBehaviour {
         ageInFrames = 0;
         ageInSeconds = 0;
 
-        UpdatePointSize();
-        UpdatePointPosition();
-        UpdatePointRotation();
+        UpdatePoint();
     }
 
     private void Update() {
@@ -108,9 +107,7 @@ public class PointBehaviour : MonoBehaviour {
         ageInSeconds += Time.deltaTime;
 
         //Update point
-        UpdatePointSize();
-        UpdatePointPosition();
-        UpdatePointRotation();
+        UpdatePoint();
 
         //Udpate text
         pointInfoText.text = "ID : " + id + '\n' + '\n' + "OID : " + oid;
@@ -133,6 +130,13 @@ public class PointBehaviour : MonoBehaviour {
 
             transform.position = new Vector3(_raycastHit.point.x, 0, _raycastHit.point.z);
         }
+    }
+
+    public void UpdatePoint() {
+
+        UpdatePointSize();
+        UpdatePointPosition();
+        UpdatePointRotation();
     }
 
     #endregion
@@ -228,12 +232,16 @@ public class PointBehaviour : MonoBehaviour {
 
         //Angle from displacement
         Vector3 displacement = transform.position - _oldPosition;
+
         float angle = -Mathf.Atan2(displacement.x, displacement.z) * Mathf.Rad2Deg;
 
         //Add noise
         angle += (Mathf.PerlinNoise(id * 35, Time.time * rotationNoiseFrequency) - 0.5f) * 2.0f * rotationNoiseAmplitude;
 
-        point.transform.localRotation = Quaternion.Euler(transform.localRotation.x, transform.localRotation.y, angle);
+        if(Mathf.Abs(previousRotationAngle - angle) < 5)
+            point.transform.localRotation = Quaternion.Euler(transform.localRotation.x, transform.localRotation.y, angle);
+
+        previousRotationAngle = angle;
     }
 
     public void StartFlickering() {

@@ -32,6 +32,7 @@ public class OSCManager : MonoBehaviour
     private List<string> _outputsToDelete;
 
     private OSCManagerControllable _controllable;
+    private NodeManager _nodeManager;
 
     private bool _initialized = false;
 
@@ -45,6 +46,9 @@ public class OSCManager : MonoBehaviour
 
     private void Update() {
 
+        if (!_initialized)
+            Initialize();
+
         UpdateOutputsTimers();
     }
 
@@ -57,6 +61,7 @@ public class OSCManager : MonoBehaviour
         _outputsToDelete = new List<string>();
 
         _controllable = FindObjectOfType<OSCManagerControllable>();
+        _nodeManager = FindObjectOfType<NodeManager>();
 
         CreateYoServer();
         CreateAugmentaClient();
@@ -227,20 +232,10 @@ public class OSCManager : MonoBehaviour
                 string infoIP = message.Data[0].ToString();
                 int infoPort = (int)message.Data[1];
 
-                OSCMessage infoMessage = new OSCMessage("/info");
-
-                infoMessage.Append(NetworkManager.GetIpv4());
-                infoMessage.Append("Augmenta Simulator");
-                infoMessage.Append(NetworkManager.GetMacAddress());
-                infoMessage.Append(Application.version);
-                infoMessage.Append(_controllable.currentPreset != "" ? _controllable.currentPreset : "None");
-                infoMessage.Append("Simulator");
-                infoMessage.Append("Simulated");
-
                 if (debug)
                     Debug.Log("Answering info from " + infoIP + ":" + infoPort + " with " + NetworkManager.GetIpv4() + " Augmenta Simulator " + NetworkManager.GetMacAddress() + " " + Application.version + " " + _controllable.currentPreset + " Simulator Simulated"); ;
 
-                OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+                SendInfoMessages(infoIP, infoPort);
                 break;
 
             case "heartbeat":
@@ -270,5 +265,128 @@ public class OSCManager : MonoBehaviour
     string GetIDFromIPAndPort(string IP, int port) {
 
         return string.Join(":", new string[] { IP, port.ToString() });
+    }
+
+    void SendInfoMessages(string infoIP, int infoPort) {
+
+        switch (ProtocolVersionManager.protocolVersion) {
+            case ProtocolVersionManager.AugmentaProtocolVersion.V1:
+                SendInfoMessagesV1(infoIP, infoPort);
+                break;
+            case ProtocolVersionManager.AugmentaProtocolVersion.V2:
+                SendInfoMessagesV2(infoIP, infoPort);
+                break;
+        }
+
+    }
+
+    void SendInfoMessagesV1(string infoIP, int infoPort) {
+
+        OSCMessage infoMessage = new OSCMessage("/info");
+
+        infoMessage.Append(NetworkManager.GetIpv4());
+        infoMessage.Append("Augmenta Simulator");
+        infoMessage.Append(NetworkManager.GetMacAddress());
+        infoMessage.Append(Application.version);
+        infoMessage.Append(_controllable.currentPreset != "" ? _controllable.currentPreset : "None");
+        infoMessage.Append("Simulator");
+        infoMessage.Append("Simulated");
+
+        OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+    }
+
+    void SendInfoMessagesV2(string infoIP, int infoPort) {
+
+        //Fusion 
+        OSCMessage infoMessage = new OSCMessage("/info/name");
+        infoMessage.Append("Augmenta Simulator");
+        OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+        infoMessage = new OSCMessage("/info/type");
+        infoMessage.Append("Simulator");
+        OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+        infoMessage = new OSCMessage("/info/mac");
+        infoMessage.Append(NetworkManager.GetMacAddress());
+        OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+        infoMessage = new OSCMessage("/info/ip");
+        infoMessage.Append(NetworkManager.GetIpv4());
+        OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+        infoMessage = new OSCMessage("/info/version");
+        infoMessage.Append(Application.version);
+        OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+        infoMessage = new OSCMessage("/info/currentFile");
+        infoMessage.Append(_controllable.currentPreset != "" ? _controllable.currentPreset : "None");
+        OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+        infoMessage = new OSCMessage("/info/protocolAvailable");
+        infoMessage.Append("OSC");
+        infoMessage.Append("1");
+        infoMessage.Append("2");
+        OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+        if (_nodeManager) {
+            //Node
+            infoMessage = new OSCMessage("/info/sensor/type");
+            infoMessage.Append(_nodeManager.sensorType);
+            OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+            infoMessage = new OSCMessage("/info/sensor/brand");
+            infoMessage.Append(_nodeManager.sensorBrand);
+            OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+            infoMessage = new OSCMessage("/info/sensor/name");
+            infoMessage.Append(_nodeManager.sensorName);
+            OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+            infoMessage = new OSCMessage("/info/sensor/hFov");
+            infoMessage.Append(_nodeManager.sensorHFOV);
+            OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+            infoMessage = new OSCMessage("/info/sensor/vFov");
+            infoMessage.Append(_nodeManager.sensorVFOV);
+            OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+            infoMessage = new OSCMessage("/info/floorMode");
+            infoMessage.Append(_nodeManager.floorMode);
+            OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+            infoMessage = new OSCMessage("/info/floorState");
+            infoMessage.Append(_nodeManager.floorState);
+            OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+            infoMessage = new OSCMessage("/info/backgroundMode");
+            infoMessage.Append(_nodeManager.backgroundMode);
+            OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+            infoMessage = new OSCMessage("/info/debug/pipeName");
+            infoMessage.Append(_nodeManager.debugPipeName);
+            OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+            infoMessage = new OSCMessage("/info/debug/sensor");
+            infoMessage.Append(_nodeManager.debugSensor);
+            OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+            infoMessage = new OSCMessage("/info/debug/videoPipe");
+            infoMessage.Append(_nodeManager.debugVideoPipe);
+            OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+            infoMessage = new OSCMessage("/info/debug/trackingPipe");
+            infoMessage.Append(_nodeManager.debugTrackingPipe);
+            OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+            infoMessage = new OSCMessage("/info/debug/pid");
+            infoMessage.Append(_nodeManager.debugPID);
+            OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+
+            infoMessage = new OSCMessage("/info/tags");
+            foreach(string tag in _nodeManager.tagsList)
+                infoMessage.Append(tag);
+            OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
+        }
+
     }
 }

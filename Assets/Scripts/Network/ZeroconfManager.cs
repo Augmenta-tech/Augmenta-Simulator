@@ -7,11 +7,26 @@ public class ZeroconfManager : MonoBehaviour
 {
     private RegisterService service;
 
+    private string _name = "name";
+
     void OnEnable() {
+
+        CreateService();
+    }
+
+    void OnDisable() {
+
+        DestroyService();
+    }
+
+    void CreateService() {
+
+        if (!FindObjectOfType<NodeManager>())
+            _name = "Augmenta Simulator";
 
         //_osc._udp.
         service = new RegisterService();
-        service.Name = "Augmenta Simulator";
+        service.Name = _name;
         service.RegType = "_osc._udp";
         service.ReplyDomain = "local.";
         service.UPort = 36278;
@@ -19,9 +34,18 @@ public class ZeroconfManager : MonoBehaviour
         service.Register();
     }
 
-    void OnDisable() {
+    void DestroyService() {
 
         service.Dispose();
+    }
 
+    public void UpdateName(string newName) {
+
+        _name = newName;
+
+        if(service != null)
+            DestroyService();
+
+        CreateService();
     }
 }
