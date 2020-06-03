@@ -237,6 +237,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4c8e32f3cdcfe04caee8594416a7f5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  yoVersion: 2
   connectionTimeout: 60
   debug: 0
 --- !u!4 &18100216
@@ -277,6 +278,7 @@ MonoBehaviour:
   hasPresets: 0
   currentPreset: 
   presetList: []
+  yoVersion: 0
   outputPort: 0
   outputIP: 
   connectionTimeout: 0

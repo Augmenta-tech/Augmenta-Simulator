@@ -9,6 +9,9 @@ public class OSCManager : MonoBehaviour
 {
     public static OSCManager activeManager;
 
+    [Header("Yo Version")]
+    public int yoVersion = 2;
+
     [Header("Output settings")]
     private int _outputPort = 12000;
     public int outputPort {
@@ -173,40 +176,28 @@ public class OSCManager : MonoBehaviour
 
             case "connect":
 
-                //Answer connect
-                string outputIP = message.Data[1].ToString();
-                int outputPort = (int)message.Data[2];
+                switch (yoVersion) {
+                    case 1:
+                        HandleConnectV1(message);
+                        break;
 
-                string outputID = GetIDFromIPAndPort(outputIP, outputPort);
-
-                //Create output client
-                if (!OSCMaster.Clients.ContainsKey(outputID))
-                    OSCMaster.CreateClient(outputID, outputIP, outputPort);
-
-                if(!_augmentaOutputs.ContainsKey(outputID))
-                    _augmentaOutputs.Add(outputID, 0);
-
-                if (debug)
-                    Debug.Log("Created output " + outputID);
+                    case 2:
+                        HandleConnectV2(message);
+                        break;
+                }
 
                 break;
 
             case "disconnect":
 
-                //Answer disconnect
-                string disconnectIP = message.Data[0].ToString();
-                int disconnectPort = (int)message.Data[1];
+                switch (yoVersion) {
+                    case 1:
+                        HandleDisconnectV1(message);
+                        break;
 
-                string disconnectID = GetIDFromIPAndPort(disconnectIP, disconnectPort);
-
-                if(OSCMaster.Clients.ContainsKey(disconnectID)) {
-
-                    OSCMaster.RemoveClient(disconnectID);
-
-                    if (debug)
-                        Debug.Log("Removed output " + disconnectID);
-                                                             
-                    _augmentaOutputs.Remove(disconnectID);
+                    case 2:
+                        HandleDisconnectV2(message);
+                        break;
                 }
 
                 break;
@@ -240,17 +231,15 @@ public class OSCManager : MonoBehaviour
 
             case "heartbeat":
 
-                //Answer heartbeat
-                string heartbeatIP = message.Data[1].ToString();
-                int heartbeatPort = (int)message.Data[2];
+                switch (yoVersion) {
+                    case 1:
+                        HandleHeartbeatV1(message);
+                        break;
 
-                string heartbeatID = GetIDFromIPAndPort(heartbeatIP, heartbeatPort);
-
-                if (debug)
-                    Debug.Log("Received heartbeat for " + heartbeatID);
-
-                if (_augmentaOutputs.ContainsKey(heartbeatID))
-                    _augmentaOutputs[heartbeatID] = 0;
+                    case 2:
+                        HandleHeartbeatV2(message);
+                        break;
+                }
 
                 break;
         }
@@ -265,6 +254,133 @@ public class OSCManager : MonoBehaviour
     string GetIDFromIPAndPort(string IP, int port) {
 
         return string.Join(":", new string[] { IP, port.ToString() });
+    }
+
+    void HandleConnectV1(OSCMessage message) {
+
+        //Answer connect
+        string outputIP = message.Data[1].ToString();
+        int outputPort = (int)message.Data[2];
+
+        string outputID = GetIDFromIPAndPort(outputIP, outputPort);
+
+        //Create output client
+        if (!OSCMaster.Clients.ContainsKey(outputID))
+            OSCMaster.CreateClient(outputID, outputIP, outputPort);
+
+        if (!_augmentaOutputs.ContainsKey(outputID))
+            _augmentaOutputs.Add(outputID, 0);
+
+        if (debug)
+            Debug.Log("Created output " + outputID);
+    }
+
+    void HandleConnectV2(OSCMessage message) {
+
+        //Answer connect
+        string outputIP = message.Data[0].ToString();
+        int outputPort = (int)message.Data[1];
+        string protocolType = message.Data[2].ToString();
+        int version = (int)message.Data[3];
+
+        if(protocolType != "osc" && protocolType != "OSC") {
+            if (debug)
+                Debug.Log("Can only create osc protocol type.");
+
+            return;
+        }
+
+        string outputID = GetIDFromIPAndPort(outputIP, outputPort);
+
+        //Create output client
+        if (!OSCMaster.Clients.ContainsKey(outputID))
+            OSCMaster.CreateClient(outputID, outputIP, outputPort);
+
+        if (!_augmentaOutputs.ContainsKey(outputID))
+            _augmentaOutputs.Add(outputID, 0);
+
+        if (debug)
+            Debug.Log("Created output " + outputID);
+    }
+
+    void HandleDisconnectV1(OSCMessage message) {
+
+        //Answer disconnect
+        string disconnectIP = message.Data[0].ToString();
+        int disconnectPort = (int)message.Data[1];
+
+        string disconnectID = GetIDFromIPAndPort(disconnectIP, disconnectPort);
+
+        if (OSCMaster.Clients.ContainsKey(disconnectID)) {
+
+            OSCMaster.RemoveClient(disconnectID);
+
+            if (debug)
+                Debug.Log("Removed output " + disconnectID);
+
+            _augmentaOutputs.Remove(disconnectID);
+        }
+    }
+
+    void HandleDisconnectV2(OSCMessage message) {
+
+        //Answer disconnect
+        string disconnectIP = message.Data[0].ToString();
+        int disconnectPort = (int)message.Data[1];
+        string protocolType = message.Data[2].ToString();
+        int version = (int)message.Data[3];
+
+        string disconnectID = GetIDFromIPAndPort(disconnectIP, disconnectPort);
+
+        if (OSCMaster.Clients.ContainsKey(disconnectID)) {
+
+            OSCMaster.RemoveClient(disconnectID);
+
+            if (debug)
+                Debug.Log("Removed output " + disconnectID);
+
+            _augmentaOutputs.Remove(disconnectID);
+        }
+    }
+
+    void HandleHeartbeatV1(OSCMessage message) {
+
+        //Answer heartbeat
+        string heartbeatIP = message.Data[1].ToString();
+        int heartbeatPort = (int)message.Data[2];
+
+        string heartbeatID = GetIDFromIPAndPort(heartbeatIP, heartbeatPort);
+
+        if (debug)
+            Debug.Log("Received heartbeat for " + heartbeatID);
+
+        if (_augmentaOutputs.ContainsKey(heartbeatID))
+            _augmentaOutputs[heartbeatID] = 0;
+    }
+
+    void HandleHeartbeatV2(OSCMessage message) {
+
+        //Answer heartbeat
+        string heartbeatIP = message.Data[0].ToString();
+        int heartbeatPort = (int)message.Data[1];
+        string protocolType = message.Data[2].ToString();
+        int version = (int)message.Data[3];
+
+        if (protocolType != "osc" && protocolType != "OSC") {
+            if (debug)
+                Debug.Log("Can only send osc protocol type.");
+
+            return;
+        }
+
+        string heartbeatID = GetIDFromIPAndPort(heartbeatIP, heartbeatPort);
+
+        if (debug)
+            Debug.Log("Received heartbeat for " + heartbeatID);
+
+        if (_augmentaOutputs.ContainsKey(heartbeatID))
+            _augmentaOutputs[heartbeatID] = 0;
+
     }
 
     void SendInfoMessages(string infoIP, int infoPort) {
