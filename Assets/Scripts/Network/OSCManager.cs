@@ -415,11 +415,19 @@ public class OSCManager : MonoBehaviour
 
         //Fusion 
         OSCMessage infoMessage = new OSCMessage("/info/name");
-        infoMessage.Append("Augmenta Simulator");
+        if (_nodeManager) {
+            infoMessage.Append(_nodeManager.nodeName);
+        } else {
+            infoMessage.Append("Augmenta Simulator");
+        }
         OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
 
         infoMessage = new OSCMessage("/info/type");
-        infoMessage.Append("Simulator");
+        if (_nodeManager) {
+            infoMessage.Append("Node");
+        } else {
+            infoMessage.Append("Simulator");
+        }
         OSCMaster.SendMessage(infoMessage, infoIP, infoPort);
 
         infoMessage = new OSCMessage("/info/mac");
