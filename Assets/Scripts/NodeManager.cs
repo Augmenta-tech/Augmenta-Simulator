@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class NodeManager : MonoBehaviour
@@ -13,8 +14,6 @@ public class NodeManager : MonoBehaviour
     private string _nodeName = "node";
 
     public List<string> tagsList = new List<string>();
-    [HideInInspector] public string currentTags;
-    [HideInInspector] public string newTag;
 
     public string sensorType = "DepthCamera";
     public string sensorBrand = "Orbbec";
@@ -37,16 +36,21 @@ public class NodeManager : MonoBehaviour
         UpdateName();
     }
 
-    void UpdateName() {
-
-        zeroconfManager.UpdateName(_nodeName);
+    void UpdateName() 
+    {
+        zeroconfManager.Setup(_nodeName, getZeroconfKeys());
     }
 
-    public void UpdateTagsList() {
+    Dictionary<string, string> getZeroconfKeys()
+    {
+        Dictionary<string, string> keys = new Dictionary<string, string>();
+        keys.Add("mac", NetworkManager.GetMacAddress());
+        keys.Add("tags", string.Join(",", tagsList));
+        return keys;
+    }
 
-        currentTags = "";
-
-        foreach (string tag in tagsList)
-            currentTags += tag + " ";
+    public void UpdateTagsList()
+    {
+        zeroconfManager.Setup(_nodeName, getZeroconfKeys());
     }
 }
