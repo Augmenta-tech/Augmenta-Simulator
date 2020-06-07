@@ -166,11 +166,19 @@ public class OSCManager : MonoBehaviour
 
                 wassupMessage.Append(NetworkManager.GetIpv4());
                 wassupMessage.Append(NetworkManager.GetMacAddress());
+                wassupMessage.Append(_nodeManager.nodeName);
+                wassupMessage.Append(string.Join(",", _nodeManager.tagsList));
 
                 if (debug)
                     Debug.Log("Answering yo from "+yoIP+":"+yoPort+" with " + NetworkManager.GetIpv4() + " and " + NetworkManager.GetMacAddress());
 
-                OSCMaster.SendMessage(wassupMessage, yoIP, yoPort);
+                try
+                {
+                    OSCMaster.SendMessage(wassupMessage, yoIP, yoPort);
+                }catch(System.Exception e)
+                {
+                    Debug.LogWarning("Error sending OSC to " + yoIP + ":" + yoPort + " (" + e.Message + ")");
+                }
 
                 break;
 
