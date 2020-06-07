@@ -1674,7 +1674,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zeroconfManager: {fileID: 393421887}
-  tagsList: []
+  tagsList:
+  - room1
+  - fountain
   currentTags: 
   newTag: 
   sensorType: DepthCamera
