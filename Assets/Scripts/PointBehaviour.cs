@@ -198,10 +198,6 @@ public class PointBehaviour : MonoBehaviour {
 
         point.transform.localScale = Vector3.one;
         point.transform.localScale = new Vector3(size.x / point.transform.lossyScale.x, size.y / point.transform.lossyScale.y, size.z / point.transform.lossyScale.z);
-
-        float textScale = Mathf.Min(size.x, size.y) * textScaleMultiplier;
-        pointInfoText.transform.localScale = Vector3.one;
-        pointInfoText.transform.localScale = new Vector3(textScale / transform.lossyScale.x, textScale / transform.lossyScale.y, textScaleMultiplier);
     }
 
     private void UpdatePointPosition() {

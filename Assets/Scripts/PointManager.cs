@@ -656,6 +656,18 @@ public class PointManager : MonoBehaviour {
 
         UpdateBackgroundTexture();
         UpdateCamera();
+
+        //Update points local scale
+        if (instantiatedPoints == null) return;
+
+        foreach (var obj in instantiatedPoints)
+            obj.Value.transform.localScale = new Vector3(1.0f / _width, 1.0f / _height, 1);
+
+        foreach (var obj in _incorrectInstantiatedPoints)
+            obj.Value.transform.localScale = new Vector3(1.0f / _width, 1.0f / _height, 1);
+
+        foreach (var obj in _flickeringPoints)
+            obj.Value.transform.localScale = new Vector3(1.0f / _width, 1.0f / _height, 1);
     }
 
 	private void UpdateBackgroundTexture()
