@@ -166,7 +166,7 @@ public class OSCManager : MonoBehaviour
 
                 wassupMessage.Append(NetworkManager.GetIpv4());
                 wassupMessage.Append(NetworkManager.GetMacAddress());
-                wassupMessage.Append(_nodeManager.nodeName);
+                wassupMessage.Append(_nodeManager?_nodeManager.nodeName:"Simulator");
                 wassupMessage.Append(string.Join(",", _nodeManager.tagsList));
 
                 if (debug)
@@ -335,8 +335,12 @@ public class OSCManager : MonoBehaviour
         //Answer disconnect
         string disconnectIP = message.Data[0].ToString();
         int disconnectPort = (int)message.Data[1];
-        string protocolType = message.Data[2].ToString();
-        int version = (int)message.Data[3];
+
+        if (message.Data.Count > 2)
+        {
+            string protocolType = message.Data[2].ToString();
+            int version = (int)message.Data[3];
+        }
 
         string disconnectID = GetIDFromIPAndPort(disconnectIP, disconnectPort);
 
