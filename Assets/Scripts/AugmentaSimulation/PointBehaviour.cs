@@ -15,7 +15,8 @@ public class PointBehaviour : MonoBehaviour {
     public Color velocityColor;
     public Color orientationColor;
 
-    public float vectorThickness = 0.015f;
+    public float vectorThickness = 0.03f;
+    public float vectorDefaultMagnitude = 0.5f;
     public float textScaleMultiplier = 0.005f;
 
     [Header("Autofilled Parameters")]
@@ -63,6 +64,8 @@ public class PointBehaviour : MonoBehaviour {
 
 	void Start () {
 
+
+
         //Get velocity
         if (isIncorrectDetection) {
             direction = Vector3.zero;
@@ -74,7 +77,7 @@ public class PointBehaviour : MonoBehaviour {
         }
 
         speedPivot.localScale = Vector3.zero;
-        orientationPivot.localScale = new Vector3(vectorThickness, 0.3f, vectorThickness);
+        orientationPivot.localScale = new Vector3(vectorThickness, vectorDefaultMagnitude, vectorThickness);
 
         _timer = 0;
         _relativeTime = 0;
@@ -155,7 +158,7 @@ public class PointBehaviour : MonoBehaviour {
 
     private void UpdateSpeedVisualization() {
 
-        speedPivot.localScale = new Vector3(vectorThickness, normalizedVelocity.magnitude, vectorThickness);
+        speedPivot.localScale = new Vector3(vectorThickness * size.x, normalizedVelocity.magnitude * size.y, vectorThickness * size.z);
         speedPivot.localPosition = new Vector3(0, 0, -(size.z + vectorThickness) * 0.5f);
 
         if (normalizedVelocity.magnitude != 0) {
@@ -173,6 +176,7 @@ public class PointBehaviour : MonoBehaviour {
 
     private void UpdateOrientationVisualization() {
 
+        orientationPivot.localScale = new Vector3(vectorThickness * size.x, vectorDefaultMagnitude * size.y, vectorThickness * size.z);
         orientationPivot.localPosition = new Vector3(0, 0, -(size.z + vectorThickness) * 0.5f);
         orientationPivot.localRotation = Quaternion.Euler(0, 0, orientation - 90);
     }
@@ -190,7 +194,6 @@ public class PointBehaviour : MonoBehaviour {
             size.x = Mathf.Lerp(manager.minPointSize.x, manager.maxPointSize.x, Mathf.PerlinNoise(id * 10, _relativeTime));
             size.y = Mathf.Lerp(manager.minPointSize.y, manager.maxPointSize.y, Mathf.PerlinNoise(id * 20, _relativeTime));
             size.z = Mathf.Lerp(manager.minPointSize.z, manager.maxPointSize.z, Mathf.PerlinNoise(id * 30, _relativeTime));
-
         }
 
         //Enforce that width >= height

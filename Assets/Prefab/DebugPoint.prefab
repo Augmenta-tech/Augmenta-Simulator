@@ -357,7 +357,7 @@ MonoBehaviour:
   orientationMaterial: {fileID: 2100000, guid: 7ac04779c33b2a54f9d75c6734cc65a5, type: 2}
   velocityColor: {r: 0, g: 0.6636367, b: 1, a: 1}
   orientationColor: {r: 1, g: 0.60341847, b: 0, a: 1}
-  vectorThickness: 0.015
+  vectorThickness: 0.03
   textScaleMultiplier: 0.01
   manager: {fileID: 0}
   ageInFrames: 0
