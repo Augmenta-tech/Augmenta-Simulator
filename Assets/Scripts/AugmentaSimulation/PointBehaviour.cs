@@ -57,8 +57,8 @@ public class PointBehaviour : MonoBehaviour {
     private float _relativeTime = 0;
     private bool _oldPositionIsValid = false;
 
-    private float speedAngle;
-    private float previousRotationAngle = 0;
+    private float _speedAngle;
+    private float _oldAngle;
 
 	#region MonoBehaviour Implementation
 
@@ -124,11 +124,14 @@ public class PointBehaviour : MonoBehaviour {
         ComputePointOrientation();
         UpdateOrientationVisualization();
 
+        _oldPosition = transform.position;
+        _oldPositionIsValid = true;
     }
 
     public void OnMouseDrag() {
 
         _ray = manager.camera.ScreenPointToRay(Input.mousePosition);
+
         if (Physics.Raycast(_ray, out _raycastHit, Mathf.Infinity, manager.areaLayer)) {
 
             transform.position = new Vector3(_raycastHit.point.x, 0, _raycastHit.point.z);
@@ -152,8 +155,6 @@ public class PointBehaviour : MonoBehaviour {
         } else { 
             normalizedVelocity = Vector3.zero; 
         }
-        _oldPosition = transform.position;
-        _oldPositionIsValid = true;
     }
 
     private void UpdateSpeedVisualization() {
@@ -163,15 +164,15 @@ public class PointBehaviour : MonoBehaviour {
 
         if (normalizedVelocity.magnitude != 0) {
 
-            speedAngle = Mathf.Atan2(normalizedVelocity.z, -normalizedVelocity.x) * Mathf.Rad2Deg;
-            speedPivot.localRotation = Quaternion.Euler(0, 0, speedAngle - 90);
+            _speedAngle = Mathf.Atan2(normalizedVelocity.z, -normalizedVelocity.x) * Mathf.Rad2Deg;
+            speedPivot.localRotation = Quaternion.Euler(0, 0, _speedAngle - 90);
         }
         
     }
 
     private void ComputePointOrientation() {
 
-        orientation = Mathf.Lerp(point.transform.localRotation.eulerAngles.z, speedAngle, normalizedVelocity.magnitude * 5.0f / speedThresholdForOrientation);
+        orientation = Mathf.Lerp(point.transform.localRotation.eulerAngles.z, _speedAngle, normalizedVelocity.magnitude * 5.0f / speedThresholdForOrientation);
     }
 
     private void UpdateOrientationVisualization() {
@@ -205,7 +206,6 @@ public class PointBehaviour : MonoBehaviour {
 
     private void UpdatePointPosition() {
 
-
         //Move along velocity
         Vector3 newPos = transform.position + direction * speed * Time.deltaTime;
 
@@ -232,15 +232,18 @@ public class PointBehaviour : MonoBehaviour {
         //Angle from displacement
         Vector3 displacement = transform.position - _oldPosition;
 
-        float angle = -Mathf.Atan2(displacement.x, displacement.z) * Mathf.Rad2Deg;
+        float angle = -Mathf.Atan(displacement.x / displacement.z) * Mathf.Rad2Deg;
+
+        //Debug.Log("Displacement = " + displacement.ToString("F6") + "; tanValue = "+ displacement.x / displacement.z + "; angle(rad) = "+ -Mathf.Atan(displacement.x / displacement.z) + "; angle(deg) = " + angle);
 
         //Add noise
         angle += (Mathf.PerlinNoise(id * 35, Time.time * rotationNoiseFrequency) - 0.5f) * 2.0f * rotationNoiseAmplitude;
 
-        if(Mathf.Abs(previousRotationAngle - angle) < 5)
+        if (Mathf.Abs(_oldAngle - angle) < 10) {
             point.transform.localRotation = Quaternion.Euler(transform.localRotation.x, transform.localRotation.y, angle);
+        }
 
-        previousRotationAngle = angle;
+        _oldAngle = angle;
     }
 
     public void StartFlickering() {
