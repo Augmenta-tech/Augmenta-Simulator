@@ -65,6 +65,8 @@ public class PointManager : MonoBehaviour {
         }
     }
 
+    public float outputMaxMPS = 0;
+
     public int pointsCount {
         get { return _pointsCount; }
     }
@@ -254,6 +256,7 @@ public class PointManager : MonoBehaviour {
     private List<int> _keysList;
 
     private bool _initialized = false;
+    private float _timer = 0;
 
     #region MonoBehaviour Implementation
 
@@ -282,15 +285,18 @@ public class PointManager : MonoBehaviour {
         //Create flickering
         CreateFlickeringPoints();
 
-        //Send Augmenta scene message
-        SendAugmentaMessage(AugmentaMessageType.SceneUpdated);
+        //Send Augmenta data at desired rate
+        if (outputMaxMPS > 0) {
+            _timer += Time.deltaTime;
 
-        //Send Augmenta persons update messages
-        foreach (var point in instantiatedPoints)
-            SendAugmentaMessage(AugmentaMessageType.AugmentaObjectUpdate, point.Value);
+            if (_timer >= 1.0f / outputMaxMPS) {
 
-        foreach (var point in _incorrectInstantiatedPoints)
-            SendAugmentaMessage(AugmentaMessageType.AugmentaObjectUpdate, point.Value);
+                SendAugmentaUpdateMessages();
+                _timer = 0.0f;
+            }
+        } else {
+            SendAugmentaUpdateMessages();
+        }
     }
 
     public void OnMouseDrag() {
@@ -314,6 +320,19 @@ public class PointManager : MonoBehaviour {
         _highestId = 0;
 
         _initialized = true;
+    }
+
+    void SendAugmentaUpdateMessages() {
+
+        //Send Augmenta scene message
+        SendAugmentaMessage(AugmentaMessageType.SceneUpdated);
+
+        //Send Augmenta persons update messages
+        foreach (var point in instantiatedPoints)
+            SendAugmentaMessage(AugmentaMessageType.AugmentaObjectUpdate, point.Value);
+
+        foreach (var point in _incorrectInstantiatedPoints)
+            SendAugmentaMessage(AugmentaMessageType.AugmentaObjectUpdate, point.Value);
     }
 
 	#region Inputs Handling

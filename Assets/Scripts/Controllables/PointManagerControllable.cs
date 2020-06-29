@@ -9,6 +9,9 @@ public class PointManagerControllable : Controllable {
     [Header("OUTPUT SETTINGS")]
     [OSCProperty]
     public bool mute;
+    [OSCProperty]
+    [Tooltip("Max nb of messages per second. 0 = highest possible.")]
+    public float outputMaxMPS;
 
     [Header("SCENE SETTINGS")]
     [OSCProperty]
