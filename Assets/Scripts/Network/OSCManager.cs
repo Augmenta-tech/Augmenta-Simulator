@@ -9,8 +9,11 @@ public class OSCManager : MonoBehaviour
 {
     public static OSCManager activeManager;
 
+    public ZeroconfManager zeroconfManager;
+
     [Header("Yo Version")]
     public int yoVersion = 2;
+    public int yoPort = 36278;
 
     [Header("Output settings")]
     private int _outputPort = 12000;
@@ -38,6 +41,7 @@ public class OSCManager : MonoBehaviour
     private NodeManager _nodeManager;
 
     private bool _initialized = false;
+    private bool _yoServerCreated = false;
 
     #region MonoBehaviour Implementation
 
@@ -51,6 +55,9 @@ public class OSCManager : MonoBehaviour
 
         if (!_initialized)
             Initialize();
+
+        if (!_yoServerCreated)
+            CreateYoServer();
 
         UpdateOutputsTimers();
     }
@@ -143,8 +150,15 @@ public class OSCManager : MonoBehaviour
         if (OSCMaster.Receivers.ContainsKey("AugmentaYo"))
             return;
 
-        OSCMaster.CreateReceiver("AugmentaYo", 36278);
-        OSCMaster.Receivers["AugmentaYo"].messageReceived += OnYoMessageReceived;
+        try {
+            OSCMaster.CreateReceiver("AugmentaYo", yoPort);
+            OSCMaster.Receivers["AugmentaYo"].messageReceived += OnYoMessageReceived;
+            zeroconfManager.Setup(yoPort);
+            _yoServerCreated = true;
+        } catch {
+            Debug.LogError("Failed to create Augmenta Yo server.");
+            yoPort++;
+		}
     }
 
     /// <summary>

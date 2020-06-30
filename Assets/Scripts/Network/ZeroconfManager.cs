@@ -7,28 +7,24 @@ public class ZeroconfManager : MonoBehaviour
 {
     private RegisterService service;
 
-    private string _name = "name";
-    Dictionary<string, string> _keys;
-
-    void OnEnable() {
-
-        _name = "Simulator";
-        UpdateService();
-    }
+    private string _name = "Simulator";
+    private int _port = 36278;
+    private Dictionary<string, string> _keys;
 
     void OnDisable() {
 
-        DestroyService();
+        if (service != null) DestroyService();
     }
 
     void UpdateService()
     {
         if (service != null) DestroyService();
+
         service = new RegisterService();
         service.Name = "Augmenta - " + _name;
         service.RegType = "_osc._udp";
         service.ReplyDomain = "local.";
-        service.UPort = 36278;
+        service.UPort = (ushort)_port;
 
         if (_keys != null && _keys.Count > 0)
         {
@@ -45,9 +41,10 @@ public class ZeroconfManager : MonoBehaviour
         service.Dispose();
     }
 
-    public void Setup(string newName, Dictionary<string, string> newKeys = null)
+    public void Setup(int newPort = 36278, string newName = "Simulator", Dictionary<string, string> newKeys = null)
     {
         _name = newName;
+        _port = newPort;
         _keys = newKeys;
         UpdateService();
     }

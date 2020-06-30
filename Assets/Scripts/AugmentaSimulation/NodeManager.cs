@@ -31,6 +31,8 @@ public class NodeManager : MonoBehaviour
     public string debugTrackingPipe = "TrackingV1";
     public int debugPID = 69;
 
+    private int _defaultYoPort = 36278;
+
     private void Awake() {
 
         UpdateName();
@@ -38,7 +40,7 @@ public class NodeManager : MonoBehaviour
 
     void UpdateName() 
     {
-        zeroconfManager.Setup(_nodeName, getZeroconfKeys());
+        zeroconfManager.Setup(_defaultYoPort, _nodeName, getZeroconfKeys());
     }
 
     Dictionary<string, string> getZeroconfKeys()
@@ -51,6 +53,6 @@ public class NodeManager : MonoBehaviour
 
     public void UpdateTagsList()
     {
-        zeroconfManager.Setup(_nodeName, getZeroconfKeys());
+        zeroconfManager.Setup(_defaultYoPort, _nodeName, getZeroconfKeys());
     }
 }

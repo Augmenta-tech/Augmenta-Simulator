@@ -13,8 +13,6 @@ public class CameraController : MonoBehaviour
     public float dragSpeed = .01f;
     public float rotationSpeed = 1.0f;
 
-    public float defaultDistance = 10.0f;
-
     [Header("UI Control")]
     public GameObject orthoUI;
     public GameObject perspUI;
@@ -36,6 +34,8 @@ public class CameraController : MonoBehaviour
         set { _manager = value; }
     }
 
+    private float _defaultDistance = 5.0f;
+
     //PlayerPrefs
     private string cameraOrthographicKey = "CameraOrthographic";
     private string cameraPositionXKey = "CameraPositionX";
@@ -52,7 +52,7 @@ public class CameraController : MonoBehaviour
         cameraStartingSize = camera.orthographicSize;
 
         ResetCamera();
-        SwitchToOrthographic();
+        SwitchToPerspective();
 
         LoadPlayerPrefs();
     }
@@ -157,12 +157,14 @@ public class CameraController : MonoBehaviour
             camera.orthographicSize = cameraStartingSize;
         }
 
-        camera.transform.localPosition = GetCameraDefaultPosition();
+        SetCameraToDefaultPosition();
+
         transform.rotation = Quaternion.Euler(Vector3.zero);
 
         camera.transform.localPosition = new Vector3(camera.transform.localPosition.x,
-                                            Mathf.Max(manager.width, manager.height) * 0.5f + 5.0f,
+                                            Mathf.Max(manager.width, manager.height) * 0.5f + _defaultDistance,
                                             camera.transform.localPosition.z);
+
         cameraLastPerspectiveDistance = camera.transform.localPosition.y;
     }
 
@@ -170,18 +172,18 @@ public class CameraController : MonoBehaviour
     /// Compute default camera position centering the scene
     /// </summary>
     /// <returns></returns>
-    Vector3 GetCameraDefaultPosition() {
+    void SetCameraToDefaultPosition() {
 
-        camera.transform.localPosition = Vector3.up * defaultDistance;
+        camera.transform.localPosition = Vector3.up * _defaultDistance;
 
         Vector3 offsetCenter = Vector3.zero;
 
         if (genUIScrollView.gameObject.activeInHierarchy)
             offsetCenter = camera.ScreenToWorldPoint(new Vector3((Screen.width - genUIScrollView.sizeDelta.x) * 0.5f + genUIScrollView.sizeDelta.x,
                                                                   0.5f * Screen.height,
-                                                                  defaultDistance));
+                                                                  _defaultDistance));
 
-        return new Vector3(-offsetCenter.x, defaultDistance, 0); 
+        camera.transform.localPosition = new Vector3(- offsetCenter.x, _defaultDistance, 0); 
     }
 
     /// <summary>
@@ -191,7 +193,7 @@ public class CameraController : MonoBehaviour
 
         if (camera.orthographic) {
             camera.transform.localPosition = new Vector3(camera.transform.localPosition.x,
-                                                        Mathf.Max(manager.width, manager.height) * 0.5f + 1.0f,
+                                                        Mathf.Max(manager.width, manager.height) * 0.5f + 10.0f,
                                                         camera.transform.localPosition.z);
         }
 

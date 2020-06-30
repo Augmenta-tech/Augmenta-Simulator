@@ -237,6 +237,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4c8e32f3cdcfe04caee8594416a7f5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  zeroconfManager: {fileID: 393421887}
   yoVersion: 2
   connectionTimeout: 60
   debug: 0
@@ -1214,7 +1215,6 @@ MonoBehaviour:
   minSize: 1
   dragSpeed: 0.002
   rotationSpeed: 0.5
-  defaultDistance: 10
   orthoUI: {fileID: 792626411}
   perspUI: {fileID: 838878440}
   genUIScrollView: {fileID: 808953174}
@@ -1292,7 +1292,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 771803484}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -1396,7 +1396,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 792626411}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -1506,7 +1506,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 838878440}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
