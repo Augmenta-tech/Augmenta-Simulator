@@ -29,7 +29,9 @@ public class ZeroconfManager : MonoBehaviour
         if (_keys != null && _keys.Count > 0)
         {
             TxtRecord txt = new TxtRecord();
-            foreach (KeyValuePair<string, string> kv in _keys) txt.Add(kv.Key, kv.Value);
+            foreach (KeyValuePair<string, string> kv in _keys) {
+                txt.Add(kv.Key, kv.Value);
+            }
             service.TxtRecord = txt;
         }
 
@@ -43,6 +45,11 @@ public class ZeroconfManager : MonoBehaviour
 
     public void Setup(int newPort = 36278, string newName = "Simulator", Dictionary<string, string> newKeys = null)
     {
+        if(newKeys == null) {
+            newKeys = new Dictionary<string, string>();
+            newKeys.Add("mac", NetworkManager.GetMacAddress());
+        }
+
         _name = newName;
         _port = newPort;
         _keys = newKeys;
