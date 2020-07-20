@@ -8,8 +8,13 @@ public class FPSController : MonoBehaviour
 
     public KeyCode shortcutKey = KeyCode.F;
 
-    // Update is called once per frame
-    void Update()
+	private void OnEnable() {
+
+        text.gameObject.SetActive(false);
+    }
+
+	// Update is called once per frame
+	void Update()
     {
         if (Input.GetKeyDown(shortcutKey))
             ToggleFPS();

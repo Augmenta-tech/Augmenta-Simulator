@@ -5,7 +5,7 @@ using UnityEngine;
 public class OSCManagerControllable : Controllable
 {
     [Header("YO VERSION")]
-    [OSCProperty][Range(1, 2)] public int yoVersion;
+    [OSCProperty(isInteractible = false)] public int yoVersion;
     [OSCProperty(isInteractible = false)] public int yoPort;
 
     [Header("OUTPUT SETTINGS")]
