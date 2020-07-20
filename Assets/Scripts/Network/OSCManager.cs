@@ -180,8 +180,8 @@ public class OSCManager : MonoBehaviour
 
                 wassupMessage.Append(NetworkManager.GetIpv4());
                 wassupMessage.Append(NetworkManager.GetMacAddress());
-                wassupMessage.Append(_nodeManager?_nodeManager.nodeName:"Simulator");
-                wassupMessage.Append(string.Join(",", _nodeManager.tagsList));
+                wassupMessage.Append(_nodeManager ? _nodeManager.nodeName : "Simulator");
+                wassupMessage.Append(_nodeManager ? string.Join(",", _nodeManager.tagsList) : "");
 
                 if (debug)
                     Debug.Log("Answering yo from "+yoIP+":"+yoPort+" with " + NetworkManager.GetIpv4() + " and " + NetworkManager.GetMacAddress());

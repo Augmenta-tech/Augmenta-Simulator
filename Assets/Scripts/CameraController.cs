@@ -7,6 +7,7 @@ public class CameraController : MonoBehaviour
 {
     [Header("Camera Control")]
     public new Camera camera;
+    public VideoOutputManager videoOutputManager;
 
     public float zoomSpeed = 0.5f;
     public float minSize = 1.0f;
@@ -217,6 +218,7 @@ public class CameraController : MonoBehaviour
     public void SwitchToPerspective() {
 
         camera.orthographic = false;
+        videoOutputManager.spoutCameraOrthographic = false;
 
         orthoUI.SetActive(false);
         perspUI.SetActive(true);
@@ -232,6 +234,7 @@ public class CameraController : MonoBehaviour
     public void SwitchToOrthographic() {
 
         camera.orthographic = true;
+        videoOutputManager.spoutCameraOrthographic = true;
 
         perspUI.SetActive(false);
         orthoUI.SetActive(true);

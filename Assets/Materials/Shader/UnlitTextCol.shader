@@ -51,12 +51,20 @@
 				// sample the texture
 				float4 col = tex2D(_MainTex, i.uv) * _Color;
 				
+
+
 				// compute the border color
 				float2 uv_ST = i.uv / _MainTex_ST.xy;
 				float2 normalizedBorderSize = float2(_BorderSize / _MainTex_ST.x, _BorderSize / _MainTex_ST.y);
-				if (uv_ST.x < normalizedBorderSize.x || uv_ST.x > 1.0f - normalizedBorderSize.x 
-					|| uv_ST.y < normalizedBorderSize.y || uv_ST.y > 1.0f - normalizedBorderSize.y)
+				if (uv_ST.x < normalizedBorderSize.x || uv_ST.x > 1.0f - normalizedBorderSize.x
+			     || uv_ST.y < normalizedBorderSize.y || uv_ST.y > 1.0f - normalizedBorderSize.y) {
 					col = _BorderColor;
+				}
+				else {
+					//Clip transparent pixels
+					clip(col.a - 0.5f);
+				}
+					
 
 				return col;
 			}
