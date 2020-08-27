@@ -2,7 +2,7 @@
 
 Work without Augmenta hardware by simulating people moving in space.
 
-![Simulator](https://github.com/Theoriz/Augmenta/blob/gh-pages/res/gif/simulator2.gif) 
+![](https://media.giphy.com/media/lRdaGBXEvU5mAj0z5K/giphy.gif) 
 
 ## Download
 
