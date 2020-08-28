@@ -939,7 +939,7 @@ public class PointManager : MonoBehaviour {
         float pointX = 0.5f + behaviour.transform.position.x / width;
         float pointY = 0.5f - behaviour.transform.position.z / height;
 
-        float rotation = behaviour.point.transform.localRotation.eulerAngles.z;
+        float rotation = behaviour.point.transform.localRotation.eulerAngles.z >= 0 ? behaviour.point.transform.localRotation.eulerAngles.z : behaviour.point.transform.localRotation.eulerAngles.z + 360.0f ;
 
         msg.Append(_frameCounter);                      // Frame number
         msg.Append(behaviour.id);                       // id ex : 42th object to enter stage has id=42
@@ -949,7 +949,7 @@ public class PointManager : MonoBehaviour {
         msg.Append(pointY);
         msg.Append(-behaviour.normalizedVelocity.x);    // Speed and direction vector (in unit.s-1) (normalized)
         msg.Append(-behaviour.normalizedVelocity.z);
-        msg.Append(45.0f);                               // Orientation with respect to horizontal axis right (0° = (1,0)), rotate counterclockwise. Estimation of the object orientation from its rotation and velocity
+        msg.Append(behaviour.orientation);              // Orientation with respect to horizontal axis right (0° = (1,0)), rotate counterclockwise. Estimation of the object orientation from its rotation and velocity
         msg.Append(pointX);                             // Bounding box center coord (normalized)
         msg.Append(pointY); 
         msg.Append(behaviour.size.x / width);           // Bounding box width (normalized)

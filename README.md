@@ -40,4 +40,4 @@ For the simulator to create a Zeroconf service on Windows, you need to have Appl
 
 ## Version
 
-Unity 2019.4.1f1
+Unity 2020.1.3f1

@@ -43,7 +43,7 @@ public class PointBehaviour : MonoBehaviour {
     public float rotationNoiseAmplitude = 0;
     public float rotationNoiseFrequency = 20;
 
-    public float speedThresholdForOrientation = 1;
+    public float speedThresholdForOrientation = 0.5f;
 
     public bool isIncorrectDetection = false;
     public bool isFlickering = false;
@@ -59,6 +59,8 @@ public class PointBehaviour : MonoBehaviour {
 
     private float _speedAngle;
     private float _oldAngle;
+    private float _oldVelocityMagnitude;
+    private float _orientationOffset = 0;
 
 	#region MonoBehaviour Implementation
 
@@ -149,6 +151,8 @@ public class PointBehaviour : MonoBehaviour {
 
     private void ComputeNormalizedVelocity()
     {
+        _oldVelocityMagnitude = normalizedVelocity.magnitude;
+
         if (_oldPositionIsValid) {
             normalizedVelocity = (transform.position - _oldPosition) / Time.deltaTime;
             normalizedVelocity = new Vector3(-normalizedVelocity.x / manager.width, 0, normalizedVelocity.z / manager.height);
@@ -172,7 +176,18 @@ public class PointBehaviour : MonoBehaviour {
 
     private void ComputePointOrientation() {
 
-        orientation = Mathf.Lerp(point.transform.localRotation.eulerAngles.z, _speedAngle, normalizedVelocity.magnitude * 5.0f / speedThresholdForOrientation);
+        if (normalizedVelocity.magnitude >= speedThresholdForOrientation) {
+            orientation = _speedAngle;
+        } else {
+            if(_oldVelocityMagnitude >= speedThresholdForOrientation) {
+                //Update offset
+                _orientationOffset = orientation - point.transform.localRotation.eulerAngles.z;
+            }
+
+            orientation = point.transform.localRotation.eulerAngles.z + _orientationOffset;
+        }
+
+        orientation = orientation >= 0 ? orientation : orientation + 360.0f;
     }
 
     private void UpdateOrientationVisualization() {
