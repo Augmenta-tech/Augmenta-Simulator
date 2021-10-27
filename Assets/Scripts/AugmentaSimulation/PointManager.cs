@@ -715,6 +715,9 @@ public class PointManager : MonoBehaviour {
 
         if (mute) return;
 
+        // Craft and send a message that contains the event + extra info
+        WebsocketManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageJSON(messageType,obj));
+
         switch (ProtocolVersionManager.protocolVersion) {
             case ProtocolVersionManager.AugmentaProtocolVersion.V1:
                 OSCManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageV1(messageType, obj));
@@ -1018,4 +1021,49 @@ public class PointManager : MonoBehaviour {
 
         return angle % 360.0f;
     }
+
+    #region Websocket
+
+    public String CreateAugmentaMessageJSON(AugmentaMessageType messageType, GameObject obj = null) {
+
+        switch (messageType) {
+            case AugmentaMessageType.AugmentaObjectEnter:
+                return "{\n\"object\": {\n\"enter\": " + CreateAugmentaMessageJSONData(obj) + "\n}\n}";
+            case AugmentaMessageType.AugmentaObjectUpdate:
+                return "{\n\"object\": {\n\"update\": " + CreateAugmentaMessageJSONData(obj) + "\n}\n}";
+            case AugmentaMessageType.AugmentaObjectLeave:
+                return "{\n\"object\": {\n\"leave\": " + CreateAugmentaMessageJSONData(obj) + "\n}\n}";
+            case AugmentaMessageType.SceneUpdated:
+                return CreateAugmentaMessageJSONScene();
+            default:
+                Debug.Log("Unsupported message type " + messageType.ToString());
+                return String.Empty;
+        }
+    }
+
+    private String CreateAugmentaMessageJSONData(GameObject obj = null) {
+        var behaviour = obj.GetComponent<PointBehaviour>();
+        float pointX = 0.5f + behaviour.transform.position.x / width;
+        float pointY = 0.5f - behaviour.transform.position.z / height;
+        float rotation = behaviour.point.transform.localRotation.eulerAngles.z >= 0 ? behaviour.point.transform.localRotation.eulerAngles.z : behaviour.point.transform.localRotation.eulerAngles.z + 360.0f;
+
+        return "{\n\"frame\":" + _frameCounter + ",\n\"id\":" + behaviour.id +
+              ",\n\"oid\":" + behaviour.oid + ",\n\"age\":" + behaviour.ageInSeconds +
+              ",\n\"centroid\": {\n\"x\":" + pointX + ",\n\"y\":" + pointY + "\n}" +
+              ",\n\"velocity\": {\n\"x\":" + (-behaviour.normalizedVelocity.x) + ",\n\"y\":" + (-behaviour.normalizedVelocity.z) + "\n}" +
+              ",\n\"orientation\":" + behaviour.orientation +
+              ",\n\"boundingRect\": {\n\"x\":" + pointX + ",\n\"y\":" + pointY +
+              ",\n\"width\":" + (behaviour.size.x / width) + ",\n\"height\":" + (behaviour.size.y / height) + ",\n\"rotation\": " + rotation +
+              "\n},\n\"height\" :" + behaviour.size.z +
+              ",\n\"extra\": {\n\"frame\": " + _frameCounter + ",\"id\": " + behaviour.id + ",\"oid\": " + behaviour.oid +
+              ",\n\"highest\": {\n\"x\": " + pointX + ",\n\"y\": " + pointY + "\n}" +
+              ",\n\"distance\": " + Vector3.Distance(camera.transform.position, behaviour.transform.position) + ",\"reflectivity\": " + behaviour.pointColor.grayscale + "\n}\n}";
+    }
+
+    private String CreateAugmentaMessageJSONScene() {
+        return "{\n\"scene\" : {\n\"frame\": " + _frameCounter + ",\n\"objectCount\" : " + _pointsCount +
+                ",\n\"scene\" : {\n\"width\" : " + width + ",\n\"height\" : " + height + "\n}\n}\n}";
+    }
+
+    #endregion
 }
