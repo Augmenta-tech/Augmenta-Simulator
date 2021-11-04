@@ -312,6 +312,7 @@ public class PointManager : MonoBehaviour {
 	#endregion
 
     void Initialize() {
+        System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
         instantiatedPoints = new Dictionary<int, GameObject>();
         _incorrectInstantiatedPoints = new Dictionary<int, GameObject>();
@@ -1047,22 +1048,22 @@ public class PointManager : MonoBehaviour {
         float pointY = 0.5f - behaviour.transform.position.z / height;
         float rotation = behaviour.point.transform.localRotation.eulerAngles.z >= 0 ? behaviour.point.transform.localRotation.eulerAngles.z : behaviour.point.transform.localRotation.eulerAngles.z + 360.0f;
 
-        return "{\n\"frame\":" + _frameCounter + ",\n\"id\":" + behaviour.id +
-              ",\n\"oid\":" + behaviour.oid + ",\n\"age\":" + behaviour.ageInSeconds +
-              ",\n\"centroid\": {\n\"x\":" + pointX + ",\n\"y\":" + pointY + "\n}" +
-              ",\n\"velocity\": {\n\"x\":" + (-behaviour.normalizedVelocity.x) + ",\n\"y\":" + (-behaviour.normalizedVelocity.z) + "\n}" +
-              ",\n\"orientation\":" + behaviour.orientation +
-              ",\n\"boundingRect\": {\n\"x\":" + pointX + ",\n\"y\":" + pointY +
-              ",\n\"width\":" + (behaviour.size.x / width) + ",\n\"height\":" + (behaviour.size.y / height) + ",\n\"rotation\": " + rotation +
-              "\n},\n\"height\" :" + behaviour.size.z +
-              ",\n\"extra\": {\n\"frame\": " + _frameCounter + ",\"id\": " + behaviour.id + ",\"oid\": " + behaviour.oid +
-              ",\n\"highest\": {\n\"x\": " + pointX + ",\n\"y\": " + pointY + "\n}" +
-              ",\n\"distance\": " + Vector3.Distance(camera.transform.position, behaviour.transform.position) + ",\"reflectivity\": " + behaviour.pointColor.grayscale + "\n}\n}";
+        return "{\n\"frame\":" + _frameCounter.ToString() + ",\n\"id\":" + behaviour.id.ToString() +
+              ",\n\"oid\":" + behaviour.oid.ToString() + ",\n\"age\":" + behaviour.ageInSeconds.ToString() +
+              ",\n\"centroid\": {\n\"x\":" + pointX.ToString() + ",\n\"y\":" + pointY.ToString() + "\n}" +
+              ",\n\"velocity\": {\n\"x\":" + (-behaviour.normalizedVelocity.x).ToString() + ",\n\"y\":" + (-behaviour.normalizedVelocity.z).ToString() + "\n}" +
+              ",\n\"orientation\":" + behaviour.orientation.ToString() +
+              ",\n\"boundingRect\": {\n\"x\":" + pointX.ToString() + ",\n\"y\":" + pointY.ToString() +
+              ",\n\"width\":" + (behaviour.size.x / width).ToString() + ",\n\"height\":" + (behaviour.size.y / height).ToString() + ",\n\"rotation\": " + rotation.ToString() +
+              "\n},\n\"height\" :" + behaviour.size.z.ToString() +
+              ",\n\"extra\": {\n\"frame\": " + _frameCounter.ToString() + ",\"id\": " + behaviour.id.ToString() + ",\"oid\": " + behaviour.oid.ToString() +
+              ",\n\"highest\": {\n\"x\": " + pointX.ToString() + ",\n\"y\": " + pointY.ToString() + "\n}" +
+              ",\n\"distance\": " + Vector3.Distance(camera.transform.position, behaviour.transform.position).ToString() + ",\"reflectivity\": " + behaviour.pointColor.grayscale + "\n}\n}";
     }
 
     private String CreateAugmentaMessageJSONScene() {
-        return "{\n\"scene\" : {\n\"frame\": " + _frameCounter + ",\n\"objectCount\" : " + _pointsCount +
-                ",\n\"scene\" : {\n\"width\" : " + width + ",\n\"height\" : " + height + "\n}\n}\n}";
+        return "{\n\"scene\" : {\n\"frame\": " + _frameCounter.ToString() + ",\n\"objectCount\" : " + _pointsCount.ToString() +
+                ",\n\"scene\" : {\n\"width\" : " + width.ToString() + ",\n\"height\" : " + height.ToString() + "\n}\n}\n}";
     }
 
     #endregion
