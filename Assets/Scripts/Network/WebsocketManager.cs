@@ -49,51 +49,47 @@ public class WebsocketManager : MonoBehaviour
 
 
     private void Awake() {
+        activeManager = this;
+
         if (!_isInitialized) {
-            Initialize();
+            CreateWebsocketServer();
         }
     }
 
     private void OnDestroy() {
-        websocketServer.Stop();
-    }
 
-    void Initialize() {
-        activeManager = this;
-
-        CreateWebsocketServer();
-        _isInitialized = true;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if(_isInitialized)
+            websocketServer.Stop();
     }
 
     private void CreateWebsocketServer() {
 
-        if(_isInitialized) websocketServer.Stop();
+        if (_isInitialized) {
+            websocketServer.Stop();
+            _isInitialized = false;
+        }
 
         websocketServer = new WebSocketServer(_wsServerPort);
 
         websocketServer.AddWebSocketService<AugmentaService>("/");
 
-        websocketServer.Start();
+        try {
+            websocketServer.Start();
+        } catch (Exception e) {
+            Debug.LogError(e.Message);
+            return;
+        }
 
         _websocketClient = new WebSocket("ws://127.0.0.1:"+_wsServerPort);
         _websocketClient.Connect();
+
+        _isInitialized = true;
     }
 
     public void SendAugmentaMessage(String msg) {
-        _websocketClient.Send(_serverPrefix + msg);
+
+        if(_isInitialized)
+            _websocketClient.Send(_serverPrefix + msg);
     }
 
 	#endregion
