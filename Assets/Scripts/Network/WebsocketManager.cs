@@ -26,6 +26,8 @@ public class WebsocketManager : MonoBehaviour
 
 	public static WebsocketManager activeManager;
 
+    public bool enableWebsocket = false;
+
     [Header("Output settings")]
     private int _wsServerPort = 8080;
     public int wsServerPort {
@@ -50,13 +52,16 @@ public class WebsocketManager : MonoBehaviour
 
     private void Awake() {
         activeManager = this;
+    }
 
-        if (!_isInitialized) {
+	private void Update() {
+
+        if (!_isInitialized && enableWebsocket) {
             CreateWebsocketServer();
         }
     }
 
-    private void OnDestroy() {
+	private void OnDestroy() {
 
         if(_isInitialized)
             websocketServer.Stop();
@@ -88,7 +93,7 @@ public class WebsocketManager : MonoBehaviour
 
     public void SendAugmentaMessage(String msg) {
 
-        if(_isInitialized)
+        if(_isInitialized && enableWebsocket)
             _websocketClient.Send(_serverPrefix + msg);
     }
 

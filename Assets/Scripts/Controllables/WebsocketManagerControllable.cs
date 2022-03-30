@@ -6,7 +6,7 @@ public class WebsocketManagerControllable : Controllable
 {
 
     [Header("WEBSOCKET SETTINGS")]
-    [OSCProperty]
-    public int wsServerPort;
+    [OSCProperty] public bool enableWebsocket;
+    [OSCProperty] public int wsServerPort;
 
 }
