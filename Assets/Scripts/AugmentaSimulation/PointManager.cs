@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -243,7 +242,12 @@ public class PointManager : MonoBehaviour {
 
     private CameraController cameraController;
 
-    private int _frameCounter;
+    //private int _frameCounter;
+    //public int frameCounter
+    //{
+    //    get { return _frameCounter; }
+    //}
+    //public static int _frameCounter;
     private int _highestId;
 
     private GameObject _cursorPoint;
@@ -274,7 +278,7 @@ public class PointManager : MonoBehaviour {
         //Check keyboard inputs
         ProcessKeyboardInputs();
 
-        _frameCounter++;
+        //_frameCounter++;
 
         //Process mouse
         ProcessMouseInputs();
@@ -828,7 +832,7 @@ public class PointManager : MonoBehaviour {
 
         var msg = new OSCMessage(address);
 
-        msg.Append(_frameCounter);
+        msg.Append(Time.frameCount);
         //Compute point size
         msg.Append(instantiatedPoints.Count * 0.25f * (maxPointSize.x + minPointSize.x) * (maxPointSize.y + minPointSize.y));
         msg.Append(_pointsCount);
@@ -945,7 +949,7 @@ public class PointManager : MonoBehaviour {
 
         float rotation = behaviour.point.transform.localRotation.eulerAngles.z >= 0 ? behaviour.point.transform.localRotation.eulerAngles.z : behaviour.point.transform.localRotation.eulerAngles.z + 360.0f ;
 
-        msg.Append(_frameCounter);                      // Frame number
+        msg.Append(Time.frameCount);                      // Frame number
         msg.Append(behaviour.id);                       // id ex : 42th object to enter stage has id=42
         msg.Append(behaviour.oid);                      // Ordered id ex : if 3 objects on stage, 43th object might have oid=2 
         msg.Append(behaviour.ageInSeconds);             // Alive time (in s)
@@ -978,7 +982,7 @@ public class PointManager : MonoBehaviour {
         float pointX = 0.5f + behaviour.transform.position.x / width;
         float pointY = 0.5f - behaviour.transform.position.z / height;
 
-        msg.Append(_frameCounter);                      // Frame number
+        msg.Append(Time.frameCount);                      // Frame number
         msg.Append(behaviour.id);                       // id ex : 42th object to enter stage has id=42
         msg.Append(behaviour.oid);                      // Ordered id ex : if 3 objects on stage, 43th object might have oid=2 
         msg.Append(pointX);                             // Highest point placement (normalized)
@@ -998,7 +1002,7 @@ public class PointManager : MonoBehaviour {
 
         var msg = new OSCMessage(address);
 
-        msg.Append(_frameCounter);  // Frame number
+        msg.Append(Time.frameCount);  // Frame number
         msg.Append(_pointsCount);   // Objects count
         msg.Append(width);          // Scene width
         msg.Append(height);         //Scene height
@@ -1048,7 +1052,7 @@ public class PointManager : MonoBehaviour {
         float pointY = 0.5f - behaviour.transform.position.z / height;
         float rotation = behaviour.point.transform.localRotation.eulerAngles.z >= 0 ? behaviour.point.transform.localRotation.eulerAngles.z : behaviour.point.transform.localRotation.eulerAngles.z + 360.0f;
 
-        return "{\n\"frame\":" + _frameCounter.ToString() + ",\n\"id\":" + behaviour.id.ToString() +
+        return "{\n\"frame\":" + Time.frameCount.ToString() + ",\n\"id\":" + behaviour.id.ToString() +
               ",\n\"oid\":" + behaviour.oid.ToString() + ",\n\"age\":" + behaviour.ageInSeconds.ToString() +
               ",\n\"centroid\": {\n\"x\":" + pointX.ToString() + ",\n\"y\":" + pointY.ToString() + "\n}" +
               ",\n\"velocity\": {\n\"x\":" + (-behaviour.normalizedVelocity.x).ToString() + ",\n\"y\":" + (-behaviour.normalizedVelocity.z).ToString() + "\n}" +
@@ -1056,13 +1060,13 @@ public class PointManager : MonoBehaviour {
               ",\n\"boundingRect\": {\n\"x\":" + pointX.ToString() + ",\n\"y\":" + pointY.ToString() +
               ",\n\"width\":" + (behaviour.size.x / width).ToString() + ",\n\"height\":" + (behaviour.size.y / height).ToString() + ",\n\"rotation\": " + rotation.ToString() +
               "\n},\n\"height\" :" + behaviour.size.z.ToString() +
-              ",\n\"extra\": {\n\"frame\": " + _frameCounter.ToString() + ",\"id\": " + behaviour.id.ToString() + ",\"oid\": " + behaviour.oid.ToString() +
+              ",\n\"extra\": {\n\"frame\": " + Time.frameCount.ToString() + ",\"id\": " + behaviour.id.ToString() + ",\"oid\": " + behaviour.oid.ToString() +
               ",\n\"highest\": {\n\"x\": " + pointX.ToString() + ",\n\"y\": " + pointY.ToString() + "\n}" +
               ",\n\"distance\": " + Vector3.Distance(camera.transform.position, behaviour.transform.position).ToString() + ",\"reflectivity\": " + behaviour.pointColor.grayscale + "\n}\n}";
     }
 
     private String CreateAugmentaMessageJSONScene() {
-        return "{\n\"scene\" : {\n\"frame\": " + _frameCounter.ToString() + ",\n\"objectCount\" : " + _pointsCount.ToString() +
+        return "{\n\"scene\" : {\n\"frame\": " + Time.frameCount.ToString() + ",\n\"objectCount\" : " + _pointsCount.ToString() +
                 ",\n\"scene\" : {\n\"width\" : " + width.ToString() + ",\n\"height\" : " + height.ToString() + "\n}\n}\n}";
     }
 
