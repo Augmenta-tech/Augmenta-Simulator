@@ -696,6 +696,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 528760bd39755ab46bcb069618f0d75a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enableWebsocket: 0
 --- !u!114 &295429784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -721,6 +722,7 @@ MonoBehaviour:
   closePanelAtStart: 1
   currentPreset: 
   presetList: []
+  enableWebsocket: 0
   wsServerPort: 0
 --- !u!1 &386760238
 GameObject:
@@ -2310,6 +2312,7 @@ Transform:
   - {fileID: 18100216}
   - {fileID: 393421888}
   - {fileID: 295429782}
+  - {fileID: 1386690176}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2675,6 +2678,86 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1321598868}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1386690175
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1386690176}
+  - component: {fileID: 1386690178}
+  - component: {fileID: 1386690177}
+  m_Layer: 0
+  m_Name: TUIOManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1386690176
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1386690175}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1144076143}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1386690177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1386690175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d5ff711ccf7f31488dc864c4da06f2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TargetScript: {fileID: 1386690178}
+  BarColor: {r: 1, g: 1, b: 1, a: 1}
+  id: 
+  folder: 
+  debug: 0
+  targetDirectory: 
+  sourceScene: 
+  usePanel: 1
+  usePresets: 1
+  hasPresets: 0
+  closePanelAtStart: 0
+  currentPreset: 
+  presetList: []
+  preset: 
+  TUIOPresets: []
+  outputPort: 0
+  outputIP: 
+  dimension: 
+  TUIODimensions: []
+  descriptor: 
+  TUIODescriptors: []
+--- !u!114 &1386690178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1386690175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18ab29c69390789419f51dac4891f431, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneDepth: 10
+  debug: 0
 --- !u!1 &1396794539
 GameObject:
   m_ObjectHideFlags: 0
