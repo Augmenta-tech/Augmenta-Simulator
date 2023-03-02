@@ -332,12 +332,18 @@ public class PointManager : MonoBehaviour {
         //Send Augmenta scene message
         SendAugmentaMessage(AugmentaMessageType.SceneUpdated);
 
-        //Send Augmenta persons update messages
+        // SendStartingMessage()
+        TUIOManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageAliveTUIO());
+
+        // Send Augmenta persons update messages
         foreach (var point in instantiatedPoints)
             SendAugmentaMessage(AugmentaMessageType.AugmentaObjectUpdate, point.Value);
 
         foreach (var point in _incorrectInstantiatedPoints)
             SendAugmentaMessage(AugmentaMessageType.AugmentaObjectUpdate, point.Value);
+
+        // SendEndingMessage()
+        TUIOManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageFseqTUIO());
     }
 
 	#region Inputs Handling
@@ -723,6 +729,8 @@ public class PointManager : MonoBehaviour {
         // Craft and send a message that contains the event + extra info
         WebsocketManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageJSON(messageType,obj));
 
+        TUIOManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageSetTUIO(messageType, obj));
+
         switch (ProtocolVersionManager.protocolVersion) {
             case ProtocolVersionManager.AugmentaProtocolVersion.V1:
                 OSCManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageV1(messageType, obj));
@@ -1026,6 +1034,242 @@ public class PointManager : MonoBehaviour {
 
         return angle % 360.0f;
     }
+
+    #region TUIO
+
+    private OSCMessage CreateAugmentaMessageAliveTUIO()
+    {
+        string addr = TUIOManager.activeManager.GetAddressTUIO(TUIOManager.TUIODescriptor, TUIOManager.TUIODimension);
+        var msg = new OSCMessage(addr);
+
+        msg.Append("alive");
+
+        foreach (var point in instantiatedPoints)
+        {
+            var behaviour = point.Value.GetComponent<PointBehaviour>();
+            msg.Append(behaviour.id);
+        }
+
+        return msg;
+    }
+
+    private OSCMessage CreateAugmentaMessageSetTUIO(AugmentaMessageType messageType, GameObject obj = null)
+    {
+        string addr = TUIOManager.activeManager.GetAddressTUIO(TUIOManager.TUIODescriptor, TUIOManager.TUIODimension);
+        
+        switch (messageType)
+        {
+
+            //case AugmentaMessageType.AugmentaObjectEnter:
+                //return null; //voir si je mets qqc ou pas
+
+            case AugmentaMessageType.AugmentaObjectUpdate:
+                return CreateAugmentaMessageObjectTUIO(addr, obj); //renvoyer le message 
+
+            //case AugmentaMessageType.AugmentaObjectLeave:
+                //return null;
+
+            case AugmentaMessageType.SceneUpdated:
+                return CreateAugmentaMessageTUIOScene();
+
+            default:
+                var msg = new OSCMessage(addr);
+                return msg;
+        }
+        
+
+        //return CreateAugmentaMessageObjectTUIO(addr, obj);
+    }
+
+    private OSCMessage CreateAugmentaMessageFseqTUIO()
+    {
+        string addr = TUIOManager.activeManager.GetAddressTUIO(TUIOManager.TUIODescriptor, TUIOManager.TUIODimension);
+        var msg = new OSCMessage(addr);
+
+        msg.Append("fseq");
+        msg.Append(Time.frameCount);
+
+        return msg;
+    }
+
+    private OSCMessage CreateAugmentaMessageObjectTUIO(string address, GameObject obj)
+    {
+        var msg = new OSCMessage(address);
+        msg.Append("set");
+
+        var behaviour = obj.GetComponent<PointBehaviour>();
+        float pointX = 0.5f + behaviour.transform.position.x / width;
+        float pointY = 0.5f - behaviour.transform.position.z / height;
+        float rotation = behaviour.point.transform.localRotation.eulerAngles.z >= 0 ? behaviour.point.transform.localRotation.eulerAngles.z : behaviour.point.transform.localRotation.eulerAngles.z + 360.0f;
+
+        //float boundingRotation = behaviour.boundingRotation - orientationParam->floatValue();
+        float a = (behaviour.orientation / 180) * Mathf.PI; //!!!!!!!!!!!!!!Voir pour PI
+        float bba = (rotation / 180) * Mathf.PI; // bb orientation in rad
+        float z = behaviour.transform.position.y / TUIOManager.activeManager.sceneDepth; // Normalized !!!!!!!WARNING 
+
+        switch (TUIOManager.TUIODescriptor)
+        {
+            case TUIOManager.AugmentaTUIODescriptor.OBJECT:
+                switch (TUIOManager.TUIODimension)
+                {
+                    case TUIOManager.AugmentaTUIODimension.TUIO2D:
+                        msg.Append(behaviour.id); // s
+                        msg.Append(behaviour.oid); // i (class id)
+                        msg.Append(pointX); // x
+                        msg.Append(pointY); // y
+                        msg.Append(a); // a (angle) 
+                        msg.Append(-behaviour.normalizedVelocity.x); // X
+                        msg.Append(-behaviour.normalizedVelocity.z); // Y
+                        msg.Append(0); // A
+                        msg.Append(0); // m
+                        msg.Append(0); // r (rotation acceleration)
+                        break;
+                    case TUIOManager.AugmentaTUIODimension.TUIO25D:
+                        msg.Append(behaviour.id); // s
+                        msg.Append(behaviour.oid); // i (class id)
+                        msg.Append(pointX); // x
+                        msg.Append(pointY); // y
+                        msg.Append(z / 2); // z
+                        msg.Append(a); // a
+                        msg.Append(-behaviour.normalizedVelocity.x); // X
+                        msg.Append(-behaviour.normalizedVelocity.z); // Y
+                        msg.Append(0); // Z
+                        msg.Append(0); // A
+                        msg.Append(0); // m
+                        msg.Append(0); // r
+                        break;
+                    case TUIOManager.AugmentaTUIODimension.TUIO3D:
+                        msg.Append(behaviour.id); // s
+                        msg.Append(behaviour.oid); // i (class id)
+                        msg.Append(pointX); // x
+                        msg.Append(pointY); // y
+                        msg.Append(z / 2); // z
+                        msg.Append(a); // a
+                        msg.Append(0); // b
+                        msg.Append(0); // c
+                        msg.Append(-behaviour.normalizedVelocity.x); // X
+                        msg.Append(-behaviour.normalizedVelocity.z); // Y
+                        msg.Append(0); // Z
+                        msg.Append(0); // A
+                        msg.Append(0); // B
+                        msg.Append(0); // C
+                        msg.Append(0); // m
+                        msg.Append(0); // r
+                        break;
+                }
+
+                break;
+
+            case TUIOManager.AugmentaTUIODescriptor.CURSOR:
+                switch (TUIOManager.TUIODimension)
+                {
+                    case TUIOManager.AugmentaTUIODimension.TUIO2D:
+                        msg.Append(behaviour.id); // s
+                        msg.Append(pointX); // x
+                        msg.Append(pointY); // y
+                        msg.Append(-behaviour.normalizedVelocity.x); // X
+                        msg.Append(-behaviour.normalizedVelocity.z); // Y
+                        msg.Append(0); // m
+                        break;
+                    case TUIOManager.AugmentaTUIODimension.TUIO25D:
+                        msg.Append(behaviour.id); // s
+                        msg.Append(pointX); // x
+                        msg.Append(pointY); // y
+                        msg.Append(z / 2); // z
+                        msg.Append(-behaviour.normalizedVelocity.x); // X
+                        msg.Append(-behaviour.normalizedVelocity.z); // Y
+                        msg.Append(0); // Z
+                        msg.Append(0); // m
+                        break;
+                    case TUIOManager.AugmentaTUIODimension.TUIO3D:
+                        msg.Append(behaviour.id); // s
+                        msg.Append(pointX); // x
+                        msg.Append(pointY); // y
+                        msg.Append(behaviour.size.z / 2); // z
+                        msg.Append(-behaviour.normalizedVelocity.x); // X
+                        msg.Append(-behaviour.normalizedVelocity.z); // Y
+                        msg.Append(0); // Z
+                        msg.Append(0); // m
+                        break;
+                }
+
+                break;
+
+            case TUIOManager.AugmentaTUIODescriptor.BLOB:
+                switch (TUIOManager.TUIODimension)
+                {
+                    case TUIOManager.AugmentaTUIODimension.TUIO2D:
+                        msg.Append(behaviour.id); // s
+                        msg.Append(pointX); // x
+                        msg.Append(pointY); // y
+                        msg.Append(bba); // a
+                        msg.Append(behaviour.size.x / width); // w (bounding box dimension)
+                        msg.Append(behaviour.size.y / height); // h
+                        msg.Append(behaviour.size.x / width * behaviour.size.y / height); // f (area)
+                        msg.Append(-behaviour.normalizedVelocity.x); // X
+                        msg.Append(-behaviour.normalizedVelocity.z); // Y
+                        msg.Append(0); // A
+                        msg.Append(0); // m
+                        msg.Append(0); // r
+                        break;
+                    case TUIOManager.AugmentaTUIODimension.TUIO25D:
+                        msg.Append(behaviour.id); // s
+                        msg.Append(pointX); // x
+                        msg.Append(pointY); // y
+                        msg.Append(z / 2); // z
+                        msg.Append(bba); // a 
+                        msg.Append(behaviour.size.x / width); // w (bounding box dimension)
+                        msg.Append(behaviour.size.y / height); // h
+                        msg.Append(behaviour.size.x / width * behaviour.size.y / height); // f (area)
+                        msg.Append(-behaviour.normalizedVelocity.x); // X
+                        msg.Append(-behaviour.normalizedVelocity.z); // Y
+                        msg.Append(0); // A 
+                        msg.Append(0); // m
+                        msg.Append(0); // r
+                        break;
+                    case TUIOManager.AugmentaTUIODimension.TUIO3D:
+                        msg.Append(behaviour.id); // s
+                        msg.Append(pointX); // x
+                        msg.Append(pointY); // y
+                        msg.Append(z/2); // z
+                        msg.Append(bba); // a
+                        msg.Append(0); // b
+                        msg.Append(0); // c
+                        msg.Append(behaviour.size.x / width); // w (bounding box dimension)
+                        msg.Append(behaviour.size.y / height); // h
+                        msg.Append(behaviour.size.z); // d
+                        msg.Append(behaviour.size.x / width * behaviour.size.y / height * behaviour.size.z); // v (volume)
+                        msg.Append(-behaviour.normalizedVelocity.x); // X
+                        msg.Append(-behaviour.normalizedVelocity.z); // Y
+                        msg.Append(0); // Z
+                        msg.Append(0); // A
+                        msg.Append(0); // B
+                        msg.Append(0); // C
+                        msg.Append(0); // m
+                        msg.Append(0); // r
+                        break;
+                }
+
+                break;
+        }
+
+        return msg;
+    }
+
+    private OSCMessage CreateAugmentaMessageTUIOScene()
+    {
+        string addr = "/scene";
+        var msg = new OSCMessage(addr);
+
+        msg.Append(Time.frameCount);  // Frame number
+        msg.Append(_pointsCount);   // Objects count
+        msg.Append(width);          // Scene width
+        msg.Append(height);         //Scene height
+
+        return msg;
+    }
+
+    #endregion
 
     #region Websocket
 
