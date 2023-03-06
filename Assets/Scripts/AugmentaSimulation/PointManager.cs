@@ -333,7 +333,7 @@ public class PointManager : MonoBehaviour {
         SendAugmentaMessage(AugmentaMessageType.SceneUpdated);
 
         // SendStartingMessage()
-        TUIOManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageAliveTUIO());
+        TUIOManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageAliveTUIO(), "TUIO");
 
         // Send Augmenta persons update messages
         foreach (var point in instantiatedPoints)
@@ -343,7 +343,7 @@ public class PointManager : MonoBehaviour {
             SendAugmentaMessage(AugmentaMessageType.AugmentaObjectUpdate, point.Value);
 
         // SendEndingMessage()
-        TUIOManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageFseqTUIO());
+        TUIOManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageFseqTUIO(), "TUIO");
     }
 
 	#region Inputs Handling
@@ -729,7 +729,9 @@ public class PointManager : MonoBehaviour {
         // Craft and send a message that contains the event + extra info
         WebsocketManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageJSON(messageType,obj));
 
-        TUIOManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageSetTUIO(messageType, obj));
+        if (messageType == AugmentaMessageType.SceneUpdated) { TUIOManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageSetTUIO(messageType, obj),"Scene"); }
+        else { TUIOManager.activeManager.SendAugmentaMessage(CreateAugmentaMessageSetTUIO(messageType, obj), "TUIO"); }
+        
 
         switch (ProtocolVersionManager.protocolVersion) {
             case ProtocolVersionManager.AugmentaProtocolVersion.V1:
@@ -1039,7 +1041,7 @@ public class PointManager : MonoBehaviour {
 
     private OSCMessage CreateAugmentaMessageAliveTUIO()
     {
-        string addr = TUIOManager.activeManager.GetAddressTUIO(TUIOManager.TUIODescriptor, TUIOManager.TUIODimension);
+        string addr = TUIOManager.activeManager.GetAddressTUIO(TUIOManager.activeManager.TUIODescriptor, TUIOManager.activeManager.TUIODimension);
         var msg = new OSCMessage(addr);
 
         msg.Append("alive");
@@ -1050,24 +1052,23 @@ public class PointManager : MonoBehaviour {
             msg.Append(behaviour.id);
         }
 
+        foreach (var point in _incorrectInstantiatedPoints)
+        {
+            var behaviour = point.Value.GetComponent<PointBehaviour>();
+            msg.Append(behaviour.id);
+        }
+        
         return msg;
     }
 
     private OSCMessage CreateAugmentaMessageSetTUIO(AugmentaMessageType messageType, GameObject obj = null)
     {
-        string addr = TUIOManager.activeManager.GetAddressTUIO(TUIOManager.TUIODescriptor, TUIOManager.TUIODimension);
+        string addr = TUIOManager.activeManager.GetAddressTUIO(TUIOManager.activeManager.TUIODescriptor, TUIOManager.activeManager.TUIODimension);
         
         switch (messageType)
         {
-
-            //case AugmentaMessageType.AugmentaObjectEnter:
-                //return null; //voir si je mets qqc ou pas
-
             case AugmentaMessageType.AugmentaObjectUpdate:
                 return CreateAugmentaMessageObjectTUIO(addr, obj); //renvoyer le message 
-
-            //case AugmentaMessageType.AugmentaObjectLeave:
-                //return null;
 
             case AugmentaMessageType.SceneUpdated:
                 return CreateAugmentaMessageTUIOScene();
@@ -1076,14 +1077,11 @@ public class PointManager : MonoBehaviour {
                 var msg = new OSCMessage(addr);
                 return msg;
         }
-        
-
-        //return CreateAugmentaMessageObjectTUIO(addr, obj);
     }
 
     private OSCMessage CreateAugmentaMessageFseqTUIO()
     {
-        string addr = TUIOManager.activeManager.GetAddressTUIO(TUIOManager.TUIODescriptor, TUIOManager.TUIODimension);
+        string addr = TUIOManager.activeManager.GetAddressTUIO(TUIOManager.activeManager.TUIODescriptor, TUIOManager.activeManager.TUIODimension);
         var msg = new OSCMessage(addr);
 
         msg.Append("fseq");
@@ -1103,14 +1101,14 @@ public class PointManager : MonoBehaviour {
         float rotation = behaviour.point.transform.localRotation.eulerAngles.z >= 0 ? behaviour.point.transform.localRotation.eulerAngles.z : behaviour.point.transform.localRotation.eulerAngles.z + 360.0f;
 
         //float boundingRotation = behaviour.boundingRotation - orientationParam->floatValue();
-        float a = (behaviour.orientation / 180) * Mathf.PI; //!!!!!!!!!!!!!!Voir pour PI
+        float a = (behaviour.orientation / 180) * Mathf.PI; //
         float bba = (rotation / 180) * Mathf.PI; // bb orientation in rad
-        float z = behaviour.transform.position.y / TUIOManager.activeManager.sceneDepth; // Normalized !!!!!!!WARNING 
+        float z = behaviour.transform.position.y / TUIOManager.activeManager.sceneDepth; // Normalized 
 
-        switch (TUIOManager.TUIODescriptor)
+        switch (TUIOManager.activeManager.TUIODescriptor)
         {
             case TUIOManager.AugmentaTUIODescriptor.OBJECT:
-                switch (TUIOManager.TUIODimension)
+                switch (TUIOManager.activeManager.TUIODimension)
                 {
                     case TUIOManager.AugmentaTUIODimension.TUIO2D:
                         msg.Append(behaviour.id); // s
@@ -1161,7 +1159,7 @@ public class PointManager : MonoBehaviour {
                 break;
 
             case TUIOManager.AugmentaTUIODescriptor.CURSOR:
-                switch (TUIOManager.TUIODimension)
+                switch (TUIOManager.activeManager.TUIODimension)
                 {
                     case TUIOManager.AugmentaTUIODimension.TUIO2D:
                         msg.Append(behaviour.id); // s
@@ -1196,7 +1194,7 @@ public class PointManager : MonoBehaviour {
                 break;
 
             case TUIOManager.AugmentaTUIODescriptor.BLOB:
-                switch (TUIOManager.TUIODimension)
+                switch (TUIOManager.activeManager.TUIODimension)
                 {
                     case TUIOManager.AugmentaTUIODimension.TUIO2D:
                         msg.Append(behaviour.id); // s
