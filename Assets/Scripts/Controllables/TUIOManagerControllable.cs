@@ -56,14 +56,14 @@ public class TUIOManagerControllable : Controllable
     {
         if (name == presetParameterName)
         {
-            RemoveAllTUIODescriptors();
+            SendEmptyMessageOnAllAddresses();
             (TargetScript as TUIOManager).TUIOPreset = (TUIOManager.AugmentaTUIOPreset)Enum.Parse(typeof(TUIOManager.AugmentaTUIOPreset), preset);
             ChangedParameterPreset();
         }
 
         if (name == dimensionParameterName || name == descriptorParameterName)
         {
-            RemoveAllTUIODescriptors();
+            SendEmptyMessageOnAllAddresses();
             (TargetScript as TUIOManager).TUIODimension = (TUIOManager.AugmentaTUIODimension)Enum.Parse(typeof(TUIOManager.AugmentaTUIODimension), dimension);
             (TargetScript as TUIOManager).TUIODescriptor = (TUIOManager.AugmentaTUIODescriptor)Enum.Parse(typeof(TUIOManager.AugmentaTUIODescriptor), descriptor);
         }
@@ -104,7 +104,7 @@ public class TUIOManagerControllable : Controllable
         base.OnScriptValueChanged(name);
     }
 
-    private void RemoveAllTUIODescriptors()
+    private void SendEmptyMessageOnAllAddresses()
     {
         foreach (int i in Enum.GetValues(typeof(TUIOManager.AugmentaTUIODimension)))//for (int i = 0; i < 3; i++)
         {
@@ -157,7 +157,6 @@ public class TUIOManagerControllable : Controllable
 
                 if ((TargetScript as TUIOManager).TUIOPort == (TargetScript as TUIOManager).outputScene)
                 {
-                    Debug.Log("Warning, Remote ports for OSC and TUIO will be set to different values from each other.");
                     (TargetScript as TUIOManager).TUIOPort = 3333;
                     (TargetScript as TUIOManager).outputScene = 9001;
                 }

@@ -80,15 +80,9 @@ public class TUIOManager : MonoBehaviour
 
     public float sceneDepth = 10;
 
-    private Dictionary<string, float> _augmentaOutputs; // <ID, timer>
-    private KeyValuePair<string, float> _tmpOutput;
-    private List<string> _outputsToDelete;
-
-    private TUIOManagerControllable _controllable;
-    private NodeManager _nodeManager;
+    private TUIOManagerControllable _controllable; // if we need to call methods on the controllable we can use this variable
 
     private bool _initialized = false;
-    private bool _yoServerCreated = false;
 
     #region MonoBehaviour Implementation
 
@@ -102,8 +96,6 @@ public class TUIOManager : MonoBehaviour
 
         if (!_initialized)
             Initialize();
-
-        UpdateOutputsTimers();
     }
 
     #endregion
@@ -111,42 +103,11 @@ public class TUIOManager : MonoBehaviour
     void Initialize() {
         activeManager = this;
 
-        _augmentaOutputs = new Dictionary<string, float>();
-        _outputsToDelete = new List<string>();
-
         _controllable = FindObjectOfType<TUIOManagerControllable>();
-        _nodeManager = FindObjectOfType<NodeManager>();
 
         CreateAugmentaClient();
 
         _initialized = true;
-    }
-
-    /// <summary>
-    /// Increase output timers and delete timed out outputs
-    /// </summary>
-    void UpdateOutputsTimers() {
-
-        _outputsToDelete.Clear();
-
-        for(int i=0; i<_augmentaOutputs.Count; i++) {
-
-            _tmpOutput = _augmentaOutputs.ElementAt(i);
-
-            //Increase output timers
-            _augmentaOutputs[_tmpOutput.Key] = _tmpOutput.Value + Time.deltaTime;
-
-
-        }
-
-        //Delete timed out outputs
-        foreach(var output in _outputsToDelete) {
-
-            if(OSCMaster.Clients.ContainsKey(output))
-                OSCMaster.RemoveClient(output);
-
-            _augmentaOutputs.Remove(output);
-        }
     }
 
     /// <summary>
@@ -178,20 +139,6 @@ public class TUIOManager : MonoBehaviour
 
         if (client == "TUIO") { OSCMaster.Clients["AugmentaSimulatorOutputTUIO"].Send(message); }
         if (client == "Scene") { OSCMaster.Clients["AugmentaSimulatorOutputScene"].Send(message); }
-        
-        foreach (var output in _augmentaOutputs)
-            OSCMaster.Clients[output.Key].Send(message);
-    }
-
-    /// <summary>
-    /// Returns an ID based on the IP address and the port
-    /// </summary>
-    /// <param name="IP"></param>
-    /// <param name="port"></param>
-    /// <returns></returns>
-    string GetIDFromIPAndPort(string IP, int port) {
-
-        return string.Join(":", new string[] { IP, port.ToString() });
     }
 
     public String GetAddressTUIO(AugmentaTUIODescriptor description, AugmentaTUIODimension dimension)
