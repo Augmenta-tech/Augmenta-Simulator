@@ -241,11 +241,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4c8e32f3cdcfe04caee8594416a7f5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  zeroconfManager: {fileID: 393421887}
-  yoVersion: 2
-  yoPort: 36278
-  connectionTimeout: 60
-  debug: 0
 --- !u!4 &18100216
 Transform:
   m_ObjectHideFlags: 0
@@ -286,11 +281,8 @@ MonoBehaviour:
   closePanelAtStart: 0
   currentPreset: 
   presetList: []
-  yoVersion: 0
-  yoPort: 0
   outputPort: 0
   outputIP: 
-  connectionTimeout: 0
 --- !u!1 &33820299
 GameObject:
   m_ObjectHideFlags: 0
@@ -429,38 +421,6 @@ LightingSettings:
   m_PVRFilteringAtrousPositionSigmaIndirect: 2
   m_PVRFilteringAtrousPositionSigmaAO: 1
   m_PVRTiledBaking: 0
---- !u!1 &135095402
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 135095403}
-  m_Layer: 0
-  m_Name: NodeSimulation
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &135095403
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 135095402}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1396794540}
-  m_Father: {fileID: 0}
-  m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &183710613
 GameObject:
   m_ObjectHideFlags: 0
@@ -682,7 +642,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1144076143}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &295429783
 MonoBehaviour:
@@ -877,50 +837,6 @@ MonoBehaviour:
   _senderName: AugmentaSimulator_VideoOutput
   _useCamera: 0
   _alphaSupport: 0
---- !u!1 &393421886
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 393421888}
-  - component: {fileID: 393421887}
-  m_Layer: 0
-  m_Name: ZeroconfManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &393421887
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 393421886}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c81078e2b27379140a5eea674206f0a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &393421888
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 393421886}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1144076143}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &436944970
 GameObject:
   m_ObjectHideFlags: 0
@@ -2310,7 +2226,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 18100216}
-  - {fileID: 393421888}
   - {fileID: 295429782}
   - {fileID: 1386690176}
   m_Father: {fileID: 0}
@@ -2386,7 +2301,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1311473798
 GameObject:
@@ -2709,7 +2624,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1144076143}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1386690177
 MonoBehaviour:
@@ -2737,13 +2652,14 @@ MonoBehaviour:
   currentPreset: 
   presetList: []
   preset: 
-  TUIOPresets: []
-  outputPort: 0
+  outputScene: 0
+  TUIOPort: 0
   outputIP: 
   dimension: 
-  TUIODimensions: []
   descriptor: 
   TUIODescriptors: []
+  TUIOPresets: []
+  TUIODimensions: []
 --- !u!114 &1386690178
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2756,111 +2672,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18ab29c69390789419f51dac4891f431, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  descriptor: 
+  preset: 
+  dimension: 
   sceneDepth: 10
-  debug: 0
---- !u!1 &1396794539
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1396794540}
-  - component: {fileID: 1396794542}
-  - component: {fileID: 1396794541}
-  m_Layer: 0
-  m_Name: Manager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1396794540
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1396794539}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 135095403}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1396794541
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1396794539}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b933b1218ee8cb4aa798b43cfedb3ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TargetScript: {fileID: 1396794542}
-  BarColor: {r: 1, g: 0, b: 0.9735141, a: 1}
-  id: NodeManager
-  folder: 
-  debug: 0
-  targetDirectory: 
-  sourceScene: 
-  usePanel: 1
-  usePresets: 1
-  hasPresets: 0
-  closePanelAtStart: 0
-  currentPreset: 
-  presetList: []
-  nodeName: 
-  sensorType: 
-  sensorBrand: 
-  sensorName: 
-  sensorHFOV: 0
-  sensorVFOV: 0
-  floorMode: 
-  floorState: 
-  backgroundMode: 
-  debugPipeName: 
-  debugSensor: 
-  debugVideoPipe: 
-  debugTrackingPipe: 
-  debugPID: 0
-  currentTags: 
-  newTag: 
---- !u!114 &1396794542
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1396794539}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d869660ca48de2e4195369bc69254c2c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  zeroconfManager: {fileID: 393421887}
-  tagsList:
-  - room1
-  - fountain
-  sensorType: DepthCamera
-  sensorBrand: Orbbec
-  sensorName: AstraPro
-  sensorHFOV: 60
-  sensorVFOV: 49.5
-  floorMode: Auto
-  floorState: Found
-  backgroundMode: Auto
-  debugPipeName: OrbbecAstra
-  debugSensor: OrbbecAstraPro
-  debugVideoPipe: DepthPipe
-  debugTrackingPipe: TrackingV1
-  debugPID: 69
 --- !u!1 &1554386833
 GameObject:
   m_ObjectHideFlags: 0
@@ -3443,7 +3258,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2071885444
 GameObject:
