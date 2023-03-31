@@ -1,0 +1,47 @@
+# This workflow will upload the published release's files to a server through FTP
+
+name: Release uploader
+on: 
+  release:
+    types: [published]
+    
+jobs:
+  upload:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Log infos
+        run: |
+          echo "Uploading release artifacts for tag ${{ github.ref_name }}"
+          echo "Package will be generated with name: ${{ vars.PACKAGE_NAME }}"
+          echo "Working in ${{ github.workspace }}"
+      
+      - name: Release downloader
+        uses: robinraju/release-downloader@v1.7
+        with:
+          tag: ${{ github.ref_name }}
+          fileName: "AugmentaSimulator-*.zip"
+          token: ${{ github.token }}
+          out-file-path: ${{ vars.PACKAGE_NAME }}
+      
+      - name: Create result folder
+        working-directory: ${{ github.workspace }}
+        run: mkdir result
+      
+      - name: Create a compressed archive
+        working-directory: ${{ github.workspace }}  
+        run: |
+          zip -r ${{ vars.PACKAGE_NAME }}.zip ./${{ vars.PACKAGE_NAME }}
+          mv ${{ vars.PACKAGE_NAME }}.zip result
+
+
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ${{ github.workspace }}/result/
+          server-dir: /download/
+
