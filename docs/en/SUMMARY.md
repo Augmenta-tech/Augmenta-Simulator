@@ -1,3 +1,3 @@
 # Table of contents
 
-* [Augmenta-Simulator](README.md)
+* [Simulator](README.md)

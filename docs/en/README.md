@@ -1,20 +1,28 @@
-# Augmenta-Simulator
+---
+description: Work without Augmenta hardware by simulating people moving in space
+---
+
+# Simulator
+
+### Augmenta-Simulator
 
 Work without Augmenta hardware by simulating people moving in space.
 
-![](https://media.giphy.com/media/lRdaGBXEvU5mAj0z5K/giphy.gif) 
+![](https://media.giphy.com/media/lRdaGBXEvU5mAj0z5K/giphy.gif)
 
 ## Download
 
-Windows & Mac OS : https://github.com/Theoriz/Augmenta-Simulator/releases
+{% hint style="info" %}
+👋 Download Siulator for Windows & MacOS [here](https://mailchi.mp/augmenta.tech/0it8p7im9h)
+{% endhint %}
 
 ## Controls
 
 ### Application Shortcuts
 
-Left clic : Create point or move existing point
+Left click : Create point or move existing point
 
-Right clic : Delete point
+Right click : Delete point
 
 M : Mute/Unmute all outputs
 
