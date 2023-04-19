@@ -13,7 +13,7 @@ Work without Augmenta hardware by simulating people moving in space.
 ## Download
 
 {% hint style="info" %}
-👋 Download Siulator for Windows & MacOS [here](https://mailchi.mp/augmenta.tech/0it8p7im9h)
+👋 Download Simulator for Windows & MacOS [here](https://augmenta.tech/augmenta-simulator-download/)
 {% endhint %}
 
 ## Controls
