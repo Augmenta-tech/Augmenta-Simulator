@@ -541,7 +541,14 @@ public class PointManager : MonoBehaviour {
         newPointBehaviour.isIncorrectDetection = isIncorrectDetection;
 		newPointBehaviour.isFlickering = false;
 
-		if (isIncorrectDetection) {
+        if (isFromCursor)
+        {
+            _cursorPoint = newPoint;
+            OnMouseDrag();
+            _desiredPointsCount++;
+        }
+
+        if (isIncorrectDetection) {
 			_incorrectInstantiatedPoints.Add(_highestId, newPoint);
 			UpdateOIDs();
 			SendAugmentaMessage(AugmentaMessageType.AugmentaObjectEnter, _incorrectInstantiatedPoints[_highestId]);
@@ -550,12 +557,6 @@ public class PointManager : MonoBehaviour {
 			UpdateOIDs();
 			SendAugmentaMessage(AugmentaMessageType.AugmentaObjectEnter, instantiatedPoints[_highestId]);
 		}
-
-		if (isFromCursor) {
-			_cursorPoint = newPoint;
-			OnMouseDrag();
-            _desiredPointsCount++;
-        }
 
         _highestId++;
 		_pointsCount++;
