@@ -85,8 +85,9 @@ public class VideoOutputManager : MonoBehaviour
 		fusionMessage.Append(resolution.y);
 
 		OSCManager.activeManager.SendAugmentaMessage(fusionMessage);
+		TUIOManager.activeManager.SendAugmentaMessage(fusionMessage, "Scene");
 
-		WebsocketManager.activeManager.SendAugmentaMessage(
+        WebsocketManager.activeManager.SendAugmentaMessage(
 			"{\n\"fusion\": {\n\"textureOffset\": {\n\"x\": " + offset.x + ",\n\"y\": " + offset.y +
 			"\n},\n\"textureBounds\": {\n\"x\": " + size.x + ",\n\"y\": " + size.y +
 			"\n},\n\"targetOutSize\": {\n\"x\": " + resolution.x + ",\n\"y\": " + resolution.y + "\n}\n}\n}"
