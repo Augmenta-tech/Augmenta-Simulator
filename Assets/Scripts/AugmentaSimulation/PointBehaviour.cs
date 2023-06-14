@@ -27,7 +27,7 @@ public class PointBehaviour : MonoBehaviour {
     public float speed;
 
     public int id;
-    public int oid;
+    public int slotid;
     public Vector3 direction;
     public bool isMovedByMouse;
     public Color pointColor;
@@ -115,7 +115,7 @@ public class PointBehaviour : MonoBehaviour {
         UpdatePoint();
 
         //Udpate text
-        pointInfoText.text = "ID : " + id + '\n' + '\n' + "OID : " + oid;
+        pointInfoText.text = "ID : " + id + '\n' + '\n' + "SLOTID : " + slotid;
     }
 
     private void LateUpdate() {

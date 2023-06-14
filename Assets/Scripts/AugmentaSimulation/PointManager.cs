@@ -236,18 +236,13 @@ public class PointManager : MonoBehaviour {
     public GameObject pointPrefab;
 
     public static Dictionary<int, GameObject> instantiatedPoints;
+    private List<int> slots = new List<int>();
 
     public Material backgroundMaterial;
     public Color borderColor;
 
     private CameraController cameraController;
 
-    //private int _frameCounter;
-    //public int frameCounter
-    //{
-    //    get { return _frameCounter; }
-    //}
-    //public static int _frameCounter;
     private int _highestId;
 
     private GameObject _cursorPoint;
@@ -256,8 +251,6 @@ public class PointManager : MonoBehaviour {
 
     private Dictionary<int, GameObject> _incorrectInstantiatedPoints;
     private Dictionary<int, GameObject> _flickeringPoints;
-
-    private List<int> _keysList;
 
     private bool _initialized = false;
     private float _timer = 0;
@@ -465,8 +458,6 @@ public class PointManager : MonoBehaviour {
                 instantiatedPoints.Remove(pidToFlicker);
                 _pointsCount--;
 
-                //Update OIDs
-                UpdateOIDs();
             } catch {
 
             }
@@ -487,7 +478,6 @@ public class PointManager : MonoBehaviour {
         pointBehaviour.ShowPoint();
 
         _flickeringPoints.Remove(pid);
-        UpdateOIDs();
         SendAugmentaMessage(AugmentaMessageType.AugmentaObjectEnter, instantiatedPoints[pid]);
     }
 
@@ -529,7 +519,8 @@ public class PointManager : MonoBehaviour {
 		newPoint.transform.localPosition = GetNewPointPosition();
 		newPointBehaviour.speed = speed;
 		newPointBehaviour.id = _highestId;
-		newPointBehaviour.size = new Vector3(UnityEngine.Random.Range(minPointSize.x, maxPointSize.x),
+        newPointBehaviour.slotid = registerObject(newPoint);
+        newPointBehaviour.size = new Vector3(UnityEngine.Random.Range(minPointSize.x, maxPointSize.x),
                                              UnityEngine.Random.Range(minPointSize.y, maxPointSize.y),
                                              UnityEngine.Random.Range(minPointSize.z, maxPointSize.z));
 		newPointBehaviour.animateSize = animateSize;
@@ -550,11 +541,9 @@ public class PointManager : MonoBehaviour {
 
         if (isIncorrectDetection) {
 			_incorrectInstantiatedPoints.Add(_highestId, newPoint);
-			UpdateOIDs();
 			SendAugmentaMessage(AugmentaMessageType.AugmentaObjectEnter, _incorrectInstantiatedPoints[_highestId]);
 		} else {
 			instantiatedPoints.Add(_highestId, newPoint);
-			UpdateOIDs();
 			SendAugmentaMessage(AugmentaMessageType.AugmentaObjectEnter, instantiatedPoints[_highestId]);
 		}
 
@@ -595,11 +584,9 @@ public class PointManager : MonoBehaviour {
             pidToRemove = instantiatedPoints.ElementAt(instantiatedPoints.Count - 2).Key;
 
 		SendAugmentaMessage(AugmentaMessageType.AugmentaObjectLeave, instantiatedPoints[pidToRemove]);
+        unregisterObject(instantiatedPoints[pidToRemove]);
 		Destroy(instantiatedPoints[pidToRemove]);
 		instantiatedPoints.Remove(pidToRemove);
-
-        //Update OIDs
-        UpdateOIDs();
 
         _pointsCount--;
     }
@@ -611,11 +598,9 @@ public class PointManager : MonoBehaviour {
 
         if (instantiatedPoints.ContainsKey(pid)) {
             SendAugmentaMessage(AugmentaMessageType.AugmentaObjectLeave, instantiatedPoints[pid]);
+            unregisterObject(instantiatedPoints[pid]);
             Destroy(instantiatedPoints[pid]);
             instantiatedPoints.Remove(pid);
-
-            //Update OIDs
-            UpdateOIDs();
 
             _pointsCount--;
 
@@ -631,35 +616,43 @@ public class PointManager : MonoBehaviour {
 
         if (_incorrectInstantiatedPoints.ContainsKey(pid)) {
             SendAugmentaMessage(AugmentaMessageType.AugmentaObjectLeave, _incorrectInstantiatedPoints[pid]);
+            unregisterObject(_incorrectInstantiatedPoints[pid]);
             Destroy(_incorrectInstantiatedPoints[pid]);
             _incorrectInstantiatedPoints.Remove(pid);
-
-            //Update OIDs
-            UpdateOIDs();
 
             _pointsCount--;
         }
     }
 
     /// <summary>
-    /// Recompute points OIDs
-    /// </summary>
-    private void UpdateOIDs() {
+    /// Compute points SLOTIDs
+    /// </summary> 
+    private int getFirstFreeId() {
 
-        _keysList = instantiatedPoints.Keys.ToList();
-        _keysList.Sort();
+        int firstFree = slots.IndexOf(-1);
+        return firstFree;
+	}
 
-        for(int i=0; i<instantiatedPoints.Count; i++) {
-            instantiatedPoints[_keysList[i]].GetComponent<PointBehaviour>().oid = i;
+    private int registerObject(GameObject obj){
+        var behaviour = obj.GetComponent<PointBehaviour>();
+        int freeId = getFirstFreeId();
+
+        if(freeId == -1)
+        {
+            freeId = slots.Count;
+            slots.Add(behaviour.id);
         }
 
-        _keysList = _incorrectInstantiatedPoints.Keys.ToList();
-        _keysList.Sort();
+        else slots[freeId] = behaviour.id;
 
-        for (int i = 0; i < _incorrectInstantiatedPoints.Count; i++) {
-            _incorrectInstantiatedPoints[_keysList[i]].GetComponent<PointBehaviour>().oid = instantiatedPoints.Count + i;
-        }
+        return freeId;
+    }
 
+    private void unregisterObject(GameObject obj)
+    {
+        var behaviour = obj.GetComponent<PointBehaviour>();
+        int indexToRemove = behaviour.slotid;
+        slots[indexToRemove] = -1;
     }
 
     public void RemovePoints() {
@@ -672,6 +665,7 @@ public class PointManager : MonoBehaviour {
         }
 
         instantiatedPoints.Clear();
+        slots.Clear();
     }
 
 	#endregion
@@ -753,7 +747,7 @@ public class PointManager : MonoBehaviour {
 
     /*
         0: pid (int)                        // Personal ID ex : 42th person to enter stage has pid=42
-        1: oid (int)                        // Ordered ID ex : if 3 person on stage, 43th person might have oid=2
+        1: slotid (int)                        // Ordered ID ex : if 3 person on stage, 43th person might have slotid=2
         2: age (int)                        // Time on stage (in frame number)
         3: centroid.x (float 0:1)           // Position projected to the ground
         4: centroid.y (float 0:1)               
@@ -821,7 +815,7 @@ public class PointManager : MonoBehaviour {
         float pointY = 0.5f - behaviour.transform.position.z / height;
 
         msg.Append(behaviour.id);
-        msg.Append(behaviour.oid);
+        msg.Append(behaviour.slotid);
         msg.Append((int)behaviour.ageInFrames);
         msg.Append(pointX);
         msg.Append(pointY);
@@ -877,7 +871,7 @@ public class PointManager : MonoBehaviour {
         where args are : 
         0: frame(int)     // Frame number
         1: id(int)                        // id ex : 42th object to enter stage has pid=42
-        2: oid(int)                        // Ordered id ex : if 3 objects on stage, 43th object might have oid=2 
+        2: slotid(int)                        // Ordered id ex : if 3 objects on stage, 43th object might have slotid=2 
         3: age(float)                      // Alive time (in s)
         4: centroid.x(float 0:1)           // Position projected to the ground (normalised)
         5: centroid.y(float 0:1)               
@@ -962,7 +956,7 @@ public class PointManager : MonoBehaviour {
 
         msg.Append(Time.frameCount);                      // Frame number
         msg.Append(behaviour.id);                       // id ex : 42th object to enter stage has id=42
-        msg.Append(behaviour.oid);                      // Ordered id ex : if 3 objects on stage, 43th object might have oid=2 
+        msg.Append(behaviour.slotid);                      // Ordered id ex : if 3 objects on stage, 43th object might have slotid=2 
         msg.Append(behaviour.ageInSeconds);             // Alive time (in s)
         msg.Append(pointX);                             // Position projected to the ground (normalized)
         msg.Append(pointY);
@@ -995,7 +989,7 @@ public class PointManager : MonoBehaviour {
 
         msg.Append(Time.frameCount);                      // Frame number
         msg.Append(behaviour.id);                       // id ex : 42th object to enter stage has id=42
-        msg.Append(behaviour.oid);                      // Ordered id ex : if 3 objects on stage, 43th object might have oid=2 
+        msg.Append(behaviour.slotid);                      // Ordered id ex : if 3 objects on stage, 43th object might have slotid=2 
         msg.Append(pointX);                             // Highest point placement (normalized)
         msg.Append(pointY);
         msg.Append(Vector3.Distance(camera.transform.position, behaviour.transform.position)); //Sensor distance in meters
@@ -1113,7 +1107,7 @@ public class PointManager : MonoBehaviour {
                 {
                     case TUIOManager.AugmentaTUIODimension.TUIO2D:
                         msg.Append(behaviour.id); // s
-                        msg.Append(behaviour.oid); // i (class id)
+                        msg.Append(behaviour.slotid); // i (class id)
                         msg.Append(pointX); // x
                         msg.Append(pointY); // y
                         msg.Append(a); // a (angle) 
@@ -1125,7 +1119,7 @@ public class PointManager : MonoBehaviour {
                         break;
                     case TUIOManager.AugmentaTUIODimension.TUIO25D:
                         msg.Append(behaviour.id); // s
-                        msg.Append(behaviour.oid); // i (class id)
+                        msg.Append(behaviour.slotid); // i (class id)
                         msg.Append(pointX); // x
                         msg.Append(pointY); // y
                         msg.Append(z / 2); // z
@@ -1139,7 +1133,7 @@ public class PointManager : MonoBehaviour {
                         break;
                     case TUIOManager.AugmentaTUIODimension.TUIO3D:
                         msg.Append(behaviour.id); // s
-                        msg.Append(behaviour.oid); // i (class id)
+                        msg.Append(behaviour.slotid); // i (class id)
                         msg.Append(pointX); // x
                         msg.Append(pointY); // y
                         msg.Append(z / 2); // z
@@ -1296,14 +1290,14 @@ public class PointManager : MonoBehaviour {
         float rotation = behaviour.point.transform.localRotation.eulerAngles.z >= 0 ? behaviour.point.transform.localRotation.eulerAngles.z : behaviour.point.transform.localRotation.eulerAngles.z + 360.0f;
 
         return "{\n\"frame\":" + Time.frameCount.ToString() + ",\n\"id\":" + behaviour.id.ToString() +
-              ",\n\"oid\":" + behaviour.oid.ToString() + ",\n\"age\":" + behaviour.ageInSeconds.ToString() +
+              ",\n\"slotid\":" + behaviour.slotid.ToString() + ",\n\"age\":" + behaviour.ageInSeconds.ToString() +
               ",\n\"centroid\": {\n\"x\":" + pointX.ToString() + ",\n\"y\":" + pointY.ToString() + "\n}" +
               ",\n\"velocity\": {\n\"x\":" + (-behaviour.normalizedVelocity.x).ToString() + ",\n\"y\":" + (-behaviour.normalizedVelocity.z).ToString() + "\n}" +
               ",\n\"orientation\":" + behaviour.orientation.ToString() +
               ",\n\"boundingRect\": {\n\"x\":" + pointX.ToString() + ",\n\"y\":" + pointY.ToString() +
               ",\n\"width\":" + (behaviour.size.x / width).ToString() + ",\n\"height\":" + (behaviour.size.y / height).ToString() + ",\n\"rotation\": " + rotation.ToString() +
               "\n},\n\"height\" :" + behaviour.size.z.ToString() +
-              ",\n\"extra\": {\n\"frame\": " + Time.frameCount.ToString() + ",\"id\": " + behaviour.id.ToString() + ",\"oid\": " + behaviour.oid.ToString() +
+              ",\n\"extra\": {\n\"frame\": " + Time.frameCount.ToString() + ",\"id\": " + behaviour.id.ToString() + ",\"slotid\": " + behaviour.slotid.ToString() +
               ",\n\"highest\": {\n\"x\": " + pointX.ToString() + ",\n\"y\": " + pointY.ToString() + "\n}" +
               ",\n\"distance\": " + Vector3.Distance(camera.transform.position, behaviour.transform.position).ToString() + ",\"reflectivity\": " + behaviour.pointColor.grayscale + "\n}\n}";
     }
