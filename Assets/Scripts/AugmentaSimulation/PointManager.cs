@@ -1113,9 +1113,9 @@ public class PointManager : MonoBehaviour {
                         msg.Append(a); // a (angle) 
                         msg.Append(-behaviour.normalizedVelocity.x); // X
                         msg.Append(-behaviour.normalizedVelocity.z); // Y
-                        msg.Append(0); // A
-                        msg.Append(0); // m
-                        msg.Append(0); // r (rotation acceleration)
+                        msg.Append(0.0f); // A
+                        msg.Append(0.0f); // m
+                        msg.Append(0.0f); // r (rotation acceleration)
                         break;
                     case TUIOManager.AugmentaTUIODimension.TUIO25D:
                         msg.Append(behaviour.id); // s
@@ -1126,10 +1126,10 @@ public class PointManager : MonoBehaviour {
                         msg.Append(a); // a
                         msg.Append(-behaviour.normalizedVelocity.x); // X
                         msg.Append(-behaviour.normalizedVelocity.z); // Y
-                        msg.Append(0); // Z
-                        msg.Append(0); // A
-                        msg.Append(0); // m
-                        msg.Append(0); // r
+                        msg.Append(0.0f); // Z
+                        msg.Append(0.0f); // A
+                        msg.Append(0.0f); // m
+                        msg.Append(0.0f); // r
                         break;
                     case TUIOManager.AugmentaTUIODimension.TUIO3D:
                         msg.Append(behaviour.id); // s
@@ -1138,16 +1138,16 @@ public class PointManager : MonoBehaviour {
                         msg.Append(pointY); // y
                         msg.Append(z / 2); // z
                         msg.Append(a); // a
-                        msg.Append(0); // b
-                        msg.Append(0); // c
+                        msg.Append(0.0f); // b
+                        msg.Append(0.0f); // c
                         msg.Append(-behaviour.normalizedVelocity.x); // X
                         msg.Append(-behaviour.normalizedVelocity.z); // Y
-                        msg.Append(0); // Z
-                        msg.Append(0); // A
-                        msg.Append(0); // B
-                        msg.Append(0); // C
-                        msg.Append(0); // m
-                        msg.Append(0); // r
+                        msg.Append(0.0f); // Z
+                        msg.Append(0.0f); // A
+                        msg.Append(0.0f); // B
+                        msg.Append(0.0f); // C
+                        msg.Append(0.0f); // m
+                        msg.Append(0.0f); // r
                         break;
                 }
 
@@ -1162,7 +1162,7 @@ public class PointManager : MonoBehaviour {
                         msg.Append(pointY); // y
                         msg.Append(-behaviour.normalizedVelocity.x); // X
                         msg.Append(-behaviour.normalizedVelocity.z); // Y
-                        msg.Append(0); // m
+                        msg.Append(0.0f); // m
                         break;
                     case TUIOManager.AugmentaTUIODimension.TUIO25D:
                         msg.Append(behaviour.id); // s
@@ -1171,8 +1171,8 @@ public class PointManager : MonoBehaviour {
                         msg.Append(z / 2); // z
                         msg.Append(-behaviour.normalizedVelocity.x); // X
                         msg.Append(-behaviour.normalizedVelocity.z); // Y
-                        msg.Append(0); // Z
-                        msg.Append(0); // m
+                        msg.Append(0.0f); // Z
+                        msg.Append(0.0f); // m
                         break;
                     case TUIOManager.AugmentaTUIODimension.TUIO3D:
                         msg.Append(behaviour.id); // s
@@ -1181,8 +1181,8 @@ public class PointManager : MonoBehaviour {
                         msg.Append(behaviour.size.z / 2); // z
                         msg.Append(-behaviour.normalizedVelocity.x); // X
                         msg.Append(-behaviour.normalizedVelocity.z); // Y
-                        msg.Append(0); // Z
-                        msg.Append(0); // m
+                        msg.Append(0.0f); // Z
+                        msg.Append(0.0f); // m
                         break;
                 }
 
@@ -1201,9 +1201,9 @@ public class PointManager : MonoBehaviour {
                         msg.Append(behaviour.size.x / width * behaviour.size.y / height); // f (area)
                         msg.Append(-behaviour.normalizedVelocity.x); // X
                         msg.Append(-behaviour.normalizedVelocity.z); // Y
-                        msg.Append(0); // A
-                        msg.Append(0); // m
-                        msg.Append(0); // r
+                        msg.Append(0.0f); // A
+                        msg.Append(0.0f); // m
+                        msg.Append(0.0f); // r
                         break;
                     case TUIOManager.AugmentaTUIODimension.TUIO25D:
                         msg.Append(behaviour.id); // s
@@ -1216,9 +1216,9 @@ public class PointManager : MonoBehaviour {
                         msg.Append(behaviour.size.x / width * behaviour.size.y / height); // f (area)
                         msg.Append(-behaviour.normalizedVelocity.x); // X
                         msg.Append(-behaviour.normalizedVelocity.z); // Y
-                        msg.Append(0); // A 
-                        msg.Append(0); // m
-                        msg.Append(0); // r
+                        msg.Append(0.0f); // A 
+                        msg.Append(0.0f); // m
+                        msg.Append(0.0f); // r
                         break;
                     case TUIOManager.AugmentaTUIODimension.TUIO3D:
                         msg.Append(behaviour.id); // s
@@ -1226,20 +1226,20 @@ public class PointManager : MonoBehaviour {
                         msg.Append(pointY); // y
                         msg.Append(z/2); // z
                         msg.Append(bba); // a
-                        msg.Append(0); // b
-                        msg.Append(0); // c
+                        msg.Append(0.0f); // b
+                        msg.Append(0.0f); // c
                         msg.Append(behaviour.size.x / width); // w (bounding box dimension)
                         msg.Append(behaviour.size.y / height); // h
                         msg.Append(behaviour.size.z); // d
                         msg.Append(behaviour.size.x / width * behaviour.size.y / height * behaviour.size.z); // v (volume)
                         msg.Append(-behaviour.normalizedVelocity.x); // X
                         msg.Append(-behaviour.normalizedVelocity.z); // Y
-                        msg.Append(0); // Z
-                        msg.Append(0); // A
-                        msg.Append(0); // B
-                        msg.Append(0); // C
-                        msg.Append(0); // m
-                        msg.Append(0); // r
+                        msg.Append(0.0f); // Z
+                        msg.Append(0.0f); // A
+                        msg.Append(0.0f); // B
+                        msg.Append(0.0f); // C
+                        msg.Append(0.0f); // m
+                        msg.Append(0.0f); // r
                         break;
                 }
 
