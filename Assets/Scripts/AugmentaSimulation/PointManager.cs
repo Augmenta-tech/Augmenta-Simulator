@@ -1216,6 +1216,7 @@ public class PointManager : MonoBehaviour {
                         msg.Append(behaviour.size.x / width * behaviour.size.y / height); // f (area)
                         msg.Append(-behaviour.normalizedVelocity.x); // X
                         msg.Append(-behaviour.normalizedVelocity.z); // Y
+                        msg.Append(0.0f); // Z
                         msg.Append(0.0f); // A 
                         msg.Append(0.0f); // m
                         msg.Append(0.0f); // r
