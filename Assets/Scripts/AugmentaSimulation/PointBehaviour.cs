@@ -155,7 +155,7 @@ public class PointBehaviour : MonoBehaviour {
 
         if (_oldPositionIsValid) {
             normalizedVelocity = (transform.position - _oldPosition) / Time.deltaTime;
-            normalizedVelocity = new Vector3(-normalizedVelocity.x / manager.width, 0, normalizedVelocity.z / manager.height);
+            normalizedVelocity = new Vector3(-normalizedVelocity.x / manager.width, normalizedVelocity.y, normalizedVelocity.z / manager.height);
         } else { 
             normalizedVelocity = Vector3.zero; 
         }
