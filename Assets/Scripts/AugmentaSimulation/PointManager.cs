@@ -1231,8 +1231,8 @@ public class PointManager : MonoBehaviour {
                         msg.Append(0.0f); // c
                         msg.Append(behaviour.size.x / width); // w (bounding box dimension)
                         msg.Append(behaviour.size.y / height); // h
-                        msg.Append(behaviour.size.z); // d
-                        msg.Append(behaviour.size.x / width * behaviour.size.y / height * behaviour.size.z); // v (volume)
+                        msg.Append(behaviour.size.z / TUIOManager.activeManager.sceneDepth); // d
+                        msg.Append(behaviour.size.x / width * behaviour.size.y / height * behaviour.size.z / TUIOManager.activeManager.sceneDepth); // v (volume)
                         msg.Append(-behaviour.normalizedVelocity.x); // X
                         msg.Append(-behaviour.normalizedVelocity.z); // Y
                         msg.Append(0.0f); // Z
