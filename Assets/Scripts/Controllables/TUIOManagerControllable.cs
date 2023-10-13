@@ -48,6 +48,8 @@ public class TUIOManagerControllable : Controllable
         TUIOPresets.Add(TUIOManager.AugmentaTUIOPreset.TOUCHDESIGNER.ToString());
         TUIOPresets.Add(TUIOManager.AugmentaTUIOPreset.MINIMAL.ToString());
         TUIOPresets.Add(TUIOManager.AugmentaTUIOPreset.BEST.ToString());
+        TUIOPresets.Add(TUIOManager.AugmentaTUIOPreset.SLOTID.ToString());
+
 
         base.Awake();
     }
@@ -198,6 +200,22 @@ public class TUIOManagerControllable : Controllable
 
                 (TargetScript as TUIOManager).TUIODimension = TUIOManager.AugmentaTUIODimension.TUIO25D;
                 (TargetScript as TUIOManager).TUIODescriptor = TUIOManager.AugmentaTUIODescriptor.BLOB;
+                (TargetScript as TUIOManager).dimension = (TargetScript as TUIOManager).TUIODimension.ToString();
+                (TargetScript as TUIOManager).descriptor = (TargetScript as TUIOManager).TUIODescriptor.ToString();
+
+                break;
+
+            case TUIOManager.AugmentaTUIOPreset.SLOTID:
+
+                InitialiseParameters();
+                TUIODimensions.Remove(TUIOManager.AugmentaTUIODimension.TUIO2D.ToString());
+                TUIODimensions.Remove(TUIOManager.AugmentaTUIODimension.TUIO3D.ToString());
+
+                TUIODescriptors.Remove(TUIOManager.AugmentaTUIODescriptor.BLOB.ToString());
+                TUIODescriptors.Remove(TUIOManager.AugmentaTUIODescriptor.CURSOR.ToString());
+
+                (TargetScript as TUIOManager).TUIODimension = TUIOManager.AugmentaTUIODimension.TUIO25D;
+                (TargetScript as TUIOManager).TUIODescriptor = TUIOManager.AugmentaTUIODescriptor.OBJECT;
                 (TargetScript as TUIOManager).dimension = (TargetScript as TUIOManager).TUIODimension.ToString();
                 (TargetScript as TUIOManager).descriptor = (TargetScript as TUIOManager).TUIODescriptor.ToString();
 

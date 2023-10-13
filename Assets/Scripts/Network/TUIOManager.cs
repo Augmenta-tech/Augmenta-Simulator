@@ -54,7 +54,8 @@ public class TUIOManager : MonoBehaviour
         NOTCH,
         TOUCHDESIGNER,
         MINIMAL,
-        BEST
+        BEST,
+        SLOTID
     }
 
     public AugmentaTUIODescriptor TUIODescriptor
