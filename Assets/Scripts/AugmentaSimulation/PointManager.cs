@@ -1258,7 +1258,8 @@ public class PointManager : MonoBehaviour {
         msg.Append(Time.frameCount);  // Frame number
         msg.Append(_pointsCount);   // Objects count
         msg.Append(width);          // Scene width
-        msg.Append(height);         //Scene height
+        msg.Append(height);         // Scene height
+        msg.Append(TUIOManager.activeManager.sceneDepth);          // For TUIO output we add the sceneDepth parameter to the scene message (because we use it to normalize the height to follow the TUIO standard)
 
         return msg;
     }
