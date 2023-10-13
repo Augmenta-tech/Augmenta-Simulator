@@ -1098,7 +1098,7 @@ public class PointManager : MonoBehaviour {
         //float boundingRotation = behaviour.boundingRotation - orientationParam->floatValue();
         float a = (behaviour.orientation / 180) * Mathf.PI; //
         float bba = (rotation / 180) * Mathf.PI; // bb orientation in rad
-        float z = behaviour.transform.position.y / TUIOManager.activeManager.sceneDepth; // Normalized 
+        float z = behaviour.transform.position.y / TUIOManager.activeManager.sceneDepth; // centroid / sceneDepth -> centroid == behaviour.size.z/2 here
 
         switch (TUIOManager.activeManager.TUIODescriptor)
         {
@@ -1122,7 +1122,7 @@ public class PointManager : MonoBehaviour {
                         msg.Append(behaviour.slotid); // i (class id)
                         msg.Append(pointX); // x
                         msg.Append(pointY); // y
-                        msg.Append(z / 2); // z
+                        msg.Append(z); // z
                         msg.Append(a); // a
                         msg.Append(-behaviour.normalizedVelocity.x); // X
                         msg.Append(-behaviour.normalizedVelocity.z); // Y
@@ -1136,7 +1136,7 @@ public class PointManager : MonoBehaviour {
                         msg.Append(behaviour.slotid); // i (class id)
                         msg.Append(pointX); // x
                         msg.Append(pointY); // y
-                        msg.Append(z / 2); // z
+                        msg.Append(z); // z
                         msg.Append(a); // a
                         msg.Append(0.0f); // b
                         msg.Append(0.0f); // c
@@ -1168,7 +1168,7 @@ public class PointManager : MonoBehaviour {
                         msg.Append(behaviour.id); // s
                         msg.Append(pointX); // x
                         msg.Append(pointY); // y
-                        msg.Append(z / 2); // z
+                        msg.Append(z); // z
                         msg.Append(-behaviour.normalizedVelocity.x); // X
                         msg.Append(-behaviour.normalizedVelocity.z); // Y
                         msg.Append(-behaviour.normalizedVelocity.y / TUIOManager.activeManager.sceneDepth); // Z
@@ -1178,7 +1178,7 @@ public class PointManager : MonoBehaviour {
                         msg.Append(behaviour.id); // s
                         msg.Append(pointX); // x
                         msg.Append(pointY); // y
-                        msg.Append(z / 2); // z
+                        msg.Append(z); // z
                         msg.Append(-behaviour.normalizedVelocity.x); // X
                         msg.Append(-behaviour.normalizedVelocity.z); // Y
                         msg.Append(-behaviour.normalizedVelocity.y / TUIOManager.activeManager.sceneDepth); // Z
@@ -1209,7 +1209,7 @@ public class PointManager : MonoBehaviour {
                         msg.Append(behaviour.id); // s
                         msg.Append(pointX); // x
                         msg.Append(pointY); // y
-                        msg.Append(z / 2); // z
+                        msg.Append(z); // z
                         msg.Append(bba); // a 
                         msg.Append(behaviour.size.x / width); // w (bounding box dimension)
                         msg.Append(behaviour.size.y / height); // h
@@ -1225,7 +1225,7 @@ public class PointManager : MonoBehaviour {
                         msg.Append(behaviour.id); // s
                         msg.Append(pointX); // x
                         msg.Append(pointY); // y
-                        msg.Append(z/2); // z
+                        msg.Append(z); // z
                         msg.Append(bba); // a
                         msg.Append(0.0f); // b
                         msg.Append(0.0f); // c
