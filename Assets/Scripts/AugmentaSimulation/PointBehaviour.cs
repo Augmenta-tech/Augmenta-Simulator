@@ -62,6 +62,8 @@ public class PointBehaviour : MonoBehaviour {
     private float _oldVelocityMagnitude;
     private float _orientationOffset = 0;
 
+    private Material _pointMaterial;
+
 	#region MonoBehaviour Implementation
 
 	void Start () {
@@ -147,6 +149,12 @@ public class PointBehaviour : MonoBehaviour {
         UpdatePointRotation();
     }
 
+    void OnDestroy()
+    {
+        if(_pointMaterial)
+            Destroy(_pointMaterial);
+    }
+
     #endregion
 
     private void ComputeNormalizedVelocity()
@@ -199,7 +207,10 @@ public class PointBehaviour : MonoBehaviour {
 
     public void UpdatePointColor(Color color)
     {
-        point.GetComponent<MeshRenderer>().material.SetColor("_BorderColor", color);
+        if(!_pointMaterial)
+            _pointMaterial = point.GetComponent<MeshRenderer>().material;
+
+		_pointMaterial.SetColor("_BorderColor", color);
     }
 
     void UpdatePointSize() {
